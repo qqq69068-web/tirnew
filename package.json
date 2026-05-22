@@ -1,14 +1,14 @@
 {
-  "name": "tir-service-platform",
+  "name": "tirnew",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p ${PORT:-3000}"
   },
   "dependencies": {
-    "next": "^15",
-    "react": "^19",
-    "react-dom": "^19"
+    "next": "15.3.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   }
 }
