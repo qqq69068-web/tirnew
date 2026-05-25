@@ -5,6 +5,9 @@ import { useState, Suspense } from "react";
 import { services } from "@/lib/services";
 import { CheckCircle2 } from "lucide-react";
 
+const inputCls =
+  "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500";
+
 function BookingForm() {
   const searchParams = useSearchParams();
   const preSelected = searchParams.get("service") ?? "";
@@ -82,6 +85,7 @@ function BookingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
       {/* Контакти */}
       <fieldset>
         <legend className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
@@ -97,7 +101,7 @@ function BookingForm() {
               value={form.name} onChange={handleChange}
               placeholder="Олексій"
               autoComplete="name"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={inputCls}
             />
           </div>
           <div>
@@ -110,7 +114,7 @@ function BookingForm() {
               placeholder="+380 50 000 00 00"
               autoComplete="tel"
               inputMode="numeric"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={inputCls}
             />
           </div>
         </div>
@@ -130,7 +134,7 @@ function BookingForm() {
               id="carMake" name="carMake" required
               value={form.carMake} onChange={handleChange}
               placeholder="Volvo"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={inputCls}
             />
           </div>
           <div>
@@ -141,7 +145,7 @@ function BookingForm() {
               id="carModel" name="carModel" required
               value={form.carModel} onChange={handleChange}
               placeholder="FH 500"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={inputCls}
             />
           </div>
           <div>
@@ -150,10 +154,9 @@ function BookingForm() {
             </label>
             <input
               id="carYear" name="carYear" type="number"
-              min="1990" max="2026"
-              value={form.carYear} onChange={handleChange}
+              min="1990" max="2026"\n              value={form.carYear} onChange={handleChange}
               placeholder="2019"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={inputCls}
             />
           </div>
         </div>
@@ -172,7 +175,7 @@ function BookingForm() {
             <select
               id="service" name="service" required
               value={form.service} onChange={handleChange}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+              className={inputCls}
             >
               <option value="">Оберіть послугу</option>
               {categories.map((cat) => (
@@ -196,7 +199,7 @@ function BookingForm() {
               id="date" name="date" type="date"
               value={form.date} onChange={handleChange}
               min={new Date().toISOString().split("T")[0]}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={inputCls}
             />
           </div>
         </div>
@@ -208,7 +211,7 @@ function BookingForm() {
             id="description" name="description" rows={4}
             value={form.description} onChange={handleChange}
             placeholder="Опишіть симптоми або що саме потрібно зробити..."
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+            className={inputCls + " resize-none"}
           />
         </div>
       </fieldset>
