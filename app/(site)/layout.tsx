@@ -17,6 +17,7 @@ const links = [
 export default function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isClient, setIsClient] = useState<boolean | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -26,6 +27,16 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => { setOpen(false); }, [pathname]);
+
+  // Check if client is logged in
+  useEffect(() => {
+    fetch("/api/client/me")
+      .then((r) => setIsClient(r.ok))
+      .catch(() => setIsClient(false));
+  }, [pathname]);
+
+  const cabinetLabel = isClient ? "Кабінет" : "Реєстрація";
+  const cabinetLabelFull = isClient ? "Особистий кабінет" : "Реєстрація / Вхід";
 
   return (
     <div className="min-h-screen bg-[#09090b]">
@@ -80,17 +91,17 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               <span>+380 66 418 88 26</span>
             </a>
 
-            {/* Cabinet icon button */}
+            {/* Cabinet button — desktop */}
             <Link
               href="/cabinet"
-              title="Особистий кабінет"
-              className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
+              className={`hidden h-9 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition md:inline-flex ${
                 pathname === "/cabinet"
-                  ? "bg-red-500/15 text-red-400"
-                  : "text-neutral-400 hover:bg-white/8 hover:text-white"
+                  ? "border-teal-500/40 bg-teal-600/15 text-teal-400"
+                  : "border-white/10 text-neutral-300 hover:border-white/20 hover:text-white"
               }`}
             >
-              <User size={18} />
+              <User size={14} />
+              {cabinetLabel}
             </Link>
 
             <Link
@@ -129,16 +140,16 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                   {l.label}
                 </Link>
               ))}
-              {/* Cabinet link in mobile */}
+              {/* Cabinet in mobile */}
               <Link
                 href="/cabinet"
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition ${
                   pathname === "/cabinet"
-                    ? "bg-red-500/15 text-red-400"
+                    ? "bg-teal-600/15 text-teal-400"
                     : "text-neutral-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <User size={15} /> Особистий кабінет
+                <User size={15} /> {cabinetLabelFull}
               </Link>
               <a
                 href="tel:+380664188826"
