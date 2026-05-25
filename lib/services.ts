@@ -41,8 +41,7 @@ export const services: ServiceItem[] = [
     priceMin: 480,
     priceMax: 1200,
     hours: "4–6 год",
-    // Гальмівні колодки/накладки вантажівки крупним планом
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=800&auto=format&fit=crop",
     category: "Гальмівна система",
     details: ["Стенд BERAL", "Усі марки вантажних авто", "Дотримання заводської технології", "Контроль якості після наклепки"],
   },
@@ -70,8 +69,7 @@ export const services: ServiceItem[] = [
     priceMin: 480,
     priceMax: 1600,
     hours: "4–8 год",
-    // Передня вісь / рульовий кулак вантажівки
-    image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=800&auto=format&fit=crop",
     category: "Ходова частина",
     details: ["Прес Fuchs Hydraulik", "Точне пресування без пошкоджень", "Усі марки вантажних авто", "Рекомендована заміна щоразу при ремонті"],
   },
@@ -85,7 +83,6 @@ export const services: ServiceItem[] = [
     priceMin: 240,
     priceMax: 600,
     hours: "2–3 год",
-    // Злив моторного масла / масляний фільтр
     image: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&auto=format&fit=crop",
     category: "Технічне обслуговування",
     details: ["Згідно регламенту виробника", "Оригінальні та перевірені аналоги", "Заміна фільтрів", "Контроль рівнів після заміни"],
@@ -100,7 +97,6 @@ export const services: ServiceItem[] = [
     priceMin: 600,
     priceMax: 2400,
     hours: "5–12 год",
-    // Паливні форсунки Common Rail крупним планом
     image: "https://images.unsplash.com/photo-1632823471565-1ecdf5c6da11?w=800&auto=format&fit=crop",
     category: "Паливна система",
     details: ["Стендова перевірка форсунок", "Ультразвукове очищення", "Відновлення розпилювачів", "Перевірка тиску в рейці"],
@@ -115,8 +111,7 @@ export const services: ServiceItem[] = [
     priceMin: 1800,
     priceMax: 9000,
     hours: "15–45 год",
-    // Двигун вантажівки розібраний / поршнева група
-    image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&auto=format&fit=crop",
     category: "Двигун",
     details: ["Капітальний і частковий ремонт", "Діагностика компресії", "Заміна ГБЦ, прокладок", "Налаштування ГРМ"],
   },
@@ -130,7 +125,6 @@ export const services: ServiceItem[] = [
     priceMin: 1200,
     priceMax: 6000,
     hours: "10–30 год",
-    // Розібрана механічна КПП / шестерні трансмісії
     image: "https://images.unsplash.com/photo-1596742578443-7682ef5251cd?w=800&auto=format&fit=crop",
     category: "Трансмісія",
     details: ["Механічні та автоматичні КПП", "Заміна синхронізаторів", "Ремонт підшипників", "Регулювання перемикання"],
@@ -145,7 +139,6 @@ export const services: ServiceItem[] = [
     priceMin: 2000,
     priceMax: 10000,
     hours: "16–50 год",
-    // Диференціал / ведучий міст розібраний
     image: "https://images.unsplash.com/photo-1621905251189-08b45249ff6d?w=800&auto=format&fit=crop",
     category: "Трансмісія",
     details: ["Ведучі мости всіх марок", "Заміна шестерень і підшипників", "Регулювання зазорів", "Контрольна обкатка після ремонту"],
@@ -174,7 +167,6 @@ export const services: ServiceItem[] = [
     priceMin: 360,
     priceMax: 3000,
     hours: "3–15 год",
-    // Електрична проводка / плата / реле автомобіля
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop",
     category: "Електрика",
     details: ["Пошук обривів і коротких замикань", "Ремонт стартерів і генераторів", "Монтаж додаткового обладнання", "Перевірка бортової мережі"],
@@ -189,7 +181,6 @@ export const services: ServiceItem[] = [
     priceMin: 240,
     priceMax: 600,
     hours: "2–3 год",
-    // OBD діагностичний сканер підключений до авто
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&auto=format&fit=crop",
     category: "Діагностика",
     details: ["Сканер AutoCom", "Зчитування та скидання помилок", "Перевірка CAN-шини", "Детальний звіт після діагностики"],
@@ -204,8 +195,7 @@ export const services: ServiceItem[] = [
     priceMin: 360,
     priceMax: 800,
     hours: "3–4 год",
-    // Колесо на стенді розвалу-сходження
-    image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&auto=format&fit=crop",
     category: "Діагностика",
     details: ["Стенд Trommelberg", "Усі марки авто", "Регулювання кутів після перевірки", "Рекомендовано після ремонту підвіски"],
   },
@@ -219,8 +209,7 @@ export const services: ServiceItem[] = [
     priceMin: 480,
     priceMax: 2000,
     hours: "4–10 год",
-    // Пневматична підвіска / пневмобалони вантажівки
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&auto=format&fit=crop",
     category: "Пневмосистема",
     details: ["Електронне керування ECAS", "Калібрування висоти кузова", "Перевірка клапанів і сенсорів", "Налаштування під навантаження"],
   },
@@ -248,7 +237,6 @@ export const services: ServiceItem[] = [
     priceMin: 240,
     priceMax: 600,
     hours: "2–3 год",
-    // Кабіна вантажівки VOLVO / інтер'єр
     image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&auto=format&fit=crop",
     category: "Діагностика",
     details: ["Оригінальний комплекс VOCOM", "VOLVO FH, FM, FMX, FL, FE", "RVI / Renault Trucks", "Повна перевірка всіх систем"],
@@ -263,8 +251,7 @@ export const services: ServiceItem[] = [
     priceMin: 600,
     priceMax: 2000,
     hours: "5–10 год",
-    // Вихлопна труба / SCR система / реагент AdBlue
-    image: "https://images.unsplash.com/photo-1564417510515-b3d20c821653?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&auto=format&fit=crop",
     category: "Електронні системи",
     details: ["Аналіз конфігурації авто", "Програмне налаштування ЕБУ", "Перевірка після втручання", "Без фізичного демонтажу деталей"],
   },
@@ -292,8 +279,7 @@ export const services: ServiceItem[] = [
     priceMin: 360,
     priceMax: 2400,
     hours: "3–12 год",
-    // Пневматичні шланги / компресор / фітинги
-    image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&auto=format&fit=crop",
     category: "Пневмосистема",
     details: ["Пневматика гальм і підвіски", "Пошук витоків повітря", "Заміна клапанів і трубок", "Перевірка компресора"],
   },
@@ -307,7 +293,6 @@ export const services: ServiceItem[] = [
     priceMin: 480,
     priceMax: 4000,
     hours: "4–20 год",
-    // Зварювання металу / іскри / зварник
     image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&auto=format&fit=crop",
     category: "Відновлювальні роботи",
     details: ["MIG/MAG зварювання", "Рама, кронштейни, підсилювачі", "Контроль зварних швів", "Підготовка поверхні перед зварюванням"],
@@ -322,8 +307,7 @@ export const services: ServiceItem[] = [
     priceMin: 1200,
     priceMax: 6000,
     hours: "10–30 год",
-    // Металева балка / токарна/фрезерна обробка металу
-    image: "https://images.unsplash.com/photo-1565793960-43ab52462a4e?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=800&auto=format&fit=crop",
     category: "Відновлювальні роботи",
     details: ["Балки передніх і задніх мостів", "Оцінка ступеня зносу", "Наплавлення та механічна обробка", "Відновлення до заводських допусків"],
   },
