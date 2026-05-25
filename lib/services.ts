@@ -237,7 +237,7 @@ export const services: ServiceItem[] = [
     priceMin: 240,
     priceMax: 600,
     hours: "2–3 год",
-    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/0e9dbab58d86a1961c4e9ac26da443dbb5f66769.jpg",
+    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/2b10e63c94d90664b7587d2f543d5f8523a5b782.jpg",
     category: "Діагностика",
     details: ["Оригінальний комплекс VOCOM", "VOLVO FH, FM, FMX, FL, FE", "RVI / Renault Trucks", "Повна перевірка всіх систем"],
   },
