@@ -10,7 +10,6 @@ const links = [
   { href: "/services", label: "Послуги" },
   { href: "/price",    label: "Прайс" },
   { href: "/gallery",  label: "Галерея" },
-  { href: "/booking",  label: "Запис" },
   { href: "/contacts", label: "Контакти" },
 ];
 
@@ -28,7 +27,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  // Check if client is logged in
   useEffect(() => {
     fetch("/api/client/me")
       .then((r) => setIsClient(r.ok))
@@ -91,7 +89,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               <span>+380 66 418 88 26</span>
             </a>
 
-            {/* Cabinet button — desktop */}
+            {/* Cabinet button */}
             <Link
               href="/cabinet"
               className={`hidden h-9 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition md:inline-flex ${
@@ -104,12 +102,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               {cabinetLabel}
             </Link>
 
+            {/* CTA → contacts */}
             <Link
-              href="/booking"
+              href="/contacts"
               className="hidden h-9 items-center rounded-full bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-500 active:scale-95 md:inline-flex"
             >
-              Записатися
+              Зв'язатись
             </Link>
+
             <button
               onClick={() => setOpen(!open)}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 transition hover:bg-white/8 hover:text-white md:hidden"
@@ -140,7 +140,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                   {l.label}
                 </Link>
               ))}
-              {/* Cabinet in mobile */}
               <Link
                 href="/cabinet"
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition ${
@@ -159,10 +158,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                 +380 66 418 88 26
               </a>
               <Link
-                href="/booking"
+                href="/contacts"
                 className="mt-2 flex h-11 items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white"
               >
-                Записатися на сервіс
+                Зв'язатись з нами
               </Link>
             </nav>
           </div>
