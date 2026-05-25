@@ -22,6 +22,7 @@ export default {
         "4xl": "2rem",
         "5xl": "2.5rem",
       },
+      backgroundOpacity: {},
     },
   },
   plugins: [],

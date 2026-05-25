@@ -1,25 +1,32 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
-  *, *::before, *::after { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     margin: 0;
     padding: 0;
-    background: #09090b;
-    color: #fafafa;
-    font-family: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  a { text-decoration: none; color: inherit; }
-  img { max-width: 100%; display: block; }
-}
 
-@layer utilities {
-  .border-white\/6  { border-color: rgba(255,255,255,0.06); }
-  .border-white\/8  { border-color: rgba(255,255,255,0.08); }
-  .bg-white\/4      { background: rgba(255,255,255,0.04); }
-  .bg-white\/6      { background: rgba(255,255,255,0.06); }
-  .text-balance     { text-wrap: balance; }
-  .text-pretty      { text-wrap: pretty; }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
 }
