@@ -15,17 +15,41 @@ model User {
   createdAt DateTime @default(now())
 }
 
+model Client {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  phone     String?
+  createdAt DateTime   @default(now())
+  bookings  Booking[]
+  tokens    MagicToken[]
+}
+
+model MagicToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  client    Client   @relation(fields: [email], references: [email])
+}
+
 model Booking {
-  id        String    @id @default(cuid())
-  name      String
-  phone     String
-  carBrand  String?
-  carModel  String?
-  service   String?
-  date      DateTime?
-  message   String?
-  status    String    @default("new")
-  createdAt DateTime  @default(now())
+  id          String    @id @default(cuid())
+  name        String
+  phone       String
+  carBrand    String?
+  carModel    String?
+  service     String?
+  date        DateTime?
+  message     String?
+  status      String    @default("new")
+  progress    String    @default("received")
+  price       Float?
+  clientEmail String?
+  client      Client?   @relation(fields: [clientEmail], references: [email])
+  createdAt   DateTime  @default(now())
 }
 
 model ContactMessage {
