@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, User } from "lucide-react";
 
 const links = [
   { href: "/",         label: "Головна" },
@@ -79,6 +79,20 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               <Phone size={14} />
               <span>+380 66 418 88 26</span>
             </a>
+
+            {/* Cabinet icon button */}
+            <Link
+              href="/cabinet"
+              title="Особистий кабінет"
+              className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
+                pathname === "/cabinet"
+                  ? "bg-red-500/15 text-red-400"
+                  : "text-neutral-400 hover:bg-white/8 hover:text-white"
+              }`}
+            >
+              <User size={18} />
+            </Link>
+
             <Link
               href="/booking"
               className="hidden h-9 items-center rounded-full bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-500 active:scale-95 md:inline-flex"
@@ -115,6 +129,17 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                   {l.label}
                 </Link>
               ))}
+              {/* Cabinet link in mobile */}
+              <Link
+                href="/cabinet"
+                className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition ${
+                  pathname === "/cabinet"
+                    ? "bg-red-500/15 text-red-400"
+                    : "text-neutral-300 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <User size={15} /> Особистий кабінет
+              </Link>
               <a
                 href="tel:+380664188826"
                 className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 text-sm font-medium text-neutral-300 mt-2"
@@ -180,6 +205,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                     {l.label}
                   </Link>
                 ))}
+                <Link href="/cabinet" className="text-sm text-neutral-400 transition hover:text-white flex items-center gap-1.5">
+                  <User size={13} /> Особистий кабінет
+                </Link>
               </div>
             </div>
 
