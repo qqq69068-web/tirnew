@@ -1,152 +1,111 @@
-import type { ReactNode, CSSProperties } from "react";
+import type { ReactNode } from "react";
+import Link from "next/link";
+
+const navLinks = [
+  { href: "/", label: "Головна" },
+  { href: "/services", label: "Послуги" },
+  { href: "/gallery", label: "Галерея" },
+  { href: "/booking", label: "Запис" },
+];
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div style={shell}>
-      <header style={header}>
-        <div style={container}>
-          <div style={headerInner}>
-            <a href="/" style={brand}>
-              DVTrucks
-            </a>
+    <div className="min-h-screen bg-[#0b0b0c] font-sans text-white">
 
-            <nav style={nav}>
-              <a href="/" style={navLink}>Головна</a>
-              <a href="/services" style={navLink}>Послуги</a>
-              <a href="/contacts" style={navLink}>Контакти</a>
-              <a href="/booking" style={navLink}>Запис</a>
-              <a href="/news" style={navLink}>Новини</a>
-            </nav>
-          </div>
+      {/* ── NAVBAR ── */}
+      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#0b0b0c]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 md:px-10">
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white font-black text-sm transition group-hover:bg-red-500">
+              T
+            </div>
+            <span className="text-base font-black uppercase tracking-widest text-white">
+              Tirnew
+            </span>
+          </Link>
+
+          {/* Nav links */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-neutral-400 transition hover:bg-white/6 hover:text-white"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* CTA */}
+          <Link
+            href="/booking"
+            className="inline-flex h-9 items-center rounded-full bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-500"
+          >
+            Записатися
+          </Link>
         </div>
       </header>
 
+      {/* ── PAGE CONTENT ── */}
       <div>{children}</div>
 
-      <footer style={footer}>
-        <div style={container}>
-          <div style={footerGrid}>
-            <div>
-              <div style={footerBrand}>DVTrucks</div>
-              <p style={footerText}>
-                Сервіс і ремонт вантажних авто та комерційного транспорту.
-              </p>
-            </div>
+      {/* ── FOOTER ── */}
+      <footer className="border-t border-white/8 bg-[#080809]">
+        <div className="mx-auto max-w-7xl px-6 py-16 md:px-10">
+          <div className="grid gap-10 md:grid-cols-4">
 
-            <div>
-              <div style={footerTitle}>Навігація</div>
-              <div style={footerLinks}>
-                <a href="/" style={footerLink}>Головна</a>
-                <a href="/services" style={footerLink}>Послуги</a>
-                <a href="/contacts" style={footerLink}>Контакти</a>
-                <a href="/booking" style={footerLink}>Запис</a>
-                <a href="/news" style={footerLink}>Новини</a>
+            {/* Brand */}
+            <div className="md:col-span-2">
+              <Link href="/" className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white font-black text-sm">
+                  T
+                </div>
+                <span className="text-base font-black uppercase tracking-widest">Tirnew</span>
+              </Link>
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-500">
+                Сервіс вантажних автомобілів, причепів і напівпричепів.
+                Діагностика, ремонт, обслуговування.
+              </p>
+              <div className="mt-6 flex flex-col gap-2 text-sm text-neutral-400">
+                <a href="tel:+380000000000" className="transition hover:text-white">+38 (0XX) XXX-XX-XX</a>
+                <span>Пн–Сб, 08:00–18:00</span>
               </div>
             </div>
 
+            {/* Navigation */}
             <div>
-              <div style={footerTitle}>Контакти</div>
-              <p style={footerText}>Телефон: +38 (0XX) XXX-XX-XX</p>
-              <p style={footerText}>Адреса: додамо після уточнення</p>
-              <p style={footerText}>Графік: Пн–Сб, 09:00–18:00</p>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-neutral-600">Навігація</p>
+              <div className="flex flex-col gap-3">
+                {navLinks.map((l) => (
+                  <Link key={l.href} href={l.href} className="text-sm text-neutral-400 transition hover:text-white">
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
             </div>
+
+            {/* Services */}
+            <div>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-neutral-600">Послуги</p>
+              <div className="flex flex-col gap-3 text-sm text-neutral-400">
+                <span>Ремонт двигунів</span>
+                <span>Ремонт КПП</span>
+                <span>Гальмівна система</span>
+                <span>Пневмосистема</span>
+                <span>Електрика</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/6 pt-8 text-xs text-neutral-600 sm:flex-row">
+            <span>© {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
+            <span>Розроблено для дипломного проєкту</span>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
-const shell: CSSProperties = {
-  background: "#0e1013",
-  color: "#f5f7fa",
-  minHeight: "100vh",
-  fontFamily:
-    'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-};
-
-const container: CSSProperties = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  padding: "0 20px",
-};
-
-const header: CSSProperties = {
-  position: "sticky",
-  top: 0,
-  zIndex: 20,
-  backdropFilter: "blur(10px)",
-  background: "rgba(14,16,19,0.82)",
-  borderBottom: "1px solid rgba(255,255,255,0.08)",
-};
-
-const headerInner: CSSProperties = {
-  minHeight: 74,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: 18,
-  flexWrap: "wrap",
-};
-
-const brand: CSSProperties = {
-  color: "#fff",
-  textDecoration: "none",
-  fontWeight: 900,
-  letterSpacing: "0.05em",
-  textTransform: "uppercase",
-  fontSize: 24,
-};
-
-const nav: CSSProperties = {
-  display: "flex",
-  gap: 18,
-  flexWrap: "wrap",
-};
-
-const navLink: CSSProperties = {
-  color: "rgba(255,255,255,0.82)",
-  textDecoration: "none",
-  fontSize: 15,
-};
-
-const footer: CSSProperties = {
-  borderTop: "1px solid rgba(255,255,255,0.08)",
-  background: "#0a0c0f",
-  padding: "52px 0",
-};
-
-const footerGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: 28,
-};
-
-const footerBrand: CSSProperties = {
-  fontSize: 22,
-  fontWeight: 900,
-  marginBottom: 10,
-};
-
-const footerTitle: CSSProperties = {
-  fontSize: 16,
-  fontWeight: 800,
-  marginBottom: 12,
-};
-
-const footerText: CSSProperties = {
-  margin: "0 0 8px",
-  color: "rgba(255,255,255,0.68)",
-  lineHeight: 1.7,
-};
-
-const footerLinks: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 10,
-};
-
-const footerLink: CSSProperties = {
-  color: "rgba(255,255,255,0.78)",
-  textDecoration: "none",
-};
