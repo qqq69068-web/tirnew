@@ -9,8 +9,18 @@ export default function ContactsPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (name === "name") {
+      // Only letters (Ukrainian, Latin) and spaces/hyphens
+      if (!/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
+    }
+    if (name === "phone") {
+      // Only digits, +, spaces, dashes, parentheses
+      if (!/^[0-9+()\-\s]*$/.test(value)) return;
+    }
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +76,13 @@ export default function ContactsPage() {
           }}
         />
         <p className="relative text-xs font-semibold uppercase tracking-widest text-red-400 mb-3">
-          Зв'язатися з нами
+          Зв'язатись з нами
         </p>
         <h1 className="relative text-4xl md:text-5xl font-black text-white mb-4">
           Контакти
         </h1>
         <p className="relative text-neutral-400 max-w-md mx-auto text-base">
-          Маєте питання або хочете записатися? Напишіть нам або зателефонуйте — відповімо швидко.
+          Маєте питання або хочете записатись? Напишіть нам або зателефонуйте — відповімо швидко.
         </p>
       </section>
 
@@ -141,7 +151,7 @@ export default function ContactsPage() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Повідомлення надіслано!</h3>
                 <p className="text-neutral-400 text-sm max-w-xs">
-                  Ми отримали ваше повідомлення і зв'яжемося з вами найближчим часом.
+                  Ми отримали ваше повідомлення і зв'яжемось з вами найближчим часом.
                 </p>
                 <button
                   onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", message: "" }); }}
@@ -171,6 +181,7 @@ export default function ContactsPage() {
                       id="name" name="name" required
                       value={form.name} onChange={handleChange}
                       placeholder="Олексій"
+                      autoComplete="name"
                       className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 bg-white/5 border border-white/10 focus:outline-none focus:border-red-500/50 focus:bg-white/[0.07] transition-all"
                     />
                   </div>
@@ -183,6 +194,8 @@ export default function ContactsPage() {
                       id="phone" name="phone" type="tel" required
                       value={form.phone} onChange={handleChange}
                       placeholder="+380 66 418 88 26"
+                      autoComplete="tel"
+                      inputMode="numeric"
                       className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 bg-white/5 border border-white/10 focus:outline-none focus:border-red-500/50 focus:bg-white/[0.07] transition-all"
                     />
                   </div>

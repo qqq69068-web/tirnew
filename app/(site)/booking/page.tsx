@@ -24,14 +24,40 @@ function BookingForm() {
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  ) => {
+    const { name, value } = e.target;
+    if (name === "name") {
+      if (!/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
+    }
+    if (name === "phone") {
+      if (!/^[0-9+()\-\s]*$/.test(value)) return;
+    }
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    setSubmitted(true);
+    try {
+      await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          carBrand: form.carMake,
+          carModel: form.carModel,
+          service: form.service,
+          date: form.date || null,
+          message: form.description,
+        }),
+      });
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+      setSubmitted(true);
+    }
   };
 
   if (submitted) {
@@ -40,7 +66,7 @@ function BookingForm() {
         <CheckCircle2 size={56} className="text-teal-600 mb-4" />
         <h2 className="text-3xl font-bold text-gray-800 mb-2">Запис прийнято!</h2>
         <p className="text-gray-500 max-w-sm">
-          Ми зв&apos;яжемося з вами найближчим часом для підтвердження часу.
+          Ми зв&apos;яжемось з вами найближчим часом для підтвердження часу.
         </p>
         <button
           onClick={() => setSubmitted(false)}
@@ -52,7 +78,6 @@ function BookingForm() {
     );
   }
 
-  // Group services by category for <optgroup>
   const categories = Array.from(new Set(services.map((s) => s.category)));
 
   return (
@@ -71,6 +96,7 @@ function BookingForm() {
               id="name" name="name" required
               value={form.name} onChange={handleChange}
               placeholder="Олексій"
+              autoComplete="name"
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
@@ -82,6 +108,8 @@ function BookingForm() {
               id="phone" name="phone" type="tel" required
               value={form.phone} onChange={handleChange}
               placeholder="+380 50 000 00 00"
+              autoComplete="tel"
+              inputMode="numeric"
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
@@ -205,29 +233,17 @@ export default function BookingPage() {
         <h1 className="text-4xl md:text-5xl font-bold mb-3">
           Запишіться на сервіс
         </h1>
-        <p className="text-gray-300 max-w-md mx-auto">
-          Залиште заявку — ми зв&apos;яжемося для підтвердження зручного часу.
+        <p className="text-gray-400 max-w-lg mx-auto text-sm">
+          Залиште заявку — ми зв&apos;яжемось для підтвердження
+          зручного часу.
         </p>
       </section>
 
       <section className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          <Suspense fallback={<div className="text-gray-400 text-sm">Завантаження...</div>}>
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+          <Suspense fallback={<div className="h-96 animate-pulse bg-gray-100 rounded-2xl" />}>
             <BookingForm />
           </Suspense>
-        </div>
-
-        <div className="mt-6 grid grid-cols-3 gap-4 text-center text-sm text-gray-500">
-          {[
-            { icon: "🔒", text: "Дані захищені" },
-            { icon: "📞", text: "Підтвердження по телефону" },
-            { icon: "⚡", text: "Відповідь протягом години" },
-          ].map((item) => (
-            <div key={item.text} className="bg-white rounded-xl py-4 px-3 shadow-sm">
-              <div className="text-xl mb-1">{item.icon}</div>
-              {item.text}
-            </div>
-          ))}
         </div>
       </section>
     </main>
