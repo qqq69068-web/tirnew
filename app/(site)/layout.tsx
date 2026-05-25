@@ -6,11 +6,12 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Phone } from "lucide-react";
 
 const links = [
-  { href: "/",        label: "Головна" },
-  { href: "/services",label: "Послуги" },
-  { href: "/price",   label: "Прайс" },
-  { href: "/gallery", label: "Галерея" },
-  { href: "/booking", label: "Запис" },
+  { href: "/",         label: "Головна" },
+  { href: "/services", label: "Послуги" },
+  { href: "/price",    label: "Прайс" },
+  { href: "/gallery",  label: "Галерея" },
+  { href: "/booking",  label: "Запис" },
+  { href: "/contacts", label: "Контакти" },
 ];
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
@@ -72,11 +73,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           {/* Right actions */}
           <div className="flex items-center gap-3">
             <a
-              href="tel:+380000000000"
+              href="tel:+380664188826"
               className="hidden items-center gap-1.5 text-sm text-neutral-400 transition hover:text-white md:flex"
             >
               <Phone size={14} />
-              <span>Зателефонувати</span>
+              <span>+380 66 418 88 26</span>
             </a>
             <Link
               href="/booking"
@@ -114,6 +115,13 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                   {l.label}
                 </Link>
               ))}
+              <a
+                href="tel:+380664188826"
+                className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 text-sm font-medium text-neutral-300 mt-2"
+              >
+                <Phone size={14} />
+                +380 66 418 88 26
+              </a>
               <Link
                 href="/booking"
                 className="mt-2 flex h-11 items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white"
@@ -155,9 +163,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                 Діагностика, ремонт, обслуговування.
               </p>
               <div className="mt-5 flex flex-col gap-2">
-                <a href="tel:+380000000000" className="text-sm text-neutral-400 transition hover:text-white">
-                  +38 (0XX) XXX-XX-XX
+                <a href="tel:+380664188826" className="text-sm text-neutral-400 transition hover:text-white">
+                  +38 (066) 418-88-26
                 </a>
+                <span className="text-sm text-neutral-500">Рівненська обл., с. Велика Омеляна, вул. Шевченка 35</span>
                 <span className="text-sm text-neutral-500">Пн–Сб, 08:00–18:00</span>
               </div>
             </div>
