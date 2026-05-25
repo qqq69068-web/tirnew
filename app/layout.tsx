@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DVTrucks",
-  description: "Сервіс і ремонт вантажних авто та комерційного транспорту",
+  title: { default: "Tirnew — Сервіс вантажних автомобілів", template: "%s | Tirnew" },
+  description: "Діагностика, ремонт та обслуговування вантажних автомобілів, причепів і напівпричепів. Власний склад запчастин.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="uk">
-      <body style={{ margin: 0 }}>{children}</body>
+      <body className="bg-[#09090b] text-white antialiased">{children}</body>
     </html>
   );
 }
