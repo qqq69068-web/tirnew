@@ -4,7 +4,6 @@ import { jwtVerify } from "jose";
 import { Resend } from "resend";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const PROGRESS_LABELS: Record<string, string> = {
   received: "Заявку прийнято",
@@ -45,11 +44,11 @@ export async function PATCH(
     },
   });
 
-  // Send email if progress changed and clientEmail set
   const emailTo = clientEmail || booking.clientEmail;
   if (progress && progress !== booking.progress && emailTo) {
     const label = PROGRESS_LABELS[progress] || progress;
     const isDone = progress === "done";
+    const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: "TIR Service <onboarding@resend.dev>",
       to: emailTo,

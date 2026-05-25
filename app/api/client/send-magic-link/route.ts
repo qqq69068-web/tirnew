@@ -3,26 +3,23 @@ import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import { randomBytes } from "crypto";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: NextRequest) {
   const { email, name, phone } = await req.json();
   if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
-  // Upsert client
   await prisma.client.upsert({
     where: { email },
     update: { name: name || undefined, phone: phone || undefined },
     create: { email, name, phone },
   });
 
-  // Create token
   const token = randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 30); // 30 min
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
   await prisma.magicToken.create({ data: { token, email, expiresAt } });
 
   const url = `${process.env.NEXT_PUBLIC_APP_URL}/cabinet?token=${token}`;
 
+  const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from: "TIR Service <onboarding@resend.dev>",
     to: email,
