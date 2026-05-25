@@ -149,6 +149,18 @@ function CabinetContent() {
   );
 }
 
+/* Global autofill override injected once */
+const autofillStyle = `
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 9999px #1a1a1a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff;
+  }
+`;
+
 function LoginForm() {
   const [step, setStep] = useState<"form" | "sent">("form");
   const [email, setEmail]   = useState("");
@@ -181,12 +193,27 @@ function LoginForm() {
     );
   }
 
-  const inputCls =
-    "w-full rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 bg-white/8 focus:outline-none focus:ring-2 focus:ring-teal-500 transition";
+  /* Explicit inline style to guarantee white text regardless of Tailwind purge */
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    borderRadius: "0.75rem",
+    padding: "0.75rem 1rem",
+    fontSize: "0.875rem",
+    color: "#ffffff",
+    caretColor: "#ffffff",
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    outline: "none",
+    transition: "box-shadow 0.15s",
+  };
+
   const labelCls = "block text-sm font-medium text-neutral-300 mb-1";
 
   return (
     <div className="max-w-md mx-auto">
+      {/* Inject autofill override */}
+      <style>{autofillStyle}</style>
+
       <div className="text-center mb-8">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/20 mx-auto mb-4">
           <User size={28} className="text-teal-400" />
@@ -202,10 +229,16 @@ function LoginForm() {
 
         <div>
           <label className={labelCls}>Email *</label>
-          <input type="email" required value={email}
+          <input
+            type="email"
+            required
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
-            className={inputCls} />
+            style={inputStyle}
+            onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488")}
+            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")}
+          />
         </div>
 
         <div>
@@ -214,12 +247,13 @@ function LoginForm() {
             type="text"
             value={name}
             onChange={(e) => {
-              /* allow only letters, spaces, hyphens, apostrophes */
               const val = e.target.value.replace(/[^a-zA-ZЀ-ӿ\s\-']/g, "");
               setName(val);
             }}
             placeholder="Олексій"
-            className={inputCls}
+            style={inputStyle}
+            onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488")}
+            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")}
           />
         </div>
 
@@ -229,12 +263,13 @@ function LoginForm() {
             type="tel"
             value={phone}
             onChange={(e) => {
-              /* allow only digits, +, spaces, hyphens, parentheses */
               const val = e.target.value.replace(/[^0-9+()\s\-]/g, "");
               setPhone(val);
             }}
             placeholder="+380 50 000 00 00"
-            className={inputCls}
+            style={inputStyle}
+            onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488")}
+            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")}
           />
         </div>
 
