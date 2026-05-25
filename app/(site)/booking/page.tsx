@@ -154,7 +154,8 @@ function BookingForm() {
             </label>
             <input
               id="carYear" name="carYear" type="number"
-              min="1990" max="2026"\n              value={form.carYear} onChange={handleChange}
+              min="1990" max="2026"
+              value={form.carYear} onChange={handleChange}
               placeholder="2019"
               className={inputCls}
             />
