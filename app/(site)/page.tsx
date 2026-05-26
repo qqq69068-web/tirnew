@@ -18,16 +18,14 @@ const advantages = [
   { icon: Shield, title: "Гарантія якості",          desc: "Гарантуємо якість усіх виконаних робіт і встановлених запчастин." },
 ];
 
-// Featured services for the homepage teaser (first 3)
 const featured = services.slice(0, 3);
 
 export default function HomePage() {
   return (
     <main className="bg-[#09090b] text-white">
 
-      {/* ─── HERO ─── */}
+      {/* HERO */}
       <section className="relative overflow-hidden">
-        {/* Background image with overlay */}
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1800&q=80"
@@ -36,12 +34,9 @@ export default function HomePage() {
             style={{ filter: "brightness(0.18) saturate(0.6)" }}
           />
           <div
-            style={{
-              background: "linear-gradient(180deg, rgba(9,9,11,0.55) 0%, rgba(9,9,11,0.9) 60%, #09090b 100%)"
-            }}
+            style={{ background: "linear-gradient(180deg, rgba(9,9,11,0.55) 0%, rgba(9,9,11,0.9) 60%, #09090b 100%)" }}
             className="absolute inset-0"
           />
-          {/* Red accent glow */}
           <div
             style={{ background: "radial-gradient(ellipse 60% 50% at 10% 60%, rgba(220,38,38,0.18) 0%, transparent 70%)" }}
             className="absolute inset-0"
@@ -49,7 +44,6 @@ export default function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-24 md:px-10 md:pb-36 md:pt-32">
-          {/* Badge */}
           <div
             style={{ border: "1px solid rgba(220,38,38,0.35)", background: "rgba(220,38,38,0.12)" }}
             className="mb-8 inline-flex items-center gap-2.5 rounded-full px-4 py-2"
@@ -71,10 +65,10 @@ export default function HomePage() {
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
-              href="/booking"
+              href="/contacts"
               className="inline-flex h-12 items-center gap-2 rounded-full bg-red-600 px-8 text-sm font-bold text-white transition hover:bg-red-500 active:scale-95"
             >
-              Записатися на сервіс
+              Зв'язатись з нами
               <ChevronRight size={16} />
             </Link>
             <Link
@@ -86,7 +80,6 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Stats */}
           <div
             style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
             className="mt-20 grid grid-cols-2 gap-6 pt-10 sm:grid-cols-4"
@@ -101,7 +94,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── FEATURED SERVICES ─── */}
+      {/* FEATURED SERVICES */}
       <section
         style={{ borderTop: "1px solid rgba(255,255,255,0.07)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}
         className="bg-white/[0.015] py-20 md:py-28"
@@ -125,7 +118,6 @@ export default function HomePage() {
                 className="group relative overflow-hidden rounded-3xl transition hover:-translate-y-1 hover:shadow-2xl"
                 style={{ border: "1px solid rgba(255,255,255,0.08)" }}
               >
-                {/* Image */}
                 <div className="aspect-[16/10] overflow-hidden">
                   <img
                     src={svc.image}
@@ -135,8 +127,6 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 </div>
-
-                {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6">
                   <p
                     style={{ border: "1px solid rgba(220,38,38,0.3)", background: "rgba(220,38,38,0.15)" }}
@@ -155,7 +145,6 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Category pills */}
           <div className="mt-10 flex flex-wrap gap-2.5">
             {categories.map((cat) => (
               <Link
@@ -171,13 +160,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── ADVANTAGES ─── */}
+      {/* ADVANTAGES */}
       <section className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
         <div className="mb-14">
           <p className="text-xs font-semibold uppercase tracking-widest text-red-500">Чому обирають нас</p>
           <h2 className="mt-3 text-3xl font-bold md:text-4xl">Наші переваги</h2>
         </div>
-
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {advantages.map(({ icon: Icon, title, desc }) => (
             <div
@@ -198,7 +186,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── PROCESS ─── */}
+      {/* PROCESS */}
       <section
         style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
         className="bg-white/[0.015] py-20 md:py-24"
@@ -208,7 +196,6 @@ export default function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-widest text-red-500">Як це працює</p>
             <h2 className="mt-3 text-3xl font-bold md:text-4xl">Процес роботи</h2>
           </div>
-
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
             {[
               { num: "01", title: "Залишаєте заявку",     desc: "Онлайн або по телефону — зручним для вас способом" },
@@ -226,13 +213,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── CTA BANNER ─── */}
+      {/* CTA BANNER */}
       <section className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
         <div
           style={{ background: "linear-gradient(135deg, #7f1d1d 0%, #450a0a 50%, #1c0404 100%)" }}
           className="relative overflow-hidden rounded-[2rem] p-10 md:p-16"
         >
-          {/* Background truck image */}
           <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
             <img
               src="https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1400&q=80"
@@ -245,10 +231,9 @@ export default function HomePage() {
             style={{ background: "radial-gradient(ellipse 80% 60% at 0% 50%, rgba(220,38,38,0.25) 0%, transparent 70%)" }}
             className="absolute inset-0"
           />
-
           <div className="relative grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-red-400">Зв'яжіться з нами</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-red-400">Зв'жіться з нами</p>
               <h2 className="mt-4 max-w-lg text-balance text-3xl font-bold leading-snug md:text-4xl">
                 Потрібна допомога з технікою?
               </h2>
@@ -257,16 +242,15 @@ export default function HomePage() {
                 з вами протягом 30 хвилин для уточнення деталей.
               </p>
             </div>
-
             <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
               <Link
-                href="/booking"
+                href="/contacts"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-8 text-sm font-bold text-red-700 transition hover:bg-red-50 active:scale-95"
               >
-                Записатися онлайн
+                Зв'язатись онлайн
               </Link>
               <a
-                href="tel:+380000000000"
+                href="tel:+380664188826"
                 style={{ border: "1px solid rgba(255,255,255,0.25)" }}
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-sm font-semibold text-white transition hover:bg-white/10"
               >
