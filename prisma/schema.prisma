@@ -60,3 +60,22 @@ model ContactMessage {
   status    String   @default("new")
   createdAt DateTime @default(now())
 }
+
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  short       String
+  description String
+  price       String
+  priceMin    Int
+  priceMax    Int
+  hours       String
+  image       String
+  category    String
+  details     String[]
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
