@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getTokenPayload } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
@@ -9,7 +11,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
       <aside className="w-56 bg-white border-r border-gray-200 flex flex-col fixed top-0 left-0 h-full z-20">
         <div className="px-5 py-5 border-b border-gray-100">
           <span className="font-bold text-gray-900 text-base tracking-tight">TIR NEW</span>
@@ -21,8 +22,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <LogoutButton />
         </div>
       </aside>
-
-      {/* Main */}
       <div className="ml-56 flex-1 min-w-0">
         {children}
       </div>

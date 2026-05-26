@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
@@ -25,7 +27,6 @@ export default async function AdminDashboardPage() {
     <div className="p-8 max-w-4xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-8">Дашборд</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-10">
         {stats.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
@@ -42,7 +43,6 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Recent */}
       <h2 className="text-base font-semibold text-gray-700 mb-3">Останні замовлення</h2>
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {recentBookings.length === 0 ? (
