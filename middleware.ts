@@ -3,10 +3,12 @@ import { jwtVerify } from "jose";
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-  const isAdminPath = req.nextUrl.pathname.startsWith("/admin");
   const isLoginPage = req.nextUrl.pathname === "/admin/login";
+  const isAdminPath =
+    req.nextUrl.pathname.startsWith("/admin") && !isLoginPage;
 
-  if (isAdminPath && !isLoginPage) {
+  // Захист адмін-сторінок (крім логіну)
+  if (isAdminPath) {
     if (!token) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
@@ -14,18 +16,9 @@ export async function middleware(req: NextRequest) {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
       await jwtVerify(token, secret);
     } catch {
-      return NextResponse.redirect(new URL("/admin/login", req.url));
-    }
-  }
-
-  // Якщо вже залогований — редірект з /admin/login на /admin
-  if (isLoginPage && token) {
-    try {
-      const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-      await jwtVerify(token, secret);
-      return NextResponse.redirect(new URL("/admin", req.url));
-    } catch {
-      // токен невалідний — пускаємо на login
+      const response = NextResponse.redirect(new URL("/admin/login", req.url));
+      response.cookies.delete("token");
+      return response;
     }
   }
 
