@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import FormData from "form-data";
-import Mailgun from "mailgun.js";
 
-const mailgun = new Mailgun(FormData);
-const mg = mailgun.client({
-  username: "api",
-  key: process.env.MAILGUN_API_KEY!,
-});
+async function sendEmail(name: string, phone: string, message: string) {
+  const FormData = (await import("form-data")).default;
+  const Mailgun = (await import("mailgun.js")).default;
+  const mailgun = new Mailgun(FormData);
+  const mg = mailgun.client({
+    username: "api",
+    key: process.env.MAILGUN_API_KEY!,
+  });
+  await mg.messages.create(process.env.MAILGUN_DOMAIN!, {
+    from: `TirNew сайт <postmaster@${process.env.MAILGUN_DOMAIN}>`,
+    to: [process.env.NOTIFY_EMAIL!],
+    subject: `Нова заявка від ${name}`,
+    text: `Нова заявка з сайту:\n\nІм'я: ${name}\nТелефон: ${phone}\nПовідомлення: ${message}`,
+    html: `<h2>Нова заявка з сайту TirNew</h2><p><strong>Ім'я:</strong> ${name}</p><p><strong>Телефон:</strong> ${phone}</p><p><strong>Повідомлення:</strong> ${message}</p>`,
+  });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,23 +34,10 @@ export async function POST(req: NextRequest) {
       data: { name, phone, message },
     });
 
-    // Відправка листа на пошту
     try {
-      await mg.messages.create(process.env.MAILGUN_DOMAIN!, {
-        from: `TirNew сайт <postmaster@${process.env.MAILGUN_DOMAIN}>`,
-        to: [process.env.NOTIFY_EMAIL!],
-        subject: `Нова заявка від ${name}`,
-        text: `Нова заявка з сайту:\n\nІм'я: ${name}\nТелефон: ${phone}\nПовідомлення: ${message}`,
-        html: `
-          <h2>Нова заявка з сайту TirNew</h2>
-          <p><strong>Ім'я:</strong> ${name}</p>
-          <p><strong>Телефон:</strong> ${phone}</p>
-          <p><strong>Повідомлення:</strong> ${message}</p>
-        `,
-      });
+      await sendEmail(name, phone, message);
     } catch (mailErr) {
       console.error("[MAILGUN ERROR]", mailErr);
-      // Не блокуємо відповідь якщо пошта не відправилась
     }
 
     return NextResponse.json({ ok: true, id: contact.id }, { status: 201 });
