@@ -19,6 +19,10 @@ export async function POST(req: NextRequest) {
     });
 
     try {
+      console.log("[MAIL] GMAIL_USER:", process.env.GMAIL_USER);
+      console.log("[MAIL] GMAIL_PASS set:", !!process.env.GMAIL_PASS);
+      console.log("[MAIL] NOTIFY_EMAIL:", process.env.NOTIFY_EMAIL);
+
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -32,7 +36,9 @@ export async function POST(req: NextRequest) {
         .map((e) => e.trim())
         .filter(Boolean);
 
-      await transporter.sendMail({
+      console.log("[MAIL] Sending to:", recipients);
+
+      const info = await transporter.sendMail({
         from: `"TirNew сайт" <${process.env.GMAIL_USER}>`,
         to: recipients,
         subject: `Нова заявка від ${name}`,
@@ -43,6 +49,8 @@ export async function POST(req: NextRequest) {
           <p><strong>Повідомлення:</strong> ${message}</p>
         `,
       });
+
+      console.log("[MAIL] Sent OK, messageId:", info.messageId);
     } catch (mailErr) {
       console.error("[GMAIL SMTP ERROR]", mailErr);
     }
