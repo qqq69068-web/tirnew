@@ -27,9 +27,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      const recipients = (process.env.NOTIFY_EMAIL || process.env.GMAIL_USER || "")
+        .split(",")
+        .map((e) => e.trim())
+        .filter(Boolean);
+
       await transporter.sendMail({
         from: `"TirNew сайт" <${process.env.GMAIL_USER}>`,
-        to: process.env.NOTIFY_EMAIL || process.env.GMAIL_USER,
+        to: recipients,
         subject: `Нова заявка від ${name}`,
         html: `
           <h2>Нова заявка з сайту TirNew</h2>
