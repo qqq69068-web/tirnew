@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +19,17 @@ export async function POST(req: NextRequest) {
     });
 
     try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
-        from: "TirNew сайт <onboarding@resend.dev>",
-        to: [process.env.NOTIFY_EMAIL!],
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"TirNew сайт" <${process.env.GMAIL_USER}>`,
+        to: process.env.NOTIFY_EMAIL || process.env.GMAIL_USER,
         subject: `Нова заявка від ${name}`,
         html: `
           <h2>Нова заявка з сайту TirNew</h2>
@@ -32,7 +39,7 @@ export async function POST(req: NextRequest) {
         `,
       });
     } catch (mailErr) {
-      console.error("[RESEND ERROR]", mailErr);
+      console.error("[GMAIL SMTP ERROR]", mailErr);
     }
 
     return NextResponse.json({ ok: true, id: contact.id }, { status: 201 });
