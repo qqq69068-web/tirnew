@@ -62,25 +62,37 @@ function CabinetContent() {
   const searchParams = useSearchParams();
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
-  const [verifying, setVerifying] = useState(false);
 
   const fetchClient = useCallback(async () => {
-    const res = await fetch("/api/client/me");
-    if (res.ok) setClient(await res.json());
-    setLoading(false);
+    try {
+      const res = await fetch("/api/client/me");
+      if (res.ok) {
+        setClient(await res.json());
+      }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     const token = searchParams.get("token");
     if (token) {
-      setVerifying(true);
       fetch(`/api/client/verify?token=${token}`)
         .then((r) => r.json())
-        .then((data) => {
-          if (data.ok) { router.replace("/cabinet"); fetchClient(); }
-          else { setLoading(false); setVerifying(false); }
-        });
-    } else { fetchClient(); }
+        .then(async (data) => {
+          if (data.ok) {
+            router.replace("/cabinet");
+            // Чекаємо поки cookie запишеться, потім фетчимо
+            await new Promise((r) => setTimeout(r, 300));
+            fetchClient();
+          } else {
+            setLoading(false);
+          }
+        })
+        .catch(() => setLoading(false));
+    } else {
+      fetchClient();
+    }
   }, [searchParams, router, fetchClient]);
 
   const logout = async () => {
@@ -88,7 +100,7 @@ function CabinetContent() {
     setClient(null);
   };
 
-  if (loading || verifying) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-teal-500 border-t-transparent" />
@@ -149,7 +161,6 @@ function CabinetContent() {
   );
 }
 
-/* Global autofill override injected once */
 const autofillStyle = `
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
@@ -193,7 +204,6 @@ function LoginForm() {
     );
   }
 
-  /* Explicit inline style to guarantee white text regardless of Tailwind purge */
   const inputStyle: React.CSSProperties = {
     width: "100%",
     borderRadius: "0.75rem",
@@ -211,9 +221,7 @@ function LoginForm() {
 
   return (
     <div className="max-w-md mx-auto">
-      {/* Inject autofill override */}
       <style>{autofillStyle}</style>
-
       <div className="text-center mb-8">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/20 mx-auto mb-4">
           <User size={28} className="text-teal-400" />
@@ -226,53 +234,30 @@ function LoginForm() {
 
       <form onSubmit={submit} style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         className="bg-white/5 rounded-3xl p-8 space-y-4">
-
         <div>
           <label className={labelCls}>Email *</label>
-          <input
-            type="email"
-            required
-            value={email}
+          <input type="email" required value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            style={inputStyle}
+            placeholder="your@email.com" style={inputStyle}
             onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488")}
-            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")}
-          />
+            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")} />
         </div>
-
         <div>
           <label className={labelCls}>Ім&apos;я</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => {
-              const val = e.target.value.replace(/[^a-zA-ZЀ-ӿ\s\-']/g, "");
-              setName(val);
-            }}
-            placeholder="Олексій"
-            style={inputStyle}
+          <input type="text" value={name}
+            onChange={(e) => setName(e.target.value.replace(/[^a-zA-ZЀ-ӿ\s\-']/g, ""))}
+            placeholder="Олексій" style={inputStyle}
             onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488")}
-            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")}
-          />
+            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")} />
         </div>
-
         <div>
           <label className={labelCls}>Телефон</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => {
-              const val = e.target.value.replace(/[^0-9+()\s\-]/g, "");
-              setPhone(val);
-            }}
-            placeholder="+380 50 000 00 00"
-            style={inputStyle}
+          <input type="tel" value={phone}
+            onChange={(e) => setPhone(e.target.value.replace(/[^0-9+()\s\-]/g, ""))}
+            placeholder="+380 50 000 00 00" style={inputStyle}
             onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488")}
-            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")}
-          />
+            onBlur={(e)  => (e.currentTarget.style.boxShadow = "none")} />
         </div>
-
         <button type="submit" disabled={loading}
           className="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors">
           {loading ? "Надсилаємо..." : "Отримати посилання"}
