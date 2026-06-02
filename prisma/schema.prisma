@@ -41,6 +41,7 @@ model Booking {
   phone       String
   carBrand    String?
   carModel    String?
+  carCategory String?   // "car" | "truck" | "trailer"
   service     String?
   date        DateTime?
   message     String?
@@ -62,20 +63,23 @@ model ContactMessage {
 }
 
 model Service {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  short       String
-  description String
-  price       String
-  priceMin    Int
-  priceMax    Int
-  hours       String
-  image       String
-  category    String
-  details     String[]
-  order       Int      @default(0)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  short        String
+  description  String
+  price        String
+  priceMin     Int
+  priceMax     Int
+  priceCar     Int?     // ціна для легкових
+  priceTruck   Int?     // ціна для вантажних тягачів
+  priceTrailer Int?     // ціна для причепів
+  hours        String
+  image        String
+  category     String
+  details      String[]
+  order        Int      @default(0)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

@@ -7,7 +7,13 @@ import { CAR_BRANDS, getModels } from "@/lib/carData";
 interface Props {
   serviceSlug: string;
   serviceTitle: string;
+  priceCar?: number | null;
+  priceTruck?: number | null;
+  priceTrailer?: number | null;
+  priceMin?: number | null;
 }
+
+type CarCategory = "car" | "truck" | "trailer" | "";
 
 const SELECT_CLS =
   "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white appearance-none cursor-pointer";
@@ -15,11 +21,34 @@ const INPUT_CLS =
   "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white";
 const LABEL_CLS = "block text-xs text-gray-400 mb-1";
 
-// Групи для відображення
 const TRUCK_BRANDS_LIST = CAR_BRANDS.filter((b) => b.category === "truck");
 const CAR_BRANDS_LIST = CAR_BRANDS.filter((b) => b.category === "car");
 
-export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
+function getCategoryFromBrand(brandName: string): CarCategory {
+  const brand = CAR_BRANDS.find((b) => b.name === brandName);
+  if (!brand) return "";
+  if (brand.name.includes("причіп") || brand.name.includes("Schmitz") || brand.name.includes("Krone") ||
+      brand.name.includes("Wielton") || brand.name.includes("Fliegl") || brand.name.includes("Fruehauf") ||
+      brand.name.includes("Kogel") || brand.name.includes("Köge")) return "trailer";
+  if (brand.category === "truck") return "truck";
+  return "car";
+}
+
+function getCategoryLabel(cat: CarCategory) {
+  if (cat === "car") return "🚗 Легкове";
+  if (cat === "truck") return "🚛 Вантажне / Тягач";
+  if (cat === "trailer") return "🚌 Причіп";
+  return "";
+}
+
+export default function BookingButton({
+  serviceSlug,
+  serviceTitle,
+  priceCar,
+  priceTruck,
+  priceTrailer,
+  priceMin,
+}: Props) {
   const [status, setStatus] = useState<"loading" | "guest" | "auth">("loading");
   const [client, setClient] = useState<{
     email: string;
@@ -32,6 +61,7 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
   const [carBrand, setCarBrand] = useState("");
   const [carModel, setCarModel] = useState("");
   const [customModel, setCustomModel] = useState("");
+  const [carCategory, setCarCategory] = useState<CarCategory>("");
   const [phone, setPhone] = useState("");
   const [editPhone, setEditPhone] = useState(false);
   const [message, setMessage] = useState("");
@@ -39,6 +69,13 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
   const [done, setDone] = useState(false);
 
   const models = getModels(carBrand);
+
+  // Динамічна ціна на основі категорії
+  const hasCategoryPrices = priceCar != null || priceTruck != null || priceTrailer != null;
+  const dynamicPrice: number | null =
+    carCategory === "car" ? (priceCar ?? null) :
+    carCategory === "truck" ? (priceTruck ?? null) :
+    carCategory === "trailer" ? (priceTrailer ?? null) : null;
 
   useEffect(() => {
     fetch("/api/client/me")
@@ -62,6 +99,7 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
     setCarBrand(val);
     setCarModel("");
     setCustomModel("");
+    setCarCategory(getCategoryFromBrand(val));
   };
 
   const finalModel = carModel === "__custom__" ? customModel : carModel;
@@ -78,6 +116,7 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
         serviceTitle,
         carBrand,
         carModel: finalModel,
+        carCategory,
         phone: finalPhone,
         message,
       }),
@@ -130,14 +169,12 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-3">
-      <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-        Ваші дані
-      </p>
+      <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Ваші дані</p>
       {client?.name && (
         <p className="text-sm text-gray-600">👤 {client.name}</p>
       )}
 
-      {/* Марка авто */}
+      {/* Марка */}
       <div>
         <label className={LABEL_CLS}>Марка авто</label>
         <div className="relative">
@@ -149,26 +186,34 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
             <option value="">— Оберіть марку —</option>
             <optgroup label="🚛 Вантажні / Тягачі / Причепи">
               {TRUCK_BRANDS_LIST.map((b) => (
-                <option key={b.name} value={b.name}>
-                  {b.name}
-                </option>
+                <option key={b.name} value={b.name}>{b.name}</option>
               ))}
             </optgroup>
             <optgroup label="🚗 Легкові">
               {CAR_BRANDS_LIST.map((b) => (
-                <option key={b.name} value={b.name}>
-                  {b.name}
-                </option>
+                <option key={b.name} value={b.name}>{b.name}</option>
               ))}
             </optgroup>
           </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-            ▾
-          </span>
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▾</span>
         </div>
       </div>
 
-      {/* Модель авто — показується тільки якщо обрана марка */}
+      {/* Категорія авто + динамічна ціна */}
+      {carBrand && carCategory && (
+        <div className="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5">
+          <span className="text-sm text-gray-600">{getCategoryLabel(carCategory)}</span>
+          {hasCategoryPrices && (
+            <span className="font-semibold text-teal-700 text-sm">
+              {dynamicPrice != null
+                ? `від ${dynamicPrice.toLocaleString("uk-UA")} грн`
+                : <span className="text-gray-400 text-xs">ціна за запитом</span>}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Модель */}
       {carBrand && (
         <div>
           <label className={LABEL_CLS}>Модель авто</label>
@@ -180,15 +225,11 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
             >
               <option value="">— Оберіть модель —</option>
               {models.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
+                <option key={m} value={m}>{m}</option>
               ))}
               <option value="__custom__">Інша модель...</option>
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-              ▾
-            </span>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▾</span>
           </div>
           {carModel === "__custom__" && (
             <input
@@ -212,10 +253,7 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
             </div>
             <button
               type="button"
-              onClick={() => {
-                setEditPhone(true);
-                setPhone("");
-              }}
+              onClick={() => { setEditPhone(true); setPhone(""); }}
               className="text-xs text-teal-600 hover:text-teal-800 whitespace-nowrap"
             >
               Змінити

@@ -4,6 +4,12 @@ import { jwtVerify } from "jose";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
+const CAT_LABEL: Record<string, string> = {
+  car: "🚗 Легкове",
+  truck: "🚛 Вантажне / Тягач",
+  trailer: "🚌 Причіп / Напівпричіп",
+};
+
 export async function POST(req: NextRequest) {
   const token = req.cookies.get("client_token")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,37 +22,42 @@ export async function POST(req: NextRequest) {
     if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = await req.json();
-    const { serviceSlug, serviceTitle, carBrand, carModel, phone, message } = body;
+    const { serviceSlug, serviceTitle, carBrand, carModel, carCategory, phone, message } = body;
 
     if (!phone) return NextResponse.json({ error: "Phone required" }, { status: 400 });
 
-    // Знайти послугу в БД для отримання ціни та часу
+    // Знайти послугу для отримання ціни та часу
     let serviceHours: string | null = null;
-    let priceMin: number | null = null;
+    let finalPrice: number | null = null;
     try {
       const svc = await prisma.service.findUnique({ where: { slug: serviceSlug } });
       if (svc) {
         serviceHours = svc.hours;
-        priceMin = svc.priceMin;
+        // Вибираємо ціну залежно від категорії авто
+        if (carCategory === "car" && svc.priceCar != null) finalPrice = svc.priceCar;
+        else if (carCategory === "truck" && svc.priceTruck != null) finalPrice = svc.priceTruck;
+        else if (carCategory === "trailer" && svc.priceTrailer != null) finalPrice = svc.priceTrailer;
+        else finalPrice = svc.priceMin ?? null;
       }
     } catch {}
 
     const booking = await prisma.booking.create({
       data: {
         name: client.name || email,
-        phone: phone || client.phone || "",
+        phone,
         carBrand: carBrand || null,
         carModel: carModel || null,
+        carCategory: carCategory || null,
         service: serviceTitle,
         message: message || null,
         clientEmail: email,
         status: "new",
         progress: "received",
-        price: priceMin ?? null,
+        price: finalPrice,
       },
     });
 
-    // Повідомлення адміну
+    // Email адміну
     try {
       await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
@@ -65,7 +76,9 @@ export async function POST(req: NextRequest) {
             <p><strong>Телефон:</strong> ${phone}</p>
             <p><strong>Послуга:</strong> ${serviceTitle}</p>
             <p><strong>Авто:</strong> ${carBrand || "—"} ${carModel || ""}</p>
+            <p><strong>Тип:</strong> ${CAT_LABEL[carCategory] || "—"}</p>
             ${serviceHours ? `<p><strong>Орієнтовний час:</strong> ${serviceHours}</p>` : ""}
+            ${finalPrice ? `<p><strong>Орієнтовна ціна:</strong> від ${finalPrice.toLocaleString("uk-UA")} грн</p>` : ""}
             <p><strong>Коментар:</strong> ${message || "—"}</p>
           `,
         }),

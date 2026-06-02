@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, ToggleLeft, ToggleRight, Plus, X, Check } from "lucide-react";
+import { Pencil, Trash2, ToggleLeft, ToggleRight, X, Check } from "lucide-react";
 
 type Service = {
   id: string;
@@ -12,6 +12,9 @@ type Service = {
   price: string;
   priceMin: number;
   priceMax: number;
+  priceCar: number | null;
+  priceTruck: number | null;
+  priceTrailer: number | null;
   hours: string;
   image: string;
   category: string;
@@ -67,7 +70,7 @@ export default function AdminServicesClient({ initialServices }: { initialServic
   }
 
   function setField<K extends keyof Service>(key: K, val: Service[K]) {
-    setEditing((e) => e ? { ...e, [key]: val } : e);
+    setEditing((e) => (e ? { ...e, [key]: val } : e));
   }
 
   return (
@@ -90,7 +93,7 @@ export default function AdminServicesClient({ initialServices }: { initialServic
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              {["#", "Назва", "Категорія", "Ціна від", "Статус", ""].map((h) => (
+              {["#", "Назва", "Категорія", "Ціни", "Статус", ""].map((h) => (
                 <th key={h} className="text-left px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{h}</th>
               ))}
             </tr>
@@ -106,7 +109,14 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                 <td className="px-4 py-3">
                   <span className="px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 text-xs font-medium">{s.category}</span>
                 </td>
-                <td className="px-4 py-3 text-gray-600 font-medium">{s.price}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 space-y-0.5">
+                  {s.priceCar != null && <div>🚗 {s.priceCar} грн</div>}
+                  {s.priceTruck != null && <div>🚛 {s.priceTruck} грн</div>}
+                  {s.priceTrailer != null && <div>🚌 {s.priceTrailer} грн</div>}
+                  {s.priceCar == null && s.priceTruck == null && s.priceTrailer == null && (
+                    <div className="text-gray-300">від {s.priceMin} грн</div>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <button onClick={() => toggleActive(s)} title={s.active ? "Деактивувати" : "Активувати"}>
                     {s.active
@@ -146,13 +156,40 @@ export default function AdminServicesClient({ initialServices }: { initialServic
               <Field label="Короткий опис" value={editing.short} onChange={(v) => setField("short", v)} textarea />
               <Field label="Повний опис" value={editing.description} onChange={(v) => setField("description", v)} textarea />
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Ціна (текст)" value={editing.price} onChange={(v) => setField("price", v)} />
+                <Field label="Ціна (текст, напр. від 480 грн)" value={editing.price} onChange={(v) => setField("price", v)} />
                 <Field label="Час роботи" value={editing.hours} onChange={(v) => setField("hours", v)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Ціна від (грн)" value={String(editing.priceMin)} onChange={(v) => setField("priceMin", Number(v))} type="number" />
                 <Field label="Ціна до (грн)" value={String(editing.priceMax)} onChange={(v) => setField("priceMax", Number(v))} type="number" />
               </div>
+
+              {/* Ціни по категоріях */}
+              <div className="rounded-xl border border-teal-100 bg-teal-50/40 p-4 space-y-3">
+                <p className="text-xs font-semibold text-teal-700 uppercase tracking-wide">💰 Ціни по типу транспорту</p>
+                <p className="text-xs text-gray-400">Залиш порожнім якщо ціна не залежить від типу авто</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <Field
+                    label="🚗 Легкове (грн)"
+                    value={editing.priceCar != null ? String(editing.priceCar) : ""}
+                    onChange={(v) => setField("priceCar", v === "" ? null : Number(v))}
+                    type="number"
+                  />
+                  <Field
+                    label="🚛 Вантажне / Тягач (грн)"
+                    value={editing.priceTruck != null ? String(editing.priceTruck) : ""}
+                    onChange={(v) => setField("priceTruck", v === "" ? null : Number(v))}
+                    type="number"
+                  />
+                  <Field
+                    label="🚌 Причіп / Напівпричіп (грн)"
+                    value={editing.priceTrailer != null ? String(editing.priceTrailer) : ""}
+                    onChange={(v) => setField("priceTrailer", v === "" ? null : Number(v))}
+                    type="number"
+                  />
+                </div>
+              </div>
+
               <Field label="URL фото" value={editing.image} onChange={(v) => setField("image", v)} />
               {editing.image && (
                 <img src={editing.image} alt="preview" className="rounded-xl w-full h-40 object-cover border border-gray-100" />
