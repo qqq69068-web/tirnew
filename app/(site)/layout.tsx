@@ -33,8 +33,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       .catch(() => setIsClient(false));
   }, [pathname]);
 
-  const cabinetLabel = isClient ? "Кабінет" : "Реєстрація";
-  const cabinetLabelFull = isClient ? "Особистий кабінет" : "Реєстрація / Вхід";
+  // Якщо залогінений → "Кабінет", якщо ні → "Увійти"
+  const cabinetLabel = isClient ? "Кабінет" : "Увійти";
+  const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
     <div className="min-h-screen bg-[#09090b]">
@@ -89,13 +90,15 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               <span>+380 66 418 88 26</span>
             </a>
 
-            {/* Cabinet button */}
+            {/* Cabinet / Login button */}
             <Link
               href="/cabinet"
               className={`hidden h-9 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition md:inline-flex ${
                 pathname === "/cabinet"
                   ? "border-teal-500/40 bg-teal-600/15 text-teal-400"
-                  : "border-white/10 text-neutral-300 hover:border-white/20 hover:text-white"
+                  : isClient
+                    ? "border-teal-500/30 text-teal-400 hover:border-teal-500/50 hover:text-teal-300"
+                    : "border-white/10 text-neutral-300 hover:border-white/20 hover:text-white"
               }`}
             >
               <User size={14} />
@@ -107,7 +110,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               href="/contacts"
               className="hidden h-9 items-center rounded-full bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-500 active:scale-95 md:inline-flex"
             >
-              Зв'язатись
+              Зв&apos;язатись
             </Link>
 
             <button
@@ -145,7 +148,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition ${
                   pathname === "/cabinet"
                     ? "bg-teal-600/15 text-teal-400"
-                    : "text-neutral-300 hover:bg-white/5 hover:text-white"
+                    : isClient
+                      ? "text-teal-400 hover:bg-teal-600/10"
+                      : "text-neutral-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <User size={15} /> {cabinetLabelFull}
@@ -161,7 +166,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                 href="/contacts"
                 className="mt-2 flex h-11 items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white"
               >
-                Зв'язатись з нами
+                Зв&apos;язатись з нами
               </Link>
             </nav>
           </div>
