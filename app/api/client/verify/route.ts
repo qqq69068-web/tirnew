@@ -6,11 +6,11 @@ const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secr
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
-  if (!token) return NextResponse.json({ error: "No token" }, { status: 400 });
+  if (!token) return NextResponse.redirect(new URL("/cabinet?error=no_token", req.url));
 
   const magic = await prisma.magicToken.findUnique({ where: { token } });
   if (!magic || magic.used || magic.expiresAt < new Date()) {
-    return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+    return NextResponse.redirect(new URL("/cabinet?error=expired", req.url));
   }
 
   await prisma.magicToken.update({ where: { token }, data: { used: true } });
@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
     .setExpirationTime("7d")
     .sign(secret);
 
-  const res = NextResponse.json({ ok: true, email: magic.email });
+  const res = NextResponse.redirect(
+    new URL("/cabinet", req.url)
+  );
+
   res.cookies.set("client_token", jwt, {
     httpOnly: true,
     secure: true,
@@ -28,5 +31,6 @@ export async function GET(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
   });
+
   return res;
 }
