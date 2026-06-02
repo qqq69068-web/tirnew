@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Suspense } from "react";
 import {
   LogOut, Clock, CheckCircle2, Wrench, Search,
-  ChevronRight, User, ReceiptText, Timer, Mail, Phone,
+  ChevronRight, User, ReceiptText, Timer, Mail,
 } from "lucide-react";
 
 interface Booking {
@@ -101,9 +101,7 @@ function CabinetContent() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchClient();
-  }, [fetchClient]);
+  useEffect(() => { fetchClient(); }, [fetchClient]);
 
   const logout = async () => {
     await fetch("/api/client/logout", { method: "POST" });
@@ -178,83 +176,20 @@ function CabinetContent() {
   );
 }
 
-/* ─── Стилі ─── */
 const autofillStyle = `
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
+  input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 9999px #161616 inset !important;
     -webkit-text-fill-color: #ffffff !important;
     caret-color: #ffffff;
   }
 `;
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  borderRadius: "0.75rem",
-  padding: "0.75rem 1rem 0.75rem 2.75rem",
-  fontSize: "0.875rem",
-  color: "#ffffff",
-  caretColor: "#ffffff",
-  background: "rgba(255,255,255,0.06)",
-  border: "1px solid rgba(255,255,255,0.1)",
-  outline: "none",
-  transition: "box-shadow 0.15s, border-color 0.15s",
-};
-
-function InputField({
-  icon, label, type = "text", value, onChange, placeholder, required,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  type?: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  required?: boolean;
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
-        {label}{required && <span className="text-teal-400 ml-0.5">*</span>}
-      </label>
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">{icon}</span>
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          required={required}
-          style={inputStyle}
-          onFocus={(e) => {
-            e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488";
-            e.currentTarget.style.borderColor = "rgba(13,148,136,0.5)";
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.boxShadow = "none";
-            e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
 function AuthForm() {
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [step, setStep] = useState<"form" | "sent">("form");
   const [email, setEmail] = useState("");
-  const [name, setName]   = useState("");
-  const [phone, setPhone] = useState("");
+  const [sent, setSent]   = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const switchMode = (m: "login" | "register") => {
-    setMode(m);
-    setName("");
-    setPhone("");
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,139 +197,99 @@ function AuthForm() {
     await fetch("/api/client/send-magic-link", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        name:  mode === "register" ? name  : undefined,
-        phone: mode === "register" ? phone : undefined,
-      }),
+      body: JSON.stringify({ email }),
     });
     setLoading(false);
-    setStep("sent");
+    setSent(true);
   };
 
-  if (step === "sent") {
+  if (sent) {
     return (
-      <div className="max-w-md mx-auto text-center py-16">
+      <div className="max-w-md mx-auto text-center py-16 px-4">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-teal-600/20 mx-auto mb-5">
           <Mail size={36} className="text-teal-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Перевірте пошту!</h2>
-        <p className="text-neutral-400 max-w-sm mx-auto">
-          Ми надіслали посилання для входу на{" "}
+        <h2 className="text-2xl font-bold text-white mb-3">Перевірте пошту</h2>
+        <p className="text-neutral-400">
+          Надіслали посилання для входу на{" "}
           <strong className="text-white">{email}</strong>.
-          Воно діє 30 хвилин.
+          {" "}Воно діє 30 хвилин.
         </p>
         <button
-          onClick={() => { setStep("form"); setEmail(""); setName(""); setPhone(""); }}
+          onClick={() => { setSent(false); setEmail(""); }}
           className="mt-6 text-sm text-teal-400 hover:text-teal-300 transition-colors"
         >
-          ← Повернутись
+          ← Ввести інший email
         </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="max-w-sm mx-auto px-4">
       <style>{autofillStyle}</style>
 
       <div className="text-center mb-8">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/20 mx-auto mb-4">
           <User size={28} className="text-teal-400" />
         </div>
-        <h1 className="text-3xl font-bold text-white">
-          {mode === "login" ? "Увійти" : "Реєстрація"}
-        </h1>
-        <p className="text-neutral-400 mt-2 text-sm">
-          {mode === "login"
-            ? "Введіть email — надішлемо посилання для входу без пароля"
-            : "Заповніть дані для створення акаунту"}
+        <h2 className="text-2xl font-bold text-white">Увійти / зареєструватись</h2>
+        <p className="text-neutral-500 mt-2 text-sm">
+          Введіть email — надішлемо посилання. Без пароля.
         </p>
-      </div>
-
-      <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-        className="flex rounded-2xl bg-white/5 p-1 mb-6">
-        {(["login", "register"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => switchMode(m)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-              mode === m
-                ? "bg-teal-600 text-white shadow-lg shadow-teal-900/40"
-                : "text-neutral-400 hover:text-white"
-            }`}
-          >
-            {m === "login" ? "Увійти" : "Реєстрація"}
-          </button>
-        ))}
       </div>
 
       <form onSubmit={submit}
         style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         className="bg-white/5 rounded-3xl p-7 space-y-4">
-
-        {mode === "register" && (
-          <InputField
-            icon={<User size={16} />}
-            label="Ім'я"
-            value={name}
-            onChange={(v) => setName(v.replace(/[^a-zA-ZЀ-ӿ\s\-']/g, ""))}
-            placeholder="Олексій"
-          />
-        )}
-
-        <InputField
-          icon={<Mail size={16} />}
-          label="Email"
-          type="email"
-          value={email}
-          onChange={setEmail}
-          placeholder="your@email.com"
-          required
-        />
-
-        {mode === "register" && (
-          <InputField
-            icon={<Phone size={16} />}
-            label="Телефон"
-            type="tel"
-            value={phone}
-            onChange={(v) => setPhone(v.replace(/[^0-9+()\s\-]/g, ""))}
-            placeholder="+380 50 000 00 00"
-            required
-          />
-        )}
+        <div>
+          <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+            Email <span className="text-teal-400">*</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
+              <Mail size={16} />
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              required
+              style={{
+                width: "100%",
+                borderRadius: "0.75rem",
+                padding: "0.75rem 1rem 0.75rem 2.75rem",
+                fontSize: "0.875rem",
+                color: "#ffffff",
+                caretColor: "#ffffff",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                outline: "none",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 0 2px #0d9488";
+                e.currentTarget.style.borderColor = "rgba(13,148,136,0.5)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+              }}
+            />
+          </div>
+        </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors mt-2"
+          className="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors"
         >
-          {loading
-            ? "Надсилаємо..."
-            : mode === "login"
-              ? "Отримати посилання"
-              : "Створити акаунт"}
+          {loading ? "Надсилаємо..." : "Отримати посилання"}
         </button>
       </form>
 
       <p className="text-center text-xs text-neutral-600 mt-5">
-        {mode === "login" ? (
-          <>Немає акаунту?{" "}
-            <button type="button" onClick={() => switchMode("register")}
-              className="text-teal-500 hover:text-teal-400 transition-colors">
-              Зареєструйтесь
-            </button>
-          </>
-        ) : (
-          <>Вже є акаунт?{" "}
-            <button type="button" onClick={() => switchMode("login")}
-              className="text-teal-500 hover:text-teal-400 transition-colors">
-              Увійти
-            </button>
-          </>
-        )}
+        Немає акаунту? Акаунт створюється автоматично при першому вході.
       </p>
     </div>
   );
