@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import {
   LogOut, Clock, CheckCircle2, Wrench, Search,
@@ -90,8 +89,6 @@ function StatsBar({ bookings }: { bookings: Booking[] }) {
 }
 
 function CabinetContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -105,24 +102,8 @@ function CabinetContent() {
   }, []);
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) {
-      fetch(`/api/client/verify?token=${token}`)
-        .then((r) => r.json())
-        .then(async (data) => {
-          if (data.ok) {
-            router.replace("/cabinet");
-            await new Promise((r) => setTimeout(r, 300));
-            fetchClient();
-          } else {
-            setLoading(false);
-          }
-        })
-        .catch(() => setLoading(false));
-    } else {
-      fetchClient();
-    }
-  }, [searchParams, router, fetchClient]);
+    fetchClient();
+  }, [fetchClient]);
 
   const logout = async () => {
     await fetch("/api/client/logout", { method: "POST" });
@@ -269,7 +250,6 @@ function AuthForm() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // При перемиканні режиму — email зберігається
   const switchMode = (m: "login" | "register") => {
     setMode(m);
     setName("");
@@ -332,7 +312,6 @@ function AuthForm() {
         </p>
       </div>
 
-      {/* Таб-перемикач */}
       <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         className="flex rounded-2xl bg-white/5 p-1 mb-6">
         {(["login", "register"] as const).map((m) => (
@@ -355,7 +334,6 @@ function AuthForm() {
         style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         className="bg-white/5 rounded-3xl p-7 space-y-4">
 
-        {/* Ім'я — тільки при реєстрації */}
         {mode === "register" && (
           <InputField
             icon={<User size={16} />}
@@ -366,7 +344,6 @@ function AuthForm() {
           />
         )}
 
-        {/* Email — завжди */}
         <InputField
           icon={<Mail size={16} />}
           label="Email"
@@ -377,7 +354,6 @@ function AuthForm() {
           required
         />
 
-        {/* Телефон — тільки при реєстрації */}
         {mode === "register" && (
           <InputField
             icon={<Phone size={16} />}
