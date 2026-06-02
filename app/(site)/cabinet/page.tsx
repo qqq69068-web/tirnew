@@ -261,7 +261,6 @@ function InputField({
   );
 }
 
-/* ─── Головна форма авторизації ─── */
 function AuthForm() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [step, setStep] = useState<"form" | "sent">("form");
@@ -269,6 +268,13 @@ function AuthForm() {
   const [name, setName]   = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // При перемиканні режиму — email зберігається
+  const switchMode = (m: "login" | "register") => {
+    setMode(m);
+    setName("");
+    setPhone("");
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,14 +285,13 @@ function AuthForm() {
       body: JSON.stringify({
         email,
         name:  mode === "register" ? name  : undefined,
-        phone: phone || undefined,
+        phone: mode === "register" ? phone : undefined,
       }),
     });
     setLoading(false);
     setStep("sent");
   };
 
-  /* ── Успіх ── */
   if (step === "sent") {
     return (
       <div className="max-w-md mx-auto text-center py-16">
@@ -309,12 +314,10 @@ function AuthForm() {
     );
   }
 
-  /* ── Форма ── */
   return (
     <div className="max-w-md mx-auto">
       <style>{autofillStyle}</style>
 
-      {/* Іконка */}
       <div className="text-center mb-8">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/20 mx-auto mb-4">
           <User size={28} className="text-teal-400" />
@@ -332,31 +335,22 @@ function AuthForm() {
       {/* Таб-перемикач */}
       <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         className="flex rounded-2xl bg-white/5 p-1 mb-6">
-        <button
-          type="button"
-          onClick={() => setMode("login")}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            mode === "login"
-              ? "bg-teal-600 text-white shadow-lg shadow-teal-900/40"
-              : "text-neutral-400 hover:text-white"
-          }`}
-        >
-          Увійти
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("register")}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            mode === "register"
-              ? "bg-teal-600 text-white shadow-lg shadow-teal-900/40"
-              : "text-neutral-400 hover:text-white"
-          }`}
-        >
-          Реєстрація
-        </button>
+        {(["login", "register"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => switchMode(m)}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              mode === m
+                ? "bg-teal-600 text-white shadow-lg shadow-teal-900/40"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            {m === "login" ? "Увійти" : "Реєстрація"}
+          </button>
+        ))}
       </div>
 
-      {/* Форма */}
       <form onSubmit={submit}
         style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         className="bg-white/5 rounded-3xl p-7 space-y-4">
@@ -365,13 +359,14 @@ function AuthForm() {
         {mode === "register" && (
           <InputField
             icon={<User size={16} />}
-            label="Ім&apos;я"
+            label="Ім'я"
             value={name}
             onChange={(v) => setName(v.replace(/[^a-zA-ZЀ-ӿ\s\-']/g, ""))}
             placeholder="Олексій"
           />
         )}
 
+        {/* Email — завжди */}
         <InputField
           icon={<Mail size={16} />}
           label="Email"
@@ -382,15 +377,18 @@ function AuthForm() {
           required
         />
 
-        <InputField
-          icon={<Phone size={16} />}
-          label="Телефон"
-          type="tel"
-          value={phone}
-          onChange={(v) => setPhone(v.replace(/[^0-9+()\s\-]/g, ""))}
-          placeholder="+380 50 000 00 00"
-          required={mode === "register"}
-        />
+        {/* Телефон — тільки при реєстрації */}
+        {mode === "register" && (
+          <InputField
+            icon={<Phone size={16} />}
+            label="Телефон"
+            type="tel"
+            value={phone}
+            onChange={(v) => setPhone(v.replace(/[^0-9+()\s\-]/g, ""))}
+            placeholder="+380 50 000 00 00"
+            required
+          />
+        )}
 
         <button
           type="submit"
@@ -405,18 +403,17 @@ function AuthForm() {
         </button>
       </form>
 
-      {/* Підказка */}
       <p className="text-center text-xs text-neutral-600 mt-5">
         {mode === "login" ? (
           <>Немає акаунту?{" "}
-            <button type="button" onClick={() => setMode("register")}
+            <button type="button" onClick={() => switchMode("register")}
               className="text-teal-500 hover:text-teal-400 transition-colors">
               Зареєструйтесь
             </button>
           </>
         ) : (
           <>Вже є акаунт?{" "}
-            <button type="button" onClick={() => setMode("login")}
+            <button type="button" onClick={() => switchMode("login")}
               className="text-teal-500 hover:text-teal-400 transition-colors">
               Увійти
             </button>
