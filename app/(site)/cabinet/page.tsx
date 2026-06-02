@@ -3,7 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { LogOut, Clock, CheckCircle2, Wrench, Search, ChevronRight, User } from "lucide-react";
+import {
+  LogOut, Clock, CheckCircle2, Wrench, Search,
+  ChevronRight, User, ReceiptText, Timer
+} from "lucide-react";
 
 interface Booking {
   id: string;
@@ -19,6 +22,7 @@ interface Booking {
 interface Client {
   email: string;
   name: string | null;
+  phone: string | null;
   bookings: Booking[];
 }
 
@@ -57,6 +61,37 @@ function ProgressBar({ current }: { current: string }) {
   );
 }
 
+function StatsBar({ bookings }: { bookings: Booking[] }) {
+  const total = bookings.length;
+  const totalPrice = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
+  const done = bookings.filter((b) => b.progress === "done").length;
+
+  return (
+    <div className="grid grid-cols-3 gap-3 mb-8">
+      <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+        className="bg-white/5 rounded-2xl p-4 text-center">
+        <ReceiptText size={20} className="mx-auto text-teal-400 mb-1" />
+        <p className="text-2xl font-bold text-white">{total}</p>
+        <p className="text-xs text-neutral-500 mt-0.5">Замовлень</p>
+      </div>
+      <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+        className="bg-white/5 rounded-2xl p-4 text-center">
+        <CheckCircle2 size={20} className="mx-auto text-teal-400 mb-1" />
+        <p className="text-2xl font-bold text-white">{done}</p>
+        <p className="text-xs text-neutral-500 mt-0.5">Виконано</p>
+      </div>
+      <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+        className="bg-white/5 rounded-2xl p-4 text-center">
+        <Timer size={20} className="mx-auto text-teal-400 mb-1" />
+        <p className="text-2xl font-bold text-teal-400">
+          {totalPrice > 0 ? `${totalPrice.toLocaleString()} ₴` : "—"}
+        </p>
+        <p className="text-xs text-neutral-500 mt-0.5">Витрачено</p>
+      </div>
+    </div>
+  );
+}
+
 function CabinetContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,7 +117,6 @@ function CabinetContent() {
         .then(async (data) => {
           if (data.ok) {
             router.replace("/cabinet");
-            // Чекаємо поки cookie запишеться, потім фетчимо
             await new Promise((r) => setTimeout(r, 300));
             fetchClient();
           } else {
@@ -112,7 +146,7 @@ function CabinetContent() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">
             {client.name ? `Вітаємо, ${client.name}!` : "Особистий кабінет"}
@@ -125,22 +159,27 @@ function CabinetContent() {
         </button>
       </div>
 
+      {client.bookings.length > 0 && <StatsBar bookings={client.bookings} />}
+
       {client.bookings.length === 0 ? (
         <div className="text-center py-16 text-neutral-500">
           <Wrench size={40} className="mx-auto mb-3 opacity-30" />
           <p>У вас ще немає замовлень</p>
-          <a href="/booking" className="mt-4 inline-block text-teal-400 hover:underline text-sm">
-            Записатись на сервіс →
+          <a href="/services" className="mt-4 inline-block text-teal-400 hover:underline text-sm">
+            Переглянути послуги →
           </a>
         </div>
       ) : (
         <div className="space-y-4">
+          <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-2">Історія замовлень</h2>
           {client.bookings.map((b) => (
             <div key={b.id} style={{ border: "1px solid rgba(255,255,255,0.08)" }}
               className="bg-white/5 rounded-2xl p-5">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-white">{b.carBrand} {b.carModel}</p>
+                  <p className="font-semibold text-white">
+                    {b.carBrand || b.carModel ? `${b.carBrand || ""} ${b.carModel || ""}`.trim() : "Авто не вказано"}
+                  </p>
                   <p className="text-sm text-neutral-400 mt-0.5">{b.service || "Послуга"}</p>
                 </div>
                 <div className="text-right">

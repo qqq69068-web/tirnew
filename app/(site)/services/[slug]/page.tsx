@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { services } from "@/lib/services";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import BookingButton from "@/components/BookingButton";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -26,7 +27,6 @@ export default async function ServiceDetailPage({ params }: Props) {
   const service = services.find((s) => s.slug === slug);
   if (!service) notFound();
 
-  // Related services — same category, exclude current
   const related = services
     .filter((s) => s.category === service.category && s.slug !== service.slug)
     .slice(0, 3);
@@ -85,7 +85,6 @@ export default async function ServiceDetailPage({ params }: Props) {
             </section>
           )}
 
-          {/* Related */}
           {related.length > 0 && (
             <section>
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -126,15 +125,13 @@ export default async function ServiceDetailPage({ params }: Props) {
             <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">
               Вартість
             </p>
-            <div className="text-2xl font-bold text-teal-700 mb-6">
+            <div className="text-2xl font-bold text-teal-700 mb-1">
               {service.price}
             </div>
-            <Link
-              href={`/booking?service=${service.slug}`}
-              className="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-xl transition-colors"
-            >
-              Записатись
-            </Link>
+            {service.hours && (
+              <p className="text-xs text-gray-400 mb-5">⏱ {service.hours}</p>
+            )}
+            <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
             <Link
               href="/services"
               className="block w-full text-center text-gray-400 hover:text-gray-600 text-sm mt-3 transition-colors"
