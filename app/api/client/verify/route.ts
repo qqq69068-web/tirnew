@@ -3,14 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { SignJWT } from "jose";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
+const BASE_URL = process.env.APP_URL || "https://tirnew-production.up.railway.app";
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
-  if (!token) return NextResponse.redirect(new URL("/cabinet?error=no_token", req.url));
+  if (!token) return NextResponse.redirect(`${BASE_URL}/cabinet?error=no_token`);
 
   const magic = await prisma.magicToken.findUnique({ where: { token } });
   if (!magic || magic.used || magic.expiresAt < new Date()) {
-    return NextResponse.redirect(new URL("/cabinet?error=expired", req.url));
+    return NextResponse.redirect(`${BASE_URL}/cabinet?error=expired`);
   }
 
   await prisma.magicToken.update({ where: { token }, data: { used: true } });
@@ -20,9 +21,7 @@ export async function GET(req: NextRequest) {
     .setExpirationTime("7d")
     .sign(secret);
 
-  const res = NextResponse.redirect(
-    new URL("/cabinet", req.url)
-  );
+  const res = NextResponse.redirect(`${BASE_URL}/cabinet`);
 
   res.cookies.set("client_token", jwt, {
     httpOnly: true,
