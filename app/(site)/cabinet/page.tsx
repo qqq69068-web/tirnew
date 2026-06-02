@@ -91,11 +91,19 @@ function StatsBar({ bookings }: { bookings: Booking[] }) {
 function CabinetContent() {
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<string>("");
 
   const fetchClient = useCallback(async () => {
     try {
-      const res = await fetch("/api/client/me");
-      if (res.ok) setClient(await res.json());
+      const res = await fetch("/api/client/me", { credentials: "include" });
+      console.log("[cabinet] /api/client/me status:", res.status);
+      const data = await res.json();
+      console.log("[cabinet] /api/client/me response:", data);
+      setDebugInfo(`status: ${res.status} | ${JSON.stringify(data)}`);
+      if (res.ok) setClient(data);
+    } catch (e) {
+      console.error("[cabinet] fetch error:", e);
+      setDebugInfo(`fetch error: ${e}`);
     } finally {
       setLoading(false);
     }
@@ -104,7 +112,7 @@ function CabinetContent() {
   useEffect(() => { fetchClient(); }, [fetchClient]);
 
   const logout = async () => {
-    await fetch("/api/client/logout", { method: "POST" });
+    await fetch("/api/client/logout", { method: "POST", credentials: "include" });
     setClient(null);
   };
 
@@ -116,7 +124,7 @@ function CabinetContent() {
     );
   }
 
-  if (!client) return <AuthForm />;
+  if (!client) return <AuthForm debugInfo={debugInfo} />;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
@@ -186,7 +194,7 @@ const autofillStyle = `
   }
 `;
 
-function AuthForm() {
+function AuthForm({ debugInfo }: { debugInfo?: string }) {
   const [email, setEmail] = useState("");
   const [sent, setSent]   = useState(false);
   const [loading, setLoading] = useState(false);
@@ -228,6 +236,12 @@ function AuthForm() {
   return (
     <div className="max-w-sm mx-auto px-4">
       <style>{autofillStyle}</style>
+
+      {debugInfo && (
+        <div className="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-500/30 text-xs text-red-300 break-all">
+          <strong>Debug:</strong> {debugInfo}
+        </div>
+      )}
 
       <div className="text-center mb-8">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/20 mx-auto mb-4">
