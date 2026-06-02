@@ -21,7 +21,22 @@ export async function GET(req: NextRequest) {
     .setExpirationTime("7d")
     .sign(secret);
 
-  const res = NextResponse.redirect(`${BASE_URL}/cabinet`);
+  // Use HTML response instead of redirect to ensure cookie is set before navigation
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Вхід...</title>
+</head>
+<body>
+  <script>window.location.replace("${BASE_URL}/cabinet");</script>
+</body>
+</html>`;
+
+  const res = new NextResponse(html, {
+    status: 200,
+    headers: { "Content-Type": "text/html" },
+  });
 
   res.cookies.set("client_token", jwt, {
     httpOnly: true,
