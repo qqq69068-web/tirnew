@@ -12,7 +12,6 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
   const [status, setStatus] = useState<"loading" | "guest" | "auth">("loading");
   const [client, setClient] = useState<{ email: string; name: string | null } | null>(null);
 
-  // Форма стану
   const [open, setOpen] = useState(false);
   const [carBrand, setCarBrand] = useState("");
   const [carModel, setCarModel] = useState("");
@@ -48,10 +47,11 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
     if (res.ok) setDone(true);
   };
 
+  const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white";
+  const labelCls = "block text-xs text-gray-400 mb-1";
+
   if (status === "loading") {
-    return (
-      <div className="w-full h-12 rounded-xl bg-gray-100 animate-pulse" />
-    );
+    return <div className="w-full h-12 rounded-xl bg-gray-100 animate-pulse" />;
   }
 
   if (status === "guest") {
@@ -96,35 +96,47 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
       {client?.name && (
         <p className="text-sm text-gray-600">👤 {client.name}</p>
       )}
-      <input
-        type="text"
-        placeholder="Марка авто"
-        value={carBrand}
-        onChange={(e) => setCarBrand(e.target.value)}
-        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-      />
-      <input
-        type="text"
-        placeholder="Модель авто"
-        value={carModel}
-        onChange={(e) => setCarModel(e.target.value)}
-        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-      />
-      <input
-        type="tel"
-        placeholder="Телефон"
-        required
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-      />
-      <textarea
-        placeholder="Коментар (необов'язково)"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        rows={2}
-        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
-      />
+      <div>
+        <label className={labelCls}>Марка авто</label>
+        <input
+          type="text"
+          placeholder="напр. Volvo"
+          value={carBrand}
+          onChange={(e) => setCarBrand(e.target.value)}
+          className={inputCls}
+        />
+      </div>
+      <div>
+        <label className={labelCls}>Модель авто</label>
+        <input
+          type="text"
+          placeholder="напр. FH16"
+          value={carModel}
+          onChange={(e) => setCarModel(e.target.value)}
+          className={inputCls}
+        />
+      </div>
+      <div>
+        <label className={labelCls}>Телефон *</label>
+        <input
+          type="tel"
+          placeholder="+380 50 000 00 00"
+          required
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className={inputCls}
+        />
+      </div>
+      <div>
+        <label className={labelCls}>Коментар</label>
+        <textarea
+          placeholder="необов'язково"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          rows={2}
+          className={`${inputCls} resize-none`}
+        />
+      </div>
       <button
         type="submit"
         disabled={sending}
