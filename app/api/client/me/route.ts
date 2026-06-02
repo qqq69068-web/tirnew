@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
     });
     if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(client);
-  } catch {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[me] JWT verify error:", message);
+    return NextResponse.json({ error: "Invalid token", detail: message }, { status: 401 });
   }
 }
