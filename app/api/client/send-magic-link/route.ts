@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
   const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
   await prisma.magicToken.create({ data: { token, email, expiresAt } });
 
-  const url = `${process.env.NEXT_PUBLIC_APP_URL}/cabinet?token=${token}`;
+  // Посилання веде на API — там ставиться cookie і робиться redirect до /cabinet
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${req.headers.get("host")}`;
+  const url = `${baseUrl}/api/client/verify?token=${token}`;
 
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
