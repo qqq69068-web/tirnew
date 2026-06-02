@@ -10,12 +10,14 @@ interface Props {
 
 export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
   const [status, setStatus] = useState<"loading" | "guest" | "auth">("loading");
-  const [client, setClient] = useState<{ email: string; name: string | null } | null>(null);
+  const [client, setClient] = useState<{ email: string; name: string | null; phone?: string | null } | null>(null);
+  const [profilePhone, setProfilePhone] = useState<string>("");
 
   const [open, setOpen] = useState(false);
   const [carBrand, setCarBrand] = useState("");
   const [carModel, setCarModel] = useState("");
   const [phone, setPhone] = useState("");
+  const [editPhone, setEditPhone] = useState(false);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -27,7 +29,10 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
         if (data && data.email) {
           setClient(data);
           setStatus("auth");
-          if (data.phone) setPhone(data.phone);
+          if (data.phone) {
+            setProfilePhone(data.phone);
+            setPhone(data.phone);
+          }
         } else {
           setStatus("guest");
         }
@@ -38,10 +43,12 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
+    // Використовуємо тільки одне джерело телефону
+    const finalPhone = editPhone ? phone : profilePhone || phone;
     const res = await fetch("/api/client/booking", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ serviceSlug, serviceTitle, carBrand, carModel, phone, message }),
+      body: JSON.stringify({ serviceSlug, serviceTitle, carBrand, carModel, phone: finalPhone, message }),
     });
     setSending(false);
     if (res.ok) setDone(true);
@@ -118,14 +125,30 @@ export default function BookingButton({ serviceSlug, serviceTitle }: Props) {
       </div>
       <div>
         <label className={labelCls}>Телефон *</label>
-        <input
-          type="tel"
-          placeholder="+380 50 000 00 00"
-          required
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className={inputCls}
-        />
+        {profilePhone && !editPhone ? (
+          <div className="flex items-center gap-2">
+            <div className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 text-gray-700">
+              {profilePhone}
+            </div>
+            <button
+              type="button"
+              onClick={() => { setEditPhone(true); setPhone(""); }}
+              className="text-xs text-teal-600 hover:text-teal-800 whitespace-nowrap"
+            >
+              Змінити
+            </button>
+          </div>
+        ) : (
+          <input
+            type="tel"
+            placeholder="+380 50 000 00 00"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className={inputCls}
+            autoFocus
+          />
+        )}
       </div>
       <div>
         <label className={labelCls}>Коментар</label>
