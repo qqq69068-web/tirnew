@@ -18,8 +18,6 @@ export async function POST(req: NextRequest) {
     });
 
     try {
-      const notifyEmail = process.env.NOTIFY_EMAIL || process.env.GMAIL_USER || "qqq69068@gmail.com";
-
       const res = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: {
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           sender: { name: "TirNew сайт", email: "qqq69068@gmail.com" },
-          to: [{ email: notifyEmail }],
+          to: [{ email: "qqq69068@gmail.com" }],
           subject: `Нова заявка від ${name}`,
           htmlContent: `
             <h2>Нова заявка з сайту TirNew</h2>
@@ -44,7 +42,7 @@ export async function POST(req: NextRequest) {
         const err = await res.text();
         console.error("[BREVO ERROR]", err);
       } else {
-        console.log("[MAIL] Sent OK via Brevo to:", notifyEmail);
+        console.log("[MAIL] Sent OK via Brevo");
       }
     } catch (mailErr) {
       console.error("[BREVO SEND ERROR]", mailErr);
