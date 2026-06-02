@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import nodemailer from "nodemailer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,46 +18,36 @@ export async function POST(req: NextRequest) {
     });
 
     try {
-      console.log("[MAIL] GMAIL_USER:", process.env.GMAIL_USER);
-      console.log("[MAIL] GMAIL_PASS set:", !!process.env.GMAIL_PASS);
-      console.log("[MAIL] NOTIFY_EMAIL:", process.env.NOTIFY_EMAIL);
+      const notifyEmail = process.env.NOTIFY_EMAIL || process.env.GMAIL_USER || "qqq69068@gmail.com";
 
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        auth: {
-          user: process.env.GMAIL_USER,
-          pass: process.env.GMAIL_PASS,
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json",
+          "api-key": process.env.BREVO_API_KEY!,
         },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
+        body: JSON.stringify({
+          sender: { name: "TirNew сайт", email: "qqq69068@gmail.com" },
+          to: [{ email: notifyEmail }],
+          subject: `Нова заявка від ${name}`,
+          htmlContent: `
+            <h2>Нова заявка з сайту TirNew</h2>
+            <p><strong>Ім'я:</strong> ${name}</p>
+            <p><strong>Телефон:</strong> ${phone}</p>
+            <p><strong>Повідомлення:</strong> ${message}</p>
+          `,
+        }),
       });
 
-      const recipients = (process.env.NOTIFY_EMAIL || process.env.GMAIL_USER || "")
-        .split(",")
-        .map((e) => e.trim())
-        .filter(Boolean);
-
-      console.log("[MAIL] Sending to:", recipients);
-
-      const info = await transporter.sendMail({
-        from: `"TirNew сайт" <${process.env.GMAIL_USER}>`,
-        to: recipients,
-        subject: `Нова заявка від ${name}`,
-        html: `
-          <h2>Нова заявка з сайту TirNew</h2>
-          <p><strong>Ім'я:</strong> ${name}</p>
-          <p><strong>Телефон:</strong> ${phone}</p>
-          <p><strong>Повідомлення:</strong> ${message}</p>
-        `,
-      });
-
-      console.log("[MAIL] Sent OK, messageId:", info.messageId);
+      if (!res.ok) {
+        const err = await res.text();
+        console.error("[BREVO ERROR]", err);
+      } else {
+        console.log("[MAIL] Sent OK via Brevo to:", notifyEmail);
+      }
     } catch (mailErr) {
-      console.error("[GMAIL SMTP ERROR]", mailErr);
+      console.error("[BREVO SEND ERROR]", mailErr);
     }
 
     return NextResponse.json({ ok: true, id: contact.id }, { status: 201 });
