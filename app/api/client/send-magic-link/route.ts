@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
 
+const PRODUCTION_URL = "https://tirnew-production.up.railway.app";
+
 export async function POST(req: NextRequest) {
   const { email, name, phone } = await req.json();
   if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
@@ -16,16 +18,8 @@ export async function POST(req: NextRequest) {
   const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
   await prisma.magicToken.create({ data: { token, email, expiresAt } });
 
-  // APP_URL — серверна змінна (не NEXT_PUBLIC_), не вбудовується під час білду
-  // Fallback: x-forwarded-host містить реальний публічний домен у Railway
-  const host =
-    process.env.APP_URL ||
-    (() => {
-      const fwdHost = req.headers.get("x-forwarded-host");
-      const proto = req.headers.get("x-forwarded-proto") || "https";
-      return fwdHost ? `${proto}://${fwdHost}` : `https://${req.headers.get("host")}`;
-    })();
-  const url = `${host}/api/client/verify?token=${token}`;
+  const baseUrl = process.env.APP_URL || PRODUCTION_URL;
+  const url = `${baseUrl}/api/client/verify?token=${token}`;
 
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
