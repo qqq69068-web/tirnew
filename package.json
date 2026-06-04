@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "prisma generate && next build",
-    "start": "next start -H 0.0.0.0 --port 3000",
+    "start": "node_modules/.bin/next start -H 0.0.0.0 --port 3000",
     "seed": "npx tsx prisma/seed.ts"
   },
   "prisma": {
