@@ -16,9 +16,9 @@ interface Props {
 type CarCategory = "car" | "truck" | "trailer" | "";
 
 const SELECT_CLS =
-  "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white appearance-none cursor-pointer";
+  "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white appearance-none cursor-pointer";
 const INPUT_CLS =
-  "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white";
+  "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white";
 const LABEL_CLS = "block text-xs text-gray-400 mb-1";
 
 const TRUCK_BRANDS_LIST = CAR_BRANDS.filter((b) => b.category === "truck");
@@ -70,7 +70,6 @@ export default function BookingButton({
 
   const models = getModels(carBrand);
 
-  // Динамічна ціна на основі категорії
   const hasCategoryPrices = priceCar != null || priceTruck != null || priceTrailer != null;
   const dynamicPrice: number | null =
     carCategory === "car" ? (priceCar ?? null) :
@@ -182,16 +181,17 @@ export default function BookingButton({
             value={carBrand}
             onChange={(e) => handleBrandChange(e.target.value)}
             className={SELECT_CLS}
+            style={{ color: '#111827' }}
           >
-            <option value="">— Оберіть марку —</option>
-            <optgroup label="🚛 Вантажні / Тягачі / Причепи">
+            <option value="" style={{ color: '#6b7280' }}>— Оберіть марку —</option>
+            <optgroup label="🚛 Вантажні / Тягачі / Причепи" style={{ color: '#111827', backgroundColor: '#ffffff' }}>
               {TRUCK_BRANDS_LIST.map((b) => (
-                <option key={b.name} value={b.name}>{b.name}</option>
+                <option key={b.name} value={b.name} style={{ color: '#111827', backgroundColor: '#ffffff' }}>{b.name}</option>
               ))}
             </optgroup>
-            <optgroup label="🚗 Легкові">
+            <optgroup label="🚗 Легкові" style={{ color: '#111827', backgroundColor: '#ffffff' }}>
               {CAR_BRANDS_LIST.map((b) => (
-                <option key={b.name} value={b.name}>{b.name}</option>
+                <option key={b.name} value={b.name} style={{ color: '#111827', backgroundColor: '#ffffff' }}>{b.name}</option>
               ))}
             </optgroup>
           </select>
@@ -222,12 +222,13 @@ export default function BookingButton({
               value={carModel}
               onChange={(e) => setCarModel(e.target.value)}
               className={SELECT_CLS}
+              style={{ color: '#111827' }}
             >
-              <option value="">— Оберіть модель —</option>
+              <option value="" style={{ color: '#6b7280' }}>— Оберіть модель —</option>
               {models.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m} value={m} style={{ color: '#111827', backgroundColor: '#ffffff' }}>{m}</option>
               ))}
-              <option value="__custom__">Інша модель...</option>
+              <option value="__custom__" style={{ color: '#111827', backgroundColor: '#ffffff' }}>Інша модель...</option>
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▾</span>
           </div>
