@@ -5,7 +5,7 @@ import { jwtVerify } from "jose";
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
 async function verifyAdmin(req: NextRequest) {
-  const token = req.cookies.get("admin_token")?.value;
+  const token = req.cookies.get("token")?.value;
   if (!token) return false;
   try {
     const { payload } = await jwtVerify(token, secret);
