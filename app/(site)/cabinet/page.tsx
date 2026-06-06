@@ -91,19 +91,16 @@ function StatsBar({ bookings }: { bookings: Booking[] }) {
 function CabinetContent() {
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<string>("");
 
   const fetchClient = useCallback(async () => {
     try {
       const res = await fetch("/api/client/me", { credentials: "include" });
-      console.log("[cabinet] /api/client/me status:", res.status);
-      const data = await res.json();
-      console.log("[cabinet] /api/client/me response:", data);
-      setDebugInfo(`status: ${res.status} | ${JSON.stringify(data)}`);
-      if (res.ok) setClient(data);
+      if (res.ok) {
+        const data = await res.json();
+        setClient(data);
+      }
     } catch (e) {
       console.error("[cabinet] fetch error:", e);
-      setDebugInfo(`fetch error: ${e}`);
     } finally {
       setLoading(false);
     }
@@ -124,7 +121,7 @@ function CabinetContent() {
     );
   }
 
-  if (!client) return <AuthForm debugInfo={debugInfo} />;
+  if (!client) return <AuthForm />;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
@@ -194,7 +191,7 @@ const autofillStyle = `
   }
 `;
 
-function AuthForm({ debugInfo }: { debugInfo?: string }) {
+function AuthForm() {
   const [email, setEmail] = useState("");
   const [sent, setSent]   = useState(false);
   const [loading, setLoading] = useState(false);
@@ -219,9 +216,9 @@ function AuthForm({ debugInfo }: { debugInfo?: string }) {
         </div>
         <h2 className="text-2xl font-bold text-white mb-3">Перевірте пошту</h2>
         <p className="text-neutral-400">
-          Надіслали посилання для входу на{" "}
+          Надіслали посилання для входу на{ }
           <strong className="text-white">{email}</strong>.
-          {" "}Воно діє 30 хвилин.
+          { }Воно діє 30 хвилин.
         </p>
         <button
           onClick={() => { setSent(false); setEmail(""); }}
@@ -236,12 +233,6 @@ function AuthForm({ debugInfo }: { debugInfo?: string }) {
   return (
     <div className="max-w-sm mx-auto px-4">
       <style>{autofillStyle}</style>
-
-      {debugInfo && (
-        <div className="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-500/30 text-xs text-red-300 break-all">
-          <strong>Debug:</strong> {debugInfo}
-        </div>
-      )}
 
       <div className="text-center mb-8">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/20 mx-auto mb-4">
