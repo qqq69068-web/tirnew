@@ -13,7 +13,7 @@ const PROGRESS_LABELS: Record<string, string> = {
 };
 
 async function verifyAdmin(req: NextRequest) {
-  const token = req.cookies.get("admin_token")?.value;
+  const token = req.cookies.get("token")?.value;
   if (!token) return false;
   try {
     const { payload } = await jwtVerify(token, secret);
