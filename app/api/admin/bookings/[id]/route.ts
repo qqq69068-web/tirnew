@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { jwtVerify } from "jose";
-import nodemailer from "nodemailer";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
@@ -22,22 +21,23 @@ async function verifyAdmin(req: NextRequest) {
 }
 
 async function sendEmail(to: string, subject: string, html: string) {
-  const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.BREVO_SMTP_LOGIN,
-      pass: process.env.BREVO_SMTP_KEY,
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "content-type": "application/json",
+      "api-key": process.env.BREVO_API_KEY!,
     },
+    body: JSON.stringify({
+      sender: { name: "TIR Service", email: "qqq69068@gmail.com" },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
   });
-  const result = await transporter.sendMail({
-    from: `"TIR Service" <${process.env.BREVO_SMTP_LOGIN}>`,
-    to,
-    subject,
-    html,
-  });
-  console.log("[EMAIL sent]", result.messageId);
+  const data = await res.json();
+  console.log("[BREVO API]", res.status, JSON.stringify(data));
+  if (!res.ok) throw new Error(JSON.stringify(data));
 }
 
 export async function PATCH(
