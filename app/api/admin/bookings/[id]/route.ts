@@ -23,10 +23,12 @@ async function verifyAdmin(req: NextRequest) {
 
 async function sendEmail(to: string, subject: string, html: string) {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
+      user: process.env.GMAIL_USER, // Brevo login = твій email акаунта Brevo
+      pass: process.env.BREVO_SMTP_KEY, // SMTP key з Brevo (не API key!)
     },
   });
   const result = await transporter.sendMail({
