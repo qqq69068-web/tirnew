@@ -45,11 +45,13 @@ export async function PATCH(
   });
 
   const emailTo = clientEmail || booking.clientEmail;
+  console.log("[PATCH booking] progress:", progress, "prev:", booking.progress, "emailTo:", emailTo);
+
   if (progress && progress !== booking.progress && emailTo) {
     const label = PROGRESS_LABELS[progress] || progress;
     const isDone = progress === "done";
     const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: "TIR Service <onboarding@resend.dev>",
       to: emailTo,
       subject: isDone ? "✅ Ваш автомобіль готовий до видачі" : `Оновлення статусу: ${label}`,
@@ -63,6 +65,7 @@ export async function PATCH(
         </div>
       `,
     });
+    console.log("[RESEND result] data:", JSON.stringify(data), "error:", JSON.stringify(error));
   }
 
   return NextResponse.json(updated);
