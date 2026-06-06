@@ -27,12 +27,12 @@ async function sendEmail(to: string, subject: string, html: string) {
     port: 587,
     secure: false,
     auth: {
-      user: process.env.GMAIL_USER, // Brevo login = твій email акаунта Brevo
-      pass: process.env.BREVO_SMTP_KEY, // SMTP key з Brevo (не API key!)
+      user: process.env.BREVO_SMTP_LOGIN,
+      pass: process.env.BREVO_SMTP_KEY,
     },
   });
   const result = await transporter.sendMail({
-    from: `"TIR Service" <${process.env.GMAIL_USER}>`,
+    from: `"TIR Service" <${process.env.BREVO_SMTP_LOGIN}>`,
     to,
     subject,
     html,
