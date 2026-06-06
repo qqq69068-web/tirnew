@@ -19,21 +19,22 @@ function verifyJWT(token: string, secret: string): boolean {
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-  const isLoginPage = req.nextUrl.pathname === "/admin/login";
-  const isAdminPath =
-    req.nextUrl.pathname.startsWith("/admin") && !isLoginPage;
 
-  if (isAdminPath) {
-    if (!token || !verifyJWT(token, process.env.JWT_SECRET!)) {
-      const response = NextResponse.redirect(new URL("/admin/login", req.url));
-      if (token) response.cookies.delete("token");
-      return response;
-    }
+  // /admin/login завжди доступна — не перевіряємо
+  if (req.nextUrl.pathname === "/admin/login") {
+    return NextResponse.next();
+  }
+
+  if (!token || !verifyJWT(token, process.env.JWT_SECRET!)) {
+    const response = NextResponse.redirect(new URL("/admin/login", req.url));
+    if (token) response.cookies.delete("token");
+    return response;
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  // Матчимо всі /admin/* крім /admin/login
+  matcher: ["/admin/((?!login).*)" ],
 };
