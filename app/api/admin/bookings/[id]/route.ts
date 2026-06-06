@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { jwtVerify } from "jose";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
@@ -19,6 +19,23 @@ async function verifyAdmin(req: NextRequest) {
     const { payload } = await jwtVerify(token, secret);
     return payload.role === "admin";
   } catch { return false; }
+}
+
+async function sendEmail(to: string, subject: string, html: string) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_PASS,
+    },
+  });
+  const result = await transporter.sendMail({
+    from: `"TIR Service" <${process.env.GMAIL_USER}>`,
+    to,
+    subject,
+    html,
+  });
+  console.log("[EMAIL sent]", result.messageId);
 }
 
 export async function PATCH(
@@ -45,27 +62,25 @@ export async function PATCH(
   });
 
   const emailTo = clientEmail || booking.clientEmail;
-  console.log("[PATCH booking] progress:", progress, "prev:", booking.progress, "emailTo:", emailTo);
 
   if (progress && progress !== booking.progress && emailTo) {
     const label = PROGRESS_LABELS[progress] || progress;
     const isDone = progress === "done";
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const { data, error } = await resend.emails.send({
-      from: "TIR Service <onboarding@resend.dev>",
-      to: emailTo,
-      subject: isDone ? "✅ Ваш автомобіль готовий до видачі" : `Оновлення статусу: ${label}`,
-      html: `
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+    try {
+      await sendEmail(
+        emailTo,
+        isDone ? "✅ Ваш автомобіль готовий до видачі" : `Оновлення статусу: ${label}`,
+        `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
           <h2 style="color:#0f1923">${isDone ? "🎉 Ваш автомобіль готовий!" : "Оновлення по вашому замовленню"}</h2>
           <p style="color:#555">Статус вашого замовлення змінено на: <strong>${label}</strong></p>
           ${booking.carBrand ? `<p style="color:#555">Авто: <strong>${booking.carBrand} ${booking.carModel || ""}</strong></p>` : ""}
           ${isDone ? "<p style='color:#01696f;font-weight:600'>Запрошуємо забрати авто!</p>" : ""}
           <a href="${process.env.NEXT_PUBLIC_APP_URL}/cabinet" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#01696f;color:#fff;border-radius:8px;text-decoration:none">Переглянути кабінет</a>
-        </div>
-      `,
-    });
-    console.log("[RESEND result] data:", JSON.stringify(data), "error:", JSON.stringify(error));
+        </div>`
+      );
+    } catch (err) {
+      console.error("[EMAIL error]", err);
+    }
   }
 
   return NextResponse.json(updated);
