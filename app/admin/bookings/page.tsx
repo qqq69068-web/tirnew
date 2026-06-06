@@ -80,7 +80,7 @@ export default function AdminBookingsPage() {
       <div className="space-y-3">
         {bookings.map((b) => {
           const edit = edits[b.id] || {};
-          const currentProgress = (edit.progress as string) || b.progress;
+          const currentProgress = (edit.progress as string) || b.progress || "received";
           const isOpen = expanded === b.id;
           return (
             <div key={b.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -101,7 +101,7 @@ export default function AdminBookingsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${PROGRESS_COLORS[b.progress] || "bg-gray-100 text-gray-600"}`}>
-                    {PROGRESS_OPTIONS.find((p) => p.value === b.progress)?.label || b.progress}
+                    {PROGRESS_OPTIONS.find((p) => p.value === b.progress)?.label || "Заявку прийнято"}
                   </span>
                   {b.price && <span className="text-sm font-bold text-teal-700">{b.price} ₴</span>}
                   {isOpen ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
@@ -121,7 +121,7 @@ export default function AdminBookingsPage() {
                       <select
                         value={currentProgress}
                         onChange={(e) => setEdit(b.id, "progress", e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                       >
                         {PROGRESS_OPTIONS.map((p) => (
                           <option key={p.value} value={p.value}>{p.label}</option>
@@ -136,7 +136,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.price || ""}
                         onChange={(e) => setEdit(b.id, "price", e.target.value)}
                         placeholder="0"
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     {/* Client email */}
@@ -149,7 +149,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.clientEmail || ""}
                         onChange={(e) => setEdit(b.id, "clientEmail", e.target.value)}
                         placeholder="client@email.com"
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                   </div>
@@ -162,7 +162,7 @@ export default function AdminBookingsPage() {
                       <Save size={14} />
                       {saving === b.id ? "Зберігаємо..." : "Зберегти"}
                     </button>
-                    {saved === b.id && <span className="text-xs text-green-600">✓ Збережено! Email надіслано клієнту.</span>}
+                    {saved === b.id && <span className="text-xs text-green-600">✓ Збережено!</span>}
                     <span className="text-xs text-gray-400 ml-auto">
                       {new Date(b.createdAt).toLocaleString("uk-UA")}
                     </span>
