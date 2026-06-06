@@ -1,13 +1,23 @@
 export const dynamic = "force-dynamic";
 
 import { getTokenPayload } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import LogoutButton from "@/components/admin/LogoutButton";
+import { headers } from "next/headers";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Перевірку автентифікації робить тільки middleware.
+  // Layout не робить redirect, бо інакше /admin/login потрапляє в цю ж layout і виникає петля.
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? headersList.get("x-invoke-path") ?? "";
+  const isLoginPage = pathname === "/admin/login" || pathname.endsWith("/admin/login");
+
   const payload = await getTokenPayload();
-  if (!payload) redirect("/admin/login");
+
+  // Якщо це сторінка логіну — показуємо тільки children (форму входу)
+  if (isLoginPage || !payload) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
