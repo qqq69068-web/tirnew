@@ -7,39 +7,37 @@ export const WORKER_IDS_CAR = [6, 7];
 
 export const WORK_START_HOUR = 7;  // 07:00
 export const WORK_END_HOUR = 20;   // 20:00
+const WORK_DAY_HOURS = WORK_END_HOUR - WORK_START_HOUR; // 13 год
 
-// Парсимо поле hours з послуги: "2-3 год" → 2, "1 год" → 1, "30 хв" → 1
-// ВАЖЛИВО: "8-20 год" — це розклад (не тривалість!), повертаємо 1
+/**
+ * Парсимо рядок hours з послуги → повертаємо тривалість у годинах.
+ *
+ * Правила:
+ *  "30 хв"     → 1
+ *  "1 год"     → 1
+ *  "2-3 год"   → середнє = 2.5 → ceil = 3
+ *  "3-4 год"   → середнє = 3.5 → ceil = 4
+ *  "8-20 год"  → середнє = 14 → блокує весь день
+ */
 export function parseServiceHours(hours: string): number {
   if (!hours) return 1;
   const lower = hours.toLowerCase().trim();
 
-  // "30 хв" або "45 хв"
+  // "30 хв" / "45 хв"
   const minMatch = lower.match(/(\d+)\s*хв/);
-  if (minMatch) return 1; // менше години → слот 1 год
+  if (minMatch) return 1;
 
-  // Діапазон вигляду "A-B год" або "A–B год"
-  // Якщо перше число >= 4 і друге > перше → це розклад роботи (напр. "8-20"), не тривалість
-  // Тривалість зазвичай: "1-2", "2-3", "3-4" — різниця ≤ 4 год і перше число маленьке
+  // Діапазон "A-B" або "A–B" — це завжди діапазон тривалості, беремо середнє
   const rangeMatch = lower.match(/(\d+)\s*[-–]\s*(\d+)/);
   if (rangeMatch) {
     const a = parseInt(rangeMatch[1]);
     const b = parseInt(rangeMatch[2]);
-    const diff = b - a;
-    // Якщо різниця > 4 або перше число >= 4 → схоже на розклад, а не тривалість
-    if (diff > 4 || a >= 4) return 1;
-    // Інакше це тривалість: "1-2 год" → 1, "2-3 год" → 2
-    return a;
+    return Math.ceil((a + b) / 2);
   }
 
-  // "2 год", "3 год"
+  // "Тільки одне число: "2 год"
   const singleMatch = lower.match(/(\d+)/);
-  if (singleMatch) {
-    const n = parseInt(singleMatch[1]);
-    // Якщо число >= 4 і схоже на годину початку роботи → 1
-    if (n >= 4) return 1;
-    return n;
-  }
+  if (singleMatch) return Math.max(1, parseInt(singleMatch[1]));
 
   return 1;
 }
@@ -65,10 +63,21 @@ export function getAvailableDates(): Date[] {
   return dates;
 }
 
-// Генерує всі слоти на день з кроком slotHours
+/**
+ * Генерує слоти на день.
+ * Якщо slotHours >= WORK_DAY_HOURS — повертаємо лише 1 слот (07:00), що блокує весь день.
+ */
 export function generateDaySlots(date: Date, slotHours: number): Date[] {
   const slots: Date[] = [];
   const step = Math.max(1, slotHours);
+
+  // Якщо послуга займає весь день (або більше) — тільки 1 слот
+  if (step >= WORK_DAY_HOURS) {
+    const slot = new Date(date);
+    slot.setHours(WORK_START_HOUR, 0, 0, 0);
+    return [slot];
+  }
+
   let hour = WORK_START_HOUR;
   while (hour + step <= WORK_END_HOUR) {
     const slot = new Date(date);
