@@ -36,21 +36,24 @@ model MagicToken {
 }
 
 model Booking {
-  id          String    @id @default(cuid())
-  name        String
-  phone       String
-  carBrand    String?
-  carModel    String?
-  carCategory String?   // "car" | "truck" | "trailer"
-  service     String?
-  date        DateTime?
-  message     String?
-  status      String    @default("new")
-  progress    String    @default("received")
-  price       Float?
-  clientEmail String?
-  client      Client?   @relation(fields: [clientEmail], references: [email])
-  createdAt   DateTime  @default(now())
+  id           String    @id @default(cuid())
+  name         String
+  phone        String
+  carBrand     String?
+  carModel     String?
+  carCategory  String?   // "car" | "truck" | "trailer"
+  service      String?
+  date         DateTime?
+  scheduledAt  DateTime? // точна дата+час запису
+  scheduledEnd DateTime? // кінець слоту
+  workerId     Int?      // 1-5 вантажні, 6-7 легкові
+  message      String?
+  status       String    @default("new")
+  progress     String    @default("received")
+  price        Float?
+  clientEmail  String?
+  client       Client?   @relation(fields: [clientEmail], references: [email])
+  createdAt    DateTime  @default(now())
 }
 
 model ContactMessage {
@@ -71,9 +74,9 @@ model Service {
   price        String
   priceMin     Int
   priceMax     Int
-  priceCar     Int?     // ціна для легкових
-  priceTruck   Int?     // ціна для вантажних тягачів
-  priceTrailer Int?     // ціна для причепів
+  priceCar     Int?
+  priceTruck   Int?
+  priceTrailer Int?
   hours        String
   image        String
   category     String
