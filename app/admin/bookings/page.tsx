@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Save, Mail } from "lucide-react";
+import { ChevronDown, ChevronUp, Save, Mail, Calendar } from "lucide-react";
 import { services } from "@/lib/services";
 
 interface Booking {
@@ -17,6 +17,7 @@ interface Booking {
   status: string;
   createdAt: string;
   message: string | null;
+  scheduledAt: string | null;
 }
 
 const PROGRESS_OPTIONS = [
@@ -33,11 +34,19 @@ const PROGRESS_COLORS: Record<string, string> = {
   done: "bg-green-100 text-green-700",
 };
 
+// Convert UTC ISO string to local datetime-local input value
+function toLocalDatetimeInput(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [edits, setEdits] = useState<Record<string, Partial<Booking>>>({});
+  const [edits, setEdits] = useState<Record<string, Partial<Booking & { scheduledAt: string }>>>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
 
@@ -55,14 +64,20 @@ export default function AdminBookingsPage() {
 
   const save = async (id: string) => {
     setSaving(id);
-    const body = edits[id] || {};
+    const body = { ...edits[id] } as Record<string, unknown>;
+    // Convert local datetime string to ISO for the API
+    if (body.scheduledAt && typeof body.scheduledAt === "string" && body.scheduledAt !== "") {
+      body.scheduledAt = new Date(body.scheduledAt as string).toISOString();
+    } else if (body.scheduledAt === "") {
+      body.scheduledAt = null;
+    }
     await fetch(`/api/admin/bookings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
     setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, ...body } : b))
+      prev.map((b) => (b.id === id ? { ...b, ...body } as Booking : b))
     );
     setSaving(null);
     setSaved(id);
@@ -82,6 +97,9 @@ export default function AdminBookingsPage() {
           const edit = edits[b.id] || {};
           const currentProgress = (edit.progress as string) || b.progress || "received";
           const isOpen = expanded === b.id;
+          const scheduledValue = "scheduledAt" in edit
+            ? (edit.scheduledAt as string)
+            : toLocalDatetimeInput(b.scheduledAt);
           return (
             <div key={b.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               {/* Header */}
@@ -100,6 +118,12 @@ export default function AdminBookingsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {b.scheduledAt && (
+                    <span className="hidden sm:flex items-center gap-1 text-xs text-gray-500">
+                      <Calendar size={11} />
+                      {new Date(b.scheduledAt).toLocaleString("uk-UA", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  )}
                   <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${PROGRESS_COLORS[b.progress] || "bg-gray-100 text-gray-600"}`}>
                     {PROGRESS_OPTIONS.find((p) => p.value === b.progress)?.label || "Заявку прийнято"}
                   </span>
@@ -114,7 +138,7 @@ export default function AdminBookingsPage() {
                   {b.message && (
                     <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">{b.message}</p>
                   )}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Progress */}
                     <div>
                       <label className="block text-xs font-medium text-gray-500 mb-1">Статус прогресу</label>
@@ -127,6 +151,18 @@ export default function AdminBookingsPage() {
                           <option key={p.value} value={p.value}>{p.label}</option>
                         ))}
                       </select>
+                    </div>
+                    {/* Scheduled datetime */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                        <Calendar size={11} /> Дата та час запису
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={scheduledValue}
+                        onChange={(e) => setEdit(b.id, "scheduledAt", e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      />
                     </div>
                     {/* Price */}
                     <div>

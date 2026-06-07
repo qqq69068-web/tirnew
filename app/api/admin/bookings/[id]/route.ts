@@ -48,7 +48,7 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await req.json();
-  const { price, progress, status, clientEmail } = body;
+  const { price, progress, status, clientEmail, scheduledAt } = body;
 
   const booking = await prisma.booking.findUnique({ where: { id } });
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -60,6 +60,7 @@ export async function PATCH(
       ...(progress !== undefined && { progress }),
       ...(status !== undefined && { status }),
       ...(clientEmail !== undefined && { clientEmail }),
+      ...(scheduledAt !== undefined && { scheduledAt: scheduledAt ? new Date(scheduledAt) : null }),
     },
   });
 
