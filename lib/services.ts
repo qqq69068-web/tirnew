@@ -10,6 +10,7 @@ export type ServiceItem = {
   image: string;
   category: string;
   details?: string[];
+  isPartsOrder?: boolean;
 };
 
 // Нормогодина: 120–200 грн
@@ -17,6 +18,26 @@ export const HOUR_RATE_MIN = 120;
 export const HOUR_RATE_MAX = 200;
 
 export const services: ServiceItem[] = [
+  {
+    slug: "zamovlennya-detaley",
+    title: "Замовлення запчастин через нашу фірму",
+    short: "Підбір та доставка оригінальних і якісних аналогів запчастин для вантажного транспорту без зайвих клопотів.",
+    description:
+      "Замовте потрібні запчастини через нашу фірму — підберемо оригінал або перевірений аналог, організуємо доставку. Ви залишаєте заявку, ми займаємось пошуком і логістикою.",
+    price: "За запитом",
+    priceMin: 0,
+    priceMax: 0,
+    hours: "1–5 днів",
+    image: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?w=800&auto=format&fit=crop",
+    category: "Запчастини",
+    details: [
+      "Оригінальні та перевірені аналоги",
+      "Підбір за VIN або артикулом",
+      "Доставка по Україні",
+      "Гарантія на деталі",
+    ],
+    isPartsOrder: true,
+  },
   {
     slug: "remont-prychipnoji-tehniky",
     title: "ТО та ремонт причепів і напівпричепів",
