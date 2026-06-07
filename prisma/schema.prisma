@@ -41,16 +41,18 @@ model Booking {
   phone        String
   carBrand     String?
   carModel     String?
-  carCategory  String?   // "car" | "truck" | "trailer"
+  carCategory  String?
   service      String?
   date         DateTime?
-  scheduledAt  DateTime? // точна дата+час запису
-  scheduledEnd DateTime? // кінець слоту
-  workerId     Int?      // 1-5 вантажні, 6-7 легкові
+  scheduledAt  DateTime?
+  scheduledEnd DateTime?
+  workerId     Int?
   message      String?
   status       String    @default("new")
   progress     String    @default("received")
   price        Float?
+  partsCost    Float?    // вартість деталей
+  workItems    String[]  // список виконаних робіт
   clientEmail  String?
   client       Client?   @relation(fields: [clientEmail], references: [email])
   createdAt    DateTime  @default(now())
