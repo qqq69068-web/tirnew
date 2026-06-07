@@ -68,6 +68,10 @@ export async function PATCH(
 
   const emailTo = clientEmail || booking.clientEmail;
 
+  // Визначаємо базову URL — з env або з заголовка запиту
+  const origin = process.env.NEXT_PUBLIC_APP_URL ||
+    `${req.headers.get("x-forwarded-proto") || "https"}://${req.headers.get("host")}`;
+
   if (progress && progress !== booking.progress && emailTo) {
     const label = PROGRESS_LABELS[progress] || progress;
     const isDone = progress === "done";
@@ -80,7 +84,7 @@ export async function PATCH(
           <p style="color:#555">Статус вашого замовлення змінено на: <strong>${label}</strong></p>
           ${booking.carBrand ? `<p style="color:#555">Авто: <strong>${booking.carBrand} ${booking.carModel || ""}</strong></p>` : ""}
           ${isDone ? "<p style='color:#01696f;font-weight:600'>Запрошуємо забрати авто!</p>" : ""}
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/cabinet" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#01696f;color:#fff;border-radius:8px;text-decoration:none">Переглянути кабінет</a>
+          <a href="${origin}/cabinet" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#01696f;color:#fff;border-radius:8px;text-decoration:none">Переглянути кабінет</a>
         </div>`
       );
     } catch (err) {
