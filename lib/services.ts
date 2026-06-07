@@ -382,7 +382,7 @@ export const services: ServiceItem[] = [
     priceMin: 800,
     priceMax: 3500,
     hours: "3–8 год",
-    image: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&auto=format&fit=crop",
     category: "Двигун",
     vehicleType: "car",
     details: [
@@ -403,7 +403,7 @@ export const services: ServiceItem[] = [
     priceMin: 400,
     priceMax: 4000,
     hours: "2–10 год",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=800&auto=format&fit=crop",
     category: "Ходова частина",
     vehicleType: "car",
     details: [
@@ -424,7 +424,7 @@ export const services: ServiceItem[] = [
     priceMin: 150,
     priceMax: 600,
     hours: "0.5–1 год",
-    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/c2a33e08240f6e17925d6636ea99aebbd0d47aff.jpg",
+    image: "https://images.unsplash.com/photo-1632823469850-2f77dd9c7f93?w=800&auto=format&fit=crop",
     category: "Технічне обслуговування",
     vehicleType: "car",
     details: [
@@ -444,7 +444,7 @@ export const services: ServiceItem[] = [
     priceMin: 200,
     priceMax: 500,
     hours: "0.5–2 год",
-    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/ed36e7694584bb9fb76bcf1a8ec9113cdf9ca1f7.jpg",
+    image: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&auto=format&fit=crop",
     category: "Діагностика",
     vehicleType: "car",
     details: [
@@ -464,7 +464,7 @@ export const services: ServiceItem[] = [
     priceMin: 250,
     priceMax: 3000,
     hours: "1–8 год",
-    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/40d66fdf99f228ba1c28422090f83acaea02c970.jpg",
+    image: "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=800&auto=format&fit=crop",
     category: "Електрика",
     vehicleType: "car",
     details: [
@@ -484,7 +484,7 @@ export const services: ServiceItem[] = [
     priceMin: 350,
     priceMax: 700,
     hours: "1–2 год",
-    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/14c3a40c51eeb0f15a66e5c4d7e3637b62c26c7b.jpg",
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&auto=format&fit=crop",
     category: "Діагностика",
     vehicleType: "car",
     details: [
@@ -504,7 +504,7 @@ export const services: ServiceItem[] = [
     priceMin: 100,
     priceMax: 400,
     hours: "0.5–1.5 год",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1606577924006-27d39b132ae2?w=800&auto=format&fit=crop",
     category: "Технічне обслуговування",
     vehicleType: "car",
     details: [
@@ -524,7 +524,7 @@ export const services: ServiceItem[] = [
     priceMin: 500,
     priceMax: 1200,
     hours: "1–2 год",
-    image: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1537041373298-55dbb9073f23?w=800&auto=format&fit=crop",
     category: "Технічне обслуговування",
     vehicleType: "car",
     details: [
@@ -544,7 +544,7 @@ export const services: ServiceItem[] = [
     priceMin: 600,
     priceMax: 1500,
     hours: "2–3 год",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&auto=format&fit=crop",
     category: "Діагностика",
     vehicleType: "car",
     details: [
@@ -565,7 +565,7 @@ export const services: ServiceItem[] = [
     priceMin: 0,
     priceMax: 0,
     hours: "1–3 дні",
-    image: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&auto=format&fit=crop",
     category: "Запчастини",
     vehicleType: "car",
     details: [
