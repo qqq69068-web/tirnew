@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Package } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
 
 interface Props {
@@ -131,7 +131,20 @@ export default async function ServiceDetailPage({ params }: Props) {
             {service.hours && (
               <p className="text-xs text-gray-400 mb-5">⏱ {service.hours}</p>
             )}
-            <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
+
+            {service.isPartsOrder ? (
+              /* Кнопка для послуги замовлення запчастин */
+              <Link
+                href="/parts-order"
+                className="flex items-center justify-center gap-2 w-full bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-xl transition-colors text-sm"
+              >
+                <Package size={16} />
+                Замовити запчастини
+              </Link>
+            ) : (
+              <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
+            )}
+
             <Link
               href="/services"
               className="block w-full text-center text-gray-400 hover:text-gray-600 text-sm mt-3 transition-colors"
