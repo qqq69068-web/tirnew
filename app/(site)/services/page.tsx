@@ -1,42 +1,65 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { services } from "@/lib/services";
-import { ArrowRight, Search, X } from "lucide-react";
+import { CheckCircle2, Package, Truck, Car } from "lucide-react";
 
-const ALL = "Всі";
+type ServiceItem = {
+  title: string;
+  slug?: string; // внутрішня сторінка або null
+};
+
+const tirServices: ServiceItem[] = [
+  { title: "Технічне обслуговування, ремонт причепів і напівпричепів, ремонт осьових агрегатів BPW, SAF, ROR, SMB, TRA, FRU", slug: "remont-prychipnoji-tehniky" },
+  { title: "Наклепка гальмівних накладок на стенді BERAL", slug: "beral" },
+  { title: "Ремонт гальмівних механізмів супортів спецінструментом KNORR", slug: "remont-galmivnyh-mehanizmiv" },
+  { title: "Заміна поворотних шкворнів вантажних автомобілів пресом Fuchs Hydraulik", slug: "zamina-povorotnyh-shkvorniv" },
+  { title: "Заміна масла в двигунах і трансмісії вантажних автомобілів, згідно рекомендацій заводів виробників", slug: "zamina-masla" },
+  { title: "Діагностика та ремонт форсунок системи Common Rail", slug: "remont-forsunok-common-rail" },
+  { title: "Ремонт двигунів", slug: "remont-dviguniv" },
+  { title: "Ремонт КПП", slug: "remont-kpp" },
+  { title: "Ремонт редукторів", slug: "differential" },
+  { title: "Ремонт підвіски автомобілів", slug: "remont-pidvisky" },
+  { title: "Ремонт електрообладнання", slug: "comp-diagnostic" },
+  { title: "Комп'ютерна діагностика електричних систем автомобілів і причепів сканером AutoCom", slug: "comp-diagnostic-electro" },
+  { title: "Комп'ютерна діагностика розвалу-сходження всіх марок автомобілів стендом Trommelberg", slug: "pc-diagnostic-trommelberg" },
+  { title: "Комп'ютерна діагностика і калібрування пневмопідвіски з електронним керуванням (ECAS)", slug: "ecas" },
+  { title: "Комп'ютерна діагностика і ремонт систем WABCO і HALDEX оригінальним обладнанням", slug: "wabcohaldex" },
+  { title: "Комп'ютерна діагностика VOLVO, RVI оригінальним діагностичним комплексом VOCOM", slug: "volvo-rvi" },
+  { title: "Відключення AdBlue за допомогою емулятора", slug: "adblue" },
+  { title: "Діагностика і ремонт гальмівних систем ABS і EBS", slug: "abs-ebs" },
+  { title: "Діагностика і ремонт пневматичної системи", slug: "remont-pnevmosistem" },
+  { title: "Зварні роботи", slug: "zvaryuvalni-roboty" },
+  { title: "Реставрація балок", slug: "restavraciya-balok" },
+  { title: "Реставрація гальмівних валів, кронштейнів підвіски та інше", slug: "restavracijni-roboty" },
+];
+
+const carServices: ServiceItem[] = [
+  { title: "Заміна ГРМ" },
+  { title: "Ремонт ходової" },
+  { title: "Заміна мастила" },
+  { title: "Комп'ютерна діагностика" },
+  { title: "Автоелектрик" },
+  { title: "Розвал-сходження 3D" },
+  { title: "Шиномонтаж" },
+  { title: "Заправка кондиціонера" },
+  { title: "Перевірка авто перед покупкою" },
+  { title: "Підбір автозапчастин" },
+];
 
 export default function ServicesPage() {
-  const [query, setQuery] = useState("");
-  const [active, setActive] = useState(ALL);
-
-  const categories = useMemo(
-    () => [ALL, ...Array.from(new Set(services.map((s) => s.category)))],
-    []
-  );
-
-  const filtered = useMemo(() => {
-    const q = query.toLowerCase().trim();
-    return services.filter((s) => {
-      const matchCat = active === ALL || s.category === active;
-      const matchQ =
-        !q ||
-        s.title.toLowerCase().includes(q) ||
-        s.short.toLowerCase().includes(q) ||
-        s.category.toLowerCase().includes(q);
-      return matchCat && matchQ;
-    });
-  }, [query, active]);
+  const [tab, setTab] = useState<"tir" | "car">("tir");
 
   return (
-    <main className="min-h-screen bg-[#09090b]">
+    <main className="min-h-screen bg-[#f7f6f2]">
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#0f1923] py-24 px-4 text-white"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+      <section
+        className="relative overflow-hidden bg-[#0f1923] py-20 px-4 text-white"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+      >
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-15"
           style={{
             backgroundImage: "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80)",
             backgroundSize: "cover",
@@ -44,143 +67,135 @@ export default function ServicesPage() {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0f1923]/40 to-[#0f1923]" />
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-4xl mx-auto text-center">
           <p className="text-sm uppercase tracking-widest text-red-400 mb-3 font-medium">Що ми робимо</p>
           <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-4">Наші послуги</h1>
-          <p className="text-lg text-neutral-300 max-w-xl">
-            Повний цикл технічного обслуговування та ремонту вантажного транспорту й причіпної техніки.
+          <p className="text-lg text-neutral-300 max-w-xl mx-auto">
+            Повний цикл ремонту і обслуговування вантажного транспорту, причіпної техніки та легкових автомобілів.
           </p>
         </div>
       </section>
 
-      {/* SEARCH + FILTERS */}
-      <section className="sticky top-[65px] z-30 bg-[#09090b]/95 backdrop-blur-lg px-4 py-4"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row gap-3">
-
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Пошук послуги..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              style={{
-                color: "#ffffff",
-                caretColor: "#ffffff",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-              className="w-full pl-9 pr-9 py-2.5 rounded-xl text-sm placeholder-neutral-500 outline-none focus:ring-2 focus:ring-red-500/50 transition"
-            />
-            {query && (
-              <button onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition">
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          {/* Category chips */}
-          <div className="flex gap-2 flex-wrap">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActive(cat)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                  active === cat
-                    ? "bg-red-600 text-white"
-                    : "text-neutral-400 hover:text-white hover:bg-white/8"
-                }`}
-                style={active !== cat ? { border: "1px solid rgba(255,255,255,0.1)" } : {}}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+      {/* TABS */}
+      <div className="bg-white border-b border-gray-200 sticky top-[65px] z-30">
+        <div className="max-w-5xl mx-auto px-4 flex">
+          <button
+            onClick={() => setTab("tir")}
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
+              tab === "tir"
+                ? "border-red-600 text-red-600"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            }`}
+          >
+            <Truck size={16} />
+            Вантажні / ТІР
+          </button>
+          <button
+            onClick={() => setTab("car")}
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
+              tab === "car"
+                ? "border-red-600 text-red-600"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            }`}
+          >
+            <Car size={16} />
+            Легкові
+          </button>
         </div>
-      </section>
+      </div>
 
-      {/* RESULTS */}
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        {filtered.length === 0 ? (
-          <div className="text-center py-24 text-neutral-500">
-            <Search size={40} className="mx-auto mb-3 opacity-30" />
-            <p className="text-lg">Нічого не знайдено</p>
-            <button onClick={() => { setQuery(""); setActive(ALL); }}
-              className="mt-4 text-sm text-red-400 hover:underline">
-              Скинути фільтри
-            </button>
-          </div>
-        ) : (
-          <>
-            <p className="text-xs text-neutral-500 mb-6">
-              {filtered.length === services.length
-                ? `Усі послуги — ${filtered.length}`
-                : `Знайдено: ${filtered.length}`}
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filtered.map((s) => (
-                <Link
-                  key={s.slug}
-                  href={`/services/${s.slug}`}
-                  style={{ border: "1px solid rgba(255,255,255,0.07)" }}
-                  className="group bg-white/4 rounded-2xl overflow-hidden hover:bg-white/7 hover:border-white/15 transition-all duration-300 flex flex-col"
-                >
-                  {/* Image */}
-                  <div className="relative h-44 overflow-hidden bg-neutral-800">
-                    <img
-                      src={s.image}
-                      alt={s.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                      width={800}
-                      height={500}
-                      loading="lazy"
-                    />
-                    {/* Category badge */}
-                    <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2.5 py-1 rounded-full">
-                      {s.category}
-                    </span>
-                  </div>
+      {/* CONTENT */}
+      <section className="max-w-5xl mx-auto px-4 py-12">
 
-                  {/* Content */}
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-sm font-semibold text-white mb-1.5 group-hover:text-red-400 transition-colors leading-snug">
-                      {s.title}
-                    </h3>
-                    <p className="text-neutral-400 text-xs leading-relaxed flex-1">
-                      {s.short}
-                    </p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <span className="text-xs font-medium text-teal-400">{s.price}</span>
-                      <span className="text-neutral-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">
-                        <ArrowRight size={15} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+        {tab === "tir" && (
+          <div>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Вантажні автомобілі і ТІР</h2>
+              <p className="text-gray-500 text-sm">Повний перелік послуг для вантажного транспорту та причіпної техніки</p>
             </div>
-          </>
+            <ul className="space-y-2 mb-12">
+              {tirServices.map((s, i) => (
+                <li key={i}>
+                  {s.slug ? (
+                    <Link
+                      href={`/services/${s.slug}`}
+                      className="group flex items-start gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                    >
+                      <CheckCircle2 size={18} className="text-teal-500 mt-0.5 shrink-0 group-hover:text-teal-600" />
+                      <span className="text-gray-800 text-sm leading-snug group-hover:text-red-600 transition-colors">{s.title}</span>
+                    </Link>
+                  ) : (
+                    <div className="flex items-start gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100">
+                      <CheckCircle2 size={18} className="text-teal-500 mt-0.5 shrink-0" />
+                      <span className="text-gray-800 text-sm leading-snug">{s.title}</span>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* Замовлення запчастин */}
+            <PartsOrderCard />
+          </div>
+        )}
+
+        {tab === "car" && (
+          <div>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Легкові автомобілі</h2>
+              <p className="text-gray-500 text-sm">Послуги для легкового транспорту</p>
+            </div>
+            <ul className="space-y-2 mb-12">
+              {carServices.map((s, i) => (
+                <li key={i}>
+                  <div className="flex items-start gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100">
+                    <CheckCircle2 size={18} className="text-teal-500 mt-0.5 shrink-0" />
+                    <span className="text-gray-800 text-sm leading-snug">{s.title}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Замовлення запчастин */}
+            <PartsOrderCard />
+          </div>
         )}
       </section>
 
       {/* CTA */}
       <section
-        style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
-        className="bg-[#0f1923] text-white py-16 px-4 text-center">
+        style={{ borderTop: "1px solid rgba(0,0,0,0.07)" }}
+        className="bg-[#0f1923] text-white py-16 px-4 text-center"
+      >
         <h2 className="text-3xl font-bold mb-3">Не знаєте, яка послуга потрібна?</h2>
         <p className="text-neutral-400 mb-8 max-w-md mx-auto">
           Запишіться на безкоштовну консультацію — майстер розбереться в проблемі.
         </p>
         <Link
-          href="/booking"
+          href="/contacts"
           className="inline-block bg-red-600 hover:bg-red-500 text-white font-semibold px-8 py-3 rounded-full transition-colors"
         >
-          Записатись
+          Зв'язатись з нами
         </Link>
       </section>
     </main>
+  );
+}
+
+function PartsOrderCard() {
+  return (
+    <Link
+      href="/parts-order"
+      className="group flex items-center gap-4 bg-teal-50 border border-teal-200 rounded-2xl px-6 py-5 hover:bg-teal-100 hover:border-teal-300 transition-all"
+    >
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-600/15">
+        <Package size={22} className="text-teal-600" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-900">Замовлення запчастин через нашу фірму</p>
+        <p className="text-xs text-teal-600 mt-0.5">Підберемо оригінал або перевірений аналог, організуємо доставку</p>
+      </div>
+      <span className="text-teal-500 group-hover:translate-x-1 transition-transform">→</span>
+    </Link>
   );
 }
