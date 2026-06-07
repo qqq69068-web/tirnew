@@ -98,46 +98,24 @@ export default function ServicesPage() {
           <div>
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">Легкові автомобілі</h2>
-              <p className="text-gray-500 text-sm">Послуги для легкового транспорту</p>
+              <p className="text-gray-500 text-sm">Повний перелік послуг для легкового транспорту</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+            <ul className="space-y-2 mb-12">
               {carServices.map((s) => (
-                <Link
-                  key={s.slug}
-                  href={`/services/${s.slug}`}
-                  style={{ border: "1px solid rgba(0,0,0,0.07)" }}
-                  className="group bg-white rounded-2xl overflow-hidden hover:shadow-lg hover:border-red-200 transition-all duration-300 flex flex-col"
-                >
-                  {/* Фото */}
-                  <div className="relative h-44 overflow-hidden bg-gray-100">
-                    <img
-                      src={s.image}
-                      alt={s.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      width={600}
-                      height={350}
-                      loading="lazy"
-                    />
-                    <span className="absolute top-3 left-3 bg-black/55 backdrop-blur-sm text-white text-[10px] font-medium px-2.5 py-1 rounded-full">
-                      {s.category}
-                    </span>
-                  </div>
-                  {/* Контент */}
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1.5 group-hover:text-red-600 transition-colors leading-snug">
+                <li key={s.slug}>
+                  <Link
+                    href={`/services/${s.slug}`}
+                    className="group flex items-start gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                  >
+                    <CheckCircle2 size={18} className="text-teal-500 mt-0.5 shrink-0 group-hover:text-teal-600" />
+                    <span className="flex-1 text-gray-800 text-sm leading-snug group-hover:text-red-600 transition-colors">
                       {s.title}
-                    </h3>
-                    <p className="text-gray-500 text-xs leading-relaxed flex-1">{s.short}</p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <span className="text-xs font-medium text-teal-600">{s.price}</span>
-                      <span className="text-gray-300 group-hover:text-red-400 group-hover:translate-x-1 transition-all">
-                        <ArrowRight size={15} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+                    </span>
+                    <ArrowRight size={15} className="text-gray-300 group-hover:text-red-400 group-hover:translate-x-0.5 transition-all mt-0.5 shrink-0" />
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
             <PartsOrderCard />
           </div>
         )}
@@ -150,13 +128,13 @@ export default function ServicesPage() {
       >
         <h2 className="text-3xl font-bold mb-3">Не знаєте, яка послуга потрібна?</h2>
         <p className="text-neutral-400 mb-8 max-w-md mx-auto">
-          Зв'яжіться з нами — майстер підкаже та запише на зручний час.
+          Зв&apos;яжіться з нами — майстер підкаже та запише на зручний час.
         </p>
         <Link
           href="/contacts"
           className="inline-block bg-red-600 hover:bg-red-500 text-white font-semibold px-8 py-3 rounded-full transition-colors"
         >
-          Зв'язатись з нами
+          Зв&apos;язатись з нами
         </Link>
       </section>
     </main>
