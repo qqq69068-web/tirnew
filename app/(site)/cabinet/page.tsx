@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Suspense } from "react";
 import {
   LogOut, Clock, CheckCircle2, Wrench, Search,
-  ChevronRight, User, ReceiptText, Timer, Mail,
+  ChevronRight, User, ReceiptText, Timer, Mail, Package,
 } from "lucide-react";
 
 interface Booking {
@@ -14,6 +14,8 @@ interface Booking {
   carModel: string | null;
   progress: string;
   price: number | null;
+  partsCost: number | null;
+  workItems: string[];
   createdAt: string;
   status: string;
 }
@@ -62,7 +64,7 @@ function ProgressBar({ current }: { current: string }) {
 
 function StatsBar({ bookings }: { bookings: Booking[] }) {
   const total = bookings.length;
-  const totalPrice = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
+  const totalPrice = bookings.reduce((sum, b) => sum + (b.price || 0) + (b.partsCost || 0), 0);
   const done = bookings.filter((b) => b.progress === "done").length;
   return (
     <div className="grid grid-cols-3 gap-3 mb-8">
@@ -84,6 +86,68 @@ function StatsBar({ bookings }: { bookings: Booking[] }) {
           <p className="text-xs text-neutral-500 mt-0.5">{label}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+function BookingCard({ b }: { b: Booking }) {
+  const totalCost = (b.price || 0) + (b.partsCost || 0);
+  const hasDetails = (b.workItems && b.workItems.length > 0) || b.partsCost;
+
+  return (
+    <div style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+      className="bg-white/5 rounded-2xl p-5">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-semibold text-white">
+            {b.carBrand || b.carModel
+              ? `${b.carBrand || ""} ${b.carModel || ""}`.trim()
+              : "Авто не вказано"}
+          </p>
+          <p className="text-sm text-neutral-400 mt-0.5">{b.service || "Послуга"}</p>
+        </div>
+        <div className="text-right">
+          {totalCost > 0 ? (
+            <p className="font-bold text-teal-400 text-lg">{totalCost.toLocaleString()} ₴</p>
+          ) : (
+            <p className="text-xs text-neutral-500">Ціна уточнюється</p>
+          )}
+          <p className="text-xs text-neutral-500 mt-0.5">
+            {new Date(b.createdAt).toLocaleDateString("uk-UA")}
+          </p>
+        </div>
+      </div>
+
+      {/* Breakdown: work + parts */}
+      {(b.price || b.partsCost) && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {b.price ? (
+            <span className="flex items-center gap-1 text-xs bg-white/5 text-neutral-400 px-2.5 py-1 rounded-full">
+              <Wrench size={11} /> Робота: {b.price.toLocaleString()} ₴
+            </span>
+          ) : null}
+          {b.partsCost ? (
+            <span className="flex items-center gap-1 text-xs bg-white/5 text-neutral-400 px-2.5 py-1 rounded-full">
+              <Package size={11} /> Деталі: {b.partsCost.toLocaleString()} ₴
+            </span>
+          ) : null}
+        </div>
+      )}
+
+      {/* Work items list */}
+      {hasDetails && b.workItems && b.workItems.length > 0 && (
+        <div className="mt-3 space-y-1">
+          <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Виконані роботи</p>
+          {b.workItems.map((item, i) => (
+            <div key={i} className="flex items-start gap-2 text-sm text-neutral-300">
+              <span className="text-teal-500 mt-0.5 shrink-0">✓</span>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ProgressBar current={b.progress} />
     </div>
   );
 }
@@ -152,28 +216,7 @@ function CabinetContent() {
         <div className="space-y-4">
           <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-2">Історія замовлень</h2>
           {client.bookings.map((b) => (
-            <div key={b.id} style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-              className="bg-white/5 rounded-2xl p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-white">
-                    {b.carBrand || b.carModel
-                      ? `${b.carBrand || ""} ${b.carModel || ""}`.trim()
-                      : "Авто не вказано"}
-                  </p>
-                  <p className="text-sm text-neutral-400 mt-0.5">{b.service || "Послуга"}</p>
-                </div>
-                <div className="text-right">
-                  {b.price
-                    ? <p className="font-bold text-teal-400 text-lg">{b.price.toLocaleString()} ₴</p>
-                    : <p className="text-xs text-neutral-500">Ціна уточнюється</p>}
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    {new Date(b.createdAt).toLocaleDateString("uk-UA")}
-                  </p>
-                </div>
-              </div>
-              <ProgressBar current={b.progress} />
-            </div>
+            <BookingCard key={b.id} b={b} />
           ))}
         </div>
       )}
@@ -216,9 +259,9 @@ function AuthForm() {
         </div>
         <h2 className="text-2xl font-bold text-white mb-3">Перевірте пошту</h2>
         <p className="text-neutral-400">
-          Надіслали посилання для входу на{ }
+          Надіслали посилання для входу на{ }
           <strong className="text-white">{email}</strong>.
-          { }Воно діє 30 хвилин.
+          { }Воно діє 30 хвилин.
         </p>
         <button
           onClick={() => { setSent(false); setEmail(""); }}
