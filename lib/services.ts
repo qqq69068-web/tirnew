@@ -11,6 +11,7 @@ export type ServiceItem = {
   category: string;
   details?: string[];
   isPartsOrder?: boolean;
+  vehicleType?: "truck" | "car" | "both";
 };
 
 // Нормогодина: 120–200 грн
@@ -30,6 +31,7 @@ export const services: ServiceItem[] = [
     hours: "1–5 днів",
     image: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?w=800&auto=format&fit=crop",
     category: "Запчастини",
+    vehicleType: "both",
     details: [
       "Оригінальні та перевірені аналоги",
       "Підбір за VIN або артикулом",
@@ -38,6 +40,7 @@ export const services: ServiceItem[] = [
     ],
     isPartsOrder: true,
   },
+  // ── ВАНТАЖНІ / ТІР ──────────────────────────────────────────────────────────
   {
     slug: "remont-prychipnoji-tehniky",
     title: "ТО та ремонт причепів і напівпричепів",
@@ -50,6 +53,7 @@ export const services: ServiceItem[] = [
     hours: "8–20 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/84f9033f2f5efc24deda487fb7122d243f40e055.jpg",
     category: "Причіпна техніка",
+    vehicleType: "truck",
     details: ["Осьові агрегати BPW, SAF, ROR", "SMB, TRA та FRU", "Повна дефектація перед ремонтом", "Перевірка рами та несучих елементів"],
   },
   {
@@ -64,6 +68,7 @@ export const services: ServiceItem[] = [
     hours: "4–6 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/4b96506b9c1e24cef4e01a1a1bc5f506be36f486.jpg",
     category: "Гальмівна система",
+    vehicleType: "truck",
     details: ["Стенд BERAL", "Усі марки вантажних авто", "Дотримання заводської технології", "Контроль якості після наклепки"],
   },
   {
@@ -78,6 +83,7 @@ export const services: ServiceItem[] = [
     hours: "3–7 год",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop",
     category: "Гальмівна система",
+    vehicleType: "truck",
     details: ["Оригінальний інструмент KNORR", "Точне відновлення супортів", "Заміна зношених ущільнень", "Перевірка після ремонту"],
   },
   {
@@ -92,6 +98,7 @@ export const services: ServiceItem[] = [
     hours: "4–8 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/7bc67c17dd5214fc636d2874e1fcee6a486a3f5b.jpg",
     category: "Ходова частина",
+    vehicleType: "truck",
     details: ["Прес Fuchs Hydraulik", "Точне пресування без пошкоджень", "Усі марки вантажних авто", "Рекомендована заміна щоразу при ремонті"],
   },
   {
@@ -106,6 +113,7 @@ export const services: ServiceItem[] = [
     hours: "2–3 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/c2a33e08240f6e17925d6636ea99aebbd0d47aff.jpg",
     category: "Технічне обслуговування",
+    vehicleType: "truck",
     details: ["Згідно регламенту виробника", "Оригінальні та перевірені аналоги", "Заміна фільтрів", "Контроль рівнів після заміни"],
   },
   {
@@ -120,6 +128,7 @@ export const services: ServiceItem[] = [
     hours: "5–12 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/8daee9beb5e07ab91c97ad77d6dc174ce24ecbc7.jpg",
     category: "Паливна система",
+    vehicleType: "truck",
     details: ["Стендова перевірка форсунок", "Ультразвукове очищення", "Відновлення розпилювачів", "Перевірка тиску в рейці"],
   },
   {
@@ -134,6 +143,7 @@ export const services: ServiceItem[] = [
     hours: "15–45 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/4b7ff1d1e9c7337632543ebc2f5e043734922980.jpg",
     category: "Двигун",
+    vehicleType: "truck",
     details: ["Капітальний і частковий ремонт", "Діагностика компресії", "Заміна ГБЦ, прокладок", "Налаштування ГРМ"],
   },
   {
@@ -148,6 +158,7 @@ export const services: ServiceItem[] = [
     hours: "10–30 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/9e5670c83836bb4d566263a45cbe465a73ddb034.jpg",
     category: "Трансмісія",
+    vehicleType: "truck",
     details: ["Механічні та автоматичні КПП", "Заміна синхронізаторів", "Ремонт підшипників", "Регулювання перемикання"],
   },
   {
@@ -162,6 +173,7 @@ export const services: ServiceItem[] = [
     hours: "16–50 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/98afea8526d7957b5b407040e0373b0e62216e98.jpg",
     category: "Трансмісія",
+    vehicleType: "truck",
     details: ["Ведучі мости всіх марок", "Заміна шестерень і підшипників", "Регулювання зазорів", "Контрольна обкатка після ремонту"],
   },
   {
@@ -176,6 +188,7 @@ export const services: ServiceItem[] = [
     hours: "4–16 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/e8a5629e6d7036422ee0cfa20261579d24a8f295.jpg",
     category: "Ходова частина",
+    vehicleType: "truck",
     details: ["Листові та пневматичні підвіски", "Заміна втулок, амортизаторів", "Рихтування опорних кронштейнів", "Перевірка геометрії після ремонту"],
   },
   {
@@ -190,6 +203,7 @@ export const services: ServiceItem[] = [
     hours: "3–15 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/40d66fdf99f228ba1c28422090f83acaea02c970.jpg",
     category: "Електрика",
+    vehicleType: "truck",
     details: ["Пошук обривів і коротких замикань", "Ремонт стартерів і генераторів", "Монтаж додаткового обладнання", "Перевірка бортової мережі"],
   },
   {
@@ -204,6 +218,7 @@ export const services: ServiceItem[] = [
     hours: "2–3 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/ed36e7694584bb9fb76bcf1a8ec9113cdf9ca1f7.jpg",
     category: "Діагностика",
+    vehicleType: "truck",
     details: ["Сканер AutoCom", "Зчитування та скидання помилок", "Перевірка CAN-шини", "Детальний звіт після діагностики"],
   },
   {
@@ -218,6 +233,7 @@ export const services: ServiceItem[] = [
     hours: "3–4 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/14c3a40c51eeb0f15a66e5c4d7e3637b62c26c7b.jpg",
     category: "Діагностика",
+    vehicleType: "truck",
     details: ["Стенд Trommelberg", "Усі марки авто", "Регулювання кутів після перевірки", "Рекомендовано після ремонту підвіски"],
   },
   {
@@ -232,6 +248,7 @@ export const services: ServiceItem[] = [
     hours: "4–10 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/b06a6716fffc58971cf31faf05e62f2923e9a829.jpg",
     category: "Пневмосистема",
+    vehicleType: "truck",
     details: ["Електронне керування ECAS", "Калібрування висоти кузова", "Перевірка клапанів і сенсорів", "Налаштування під навантаження"],
   },
   {
@@ -246,6 +263,7 @@ export const services: ServiceItem[] = [
     hours: "3–12 год",
     image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&auto=format&fit=crop",
     category: "Гальмівна система",
+    vehicleType: "truck",
     details: ["Оригінальне ПЗ WABCO/HALDEX", "Зчитування кодів помилок", "Ремонт модуляторів і клапанів", "Перевірка ефективності гальмування"],
   },
   {
@@ -260,6 +278,7 @@ export const services: ServiceItem[] = [
     hours: "2–3 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/2b10e63c94d90664b7587d2f543d5f8523a5b782.jpg",
     category: "Діагностика",
+    vehicleType: "truck",
     details: ["Оригінальний комплекс VOCOM", "VOLVO FH, FM, FMX, FL, FE", "RVI / Renault Trucks", "Повна перевірка всіх систем"],
   },
   {
@@ -274,6 +293,7 @@ export const services: ServiceItem[] = [
     hours: "5–10 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/8daee9beb5e07ab91c97ad77d6dc174ce24ecbc7.jpg",
     category: "Електронні системи",
+    vehicleType: "truck",
     details: ["Аналіз конфігурації авто", "Програмне налаштування ЕБУ", "Перевірка після втручання", "Без фізичного демонтажу деталей"],
   },
   {
@@ -288,6 +308,7 @@ export const services: ServiceItem[] = [
     hours: "4–12 год",
     image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&auto=format&fit=crop",
     category: "Гальмівна система",
+    vehicleType: "truck",
     details: ["Електронне гальмування EBS", "Антиблокувальна система ABS", "Перевірка датчиків швидкості", "Ремонт модуляторів тиску"],
   },
   {
@@ -302,6 +323,7 @@ export const services: ServiceItem[] = [
     hours: "3–12 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/0fa10922b0bc4e9125e79d6d96568277a3ec3dbd.jpg",
     category: "Пневмосистема",
+    vehicleType: "truck",
     details: ["Пневматика гальм і підвіски", "Пошук витоків повітря", "Заміна клапанів і трубок", "Перевірка компресора"],
   },
   {
@@ -316,6 +338,7 @@ export const services: ServiceItem[] = [
     hours: "4–20 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/e8a5629e6d7036422ee0cfa20261579d24a8f295.jpg",
     category: "Відновлювальні роботи",
+    vehicleType: "truck",
     details: ["MIG/MAG зварювання", "Рама, кронштейни, підсилювачі", "Контроль зварних швів", "Підготовка поверхні перед зварюванням"],
   },
   {
@@ -330,6 +353,7 @@ export const services: ServiceItem[] = [
     hours: "10–30 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/98afea8526d7957b5b407040e0373b0e62216e98.jpg",
     category: "Відновлювальні роботи",
+    vehicleType: "truck",
     details: ["Балки передніх і задніх мостів", "Оцінка ступеня зносу", "Наплавлення та механічна обробка", "Відновлення до заводських допусків"],
   },
   {
@@ -344,6 +368,212 @@ export const services: ServiceItem[] = [
     hours: "6–15 год",
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/4b96506b9c1e24cef4e01a1a1bc5f506be36f486.jpg",
     category: "Відновлювальні роботи",
+    vehicleType: "truck",
     details: ["Гальмівні вали S-подібного типу", "Кронштейни ресорної підвіски", "Відновлення посадкових місць", "Дешевша альтернатива заміні"],
+  },
+  // ── ЛЕГКОВІ ─────────────────────────────────────────────────────────────────
+  {
+    slug: "car-grm",
+    title: "Заміна ГРМ",
+    short: "Заміна ременя або ланцюга ГРМ з обов'язковою перевіркою натяжників і роликів.",
+    description:
+      "Виконуємо заміну газорозподільного механізму (ГРМ) легкових автомобілів — ремінь або ланцюг із комплектом натяжників, роликів та помпи охолодження. Роботи проводяться згідно регламенту виробника.",
+    price: "від 800 грн",
+    priceMin: 800,
+    priceMax: 3500,
+    hours: "3–8 год",
+    image: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&auto=format&fit=crop",
+    category: "Двигун",
+    vehicleType: "car",
+    details: [
+      "Ремінь або ланцюг ГРМ",
+      "Заміна натяжників і роликів",
+      "Заміна помпи охолодження (за потреби)",
+      "Перевірка фаз газорозподілу",
+      "Усі марки легкових авто",
+    ],
+  },
+  {
+    slug: "car-hodova",
+    title: "Ремонт ходової частини",
+    short: "Діагностика та ремонт підвіски, рульового керування, амортизаторів.",
+    description:
+      "Проводимо повну діагностику та ремонт ходової частини легкових автомобілів: заміна амортизаторів, важелів, кульових опор, сайлентблоків, рульових тяг і наконечників.",
+    price: "від 400 грн",
+    priceMin: 400,
+    priceMax: 4000,
+    hours: "2–10 год",
+    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&auto=format&fit=crop",
+    category: "Ходова частина",
+    vehicleType: "car",
+    details: [
+      "Амортизатори та стійки",
+      "Важелі підвіски, сайлентблоки",
+      "Кульові опори та шарніри",
+      "Рульові тяги й наконечники",
+      "Діагностика на підйомнику",
+    ],
+  },
+  {
+    slug: "car-maslo",
+    title: "Заміна мастила",
+    short: "Заміна моторного масла та фільтрів згідно регламенту для вашого авто.",
+    description:
+      "Виконуємо заміну моторного масла та фільтрів для легкових автомобілів. Підбираємо оливу відповідно до допусків виробника, контролюємо рівні після заміни.",
+    price: "від 150 грн",
+    priceMin: 150,
+    priceMax: 600,
+    hours: "0.5–1 год",
+    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/c2a33e08240f6e17925d6636ea99aebbd0d47aff.jpg",
+    category: "Технічне обслуговування",
+    vehicleType: "car",
+    details: [
+      "Моторна олива та оливний фільтр",
+      "Повітряний і салонний фільтр (за потреби)",
+      "Підбір масла за допусками виробника",
+      "Скидання індикатора ТО",
+    ],
+  },
+  {
+    slug: "car-diagnostyka",
+    title: "Комп'ютерна діагностика",
+    short: "Зчитування та розшифровка помилок усіх систем авто сучасним сканером.",
+    description:
+      "Проводимо комп'ютерну діагностику легкових автомобілів: зчитування кодів несправностей двигуна, трансмісії, ABS, подушок безпеки та інших систем. Надаємо детальний звіт і рекомендації.",
+    price: "від 200 грн",
+    priceMin: 200,
+    priceMax: 500,
+    hours: "0.5–2 год",
+    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/ed36e7694584bb9fb76bcf1a8ec9113cdf9ca1f7.jpg",
+    category: "Діагностика",
+    vehicleType: "car",
+    details: [
+      "Двигун, трансмісія, ABS, SRS",
+      "Зчитування та скидання помилок",
+      "Перевірка живих параметрів",
+      "Детальний звіт після діагностики",
+    ],
+  },
+  {
+    slug: "car-avtoelektryk",
+    title: "Автоелектрик",
+    short: "Пошук і усунення несправностей електрики, ремонт стартерів і генераторів.",
+    description:
+      "Виконуємо діагностику та ремонт електрообладнання легкових автомобілів: пошук обривів, коротких замикань, ремонт стартерів і генераторів, встановлення додаткового обладнання.",
+    price: "від 250 грн",
+    priceMin: 250,
+    priceMax: 3000,
+    hours: "1–8 год",
+    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/40d66fdf99f228ba1c28422090f83acaea02c970.jpg",
+    category: "Електрика",
+    vehicleType: "car",
+    details: [
+      "Пошук обривів і коротких замикань",
+      "Ремонт стартерів і генераторів",
+      "Встановлення сигналізацій, магнітол",
+      "Перевірка зарядки та АКБ",
+    ],
+  },
+  {
+    slug: "car-rozval",
+    title: "Розвал-сходження 3D",
+    short: "Точне регулювання кутів коліс на 3D-стенді для рівного ходу авто.",
+    description:
+      "Виконуємо розвал-сходження легкових автомобілів на сучасному 3D-стенді. Точне регулювання кутів установки коліс забезпечує рівномірний знос шин і стабільне керування.",
+    price: "від 350 грн",
+    priceMin: 350,
+    priceMax: 700,
+    hours: "1–2 год",
+    image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/14c3a40c51eeb0f15a66e5c4d7e3637b62c26c7b.jpg",
+    category: "Діагностика",
+    vehicleType: "car",
+    details: [
+      "3D-стенд з високою точністю",
+      "Перевірка всіх кутів (розвал, сходження, кастер)",
+      "Рекомендовано після ремонту підвіски",
+      "Роздруківка результатів",
+    ],
+  },
+  {
+    slug: "car-shynomontazh",
+    title: "Шиномонтаж",
+    short: "Монтаж, демонтаж і балансування шин для легкових автомобілів.",
+    description:
+      "Надаємо послуги шиномонтажу для легкових автомобілів: зняття та встановлення коліс, монтаж-демонтаж шин, балансування. Швидко та акуратно.",
+    price: "від 100 грн",
+    priceMin: 100,
+    priceMax: 400,
+    hours: "0.5–1.5 год",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop",
+    category: "Технічне обслуговування",
+    vehicleType: "car",
+    details: [
+      "Зняття та встановлення коліс",
+      "Монтаж і демонтаж шин",
+      "Балансування",
+      "Підкачка азотом (за потреби)",
+    ],
+  },
+  {
+    slug: "car-kondytsioner",
+    title: "Заправка кондиціонера",
+    short: "Перевірка герметичності та заправка кондиціонера фреоном.",
+    description:
+      "Виконуємо заправку кондиціонера легкових автомобілів: перевірка герметичності системи, вакуумування, заправка фреоном згідно специфікації виробника.",
+    price: "від 500 грн",
+    priceMin: 500,
+    priceMax: 1200,
+    hours: "1–2 год",
+    image: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&auto=format&fit=crop",
+    category: "Технічне обслуговування",
+    vehicleType: "car",
+    details: [
+      "Перевірка герметичності контуру",
+      "Вакуумування системи",
+      "Заправка фреоном R134a / R1234yf",
+      "Перевірка роботи після заправки",
+    ],
+  },
+  {
+    slug: "car-perevirka",
+    title: "Перевірка авто перед покупкою",
+    short: "Повна технічна перевірка автомобіля перед купівлею — уникніть прихованих дефектів.",
+    description:
+      "Проводимо комплексну перевірку автомобіля перед покупкою: діагностика кузова, двигуна, ходової, електрики, перевірка на підйомнику. Ви отримаєте чесний звіт про стан авто.",
+    price: "від 600 грн",
+    priceMin: 600,
+    priceMax: 1500,
+    hours: "2–3 год",
+    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop",
+    category: "Діагностика",
+    vehicleType: "car",
+    details: [
+      "Комп'ютерна діагностика всіх систем",
+      "Огляд на підйомнику",
+      "Перевірка кузова товщиноміром",
+      "Перевірка двигуна і трансмісії",
+      "Письмовий звіт для покупця",
+    ],
+  },
+  {
+    slug: "car-zapchastyny",
+    title: "Підбір автозапчастин",
+    short: "Підбір і замовлення оригінальних та аналогових запчастин для вашого авто.",
+    description:
+      "Допомагаємо підібрати та замовити потрібні запчастини для легкових автомобілів. Підбір за VIN-кодом, каталогом або артикулом. Оригінали та якісні аналоги з гарантією.",
+    price: "За запитом",
+    priceMin: 0,
+    priceMax: 0,
+    hours: "1–3 дні",
+    image: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?w=800&auto=format&fit=crop",
+    category: "Запчастини",
+    vehicleType: "car",
+    details: [
+      "Підбір за VIN або артикулом",
+      "Оригінали та перевірені аналоги",
+      "Доставка в день замовлення",
+      "Гарантія на деталі",
+    ],
+    isPartsOrder: true,
   },
 ];
