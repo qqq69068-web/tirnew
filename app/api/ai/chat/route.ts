@@ -5,6 +5,21 @@ import { services } from "@/lib/services";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
+type ClientBookingLite = {
+  id: string;
+  service?: string | null;
+  scheduledAt?: Date | null;
+  status?: string | null;
+  carBrand?: string | null;
+  carModel?: string | null;
+};
+
+type ClientLite = {
+  name?: string | null;
+  email: string;
+  bookings: ClientBookingLite[];
+};
+
 const SYSTEM_INFO = `
 Ти — AI-помічник сервісного центру Tirnew Truck Service. Відповідай тільки українською мовою.
 Ти — професійний адміністратор сервісу. Ніколи не вигадуй дані.
@@ -27,7 +42,7 @@ ${services.map((s) => `- ${s.title} (${s.vehicleType === "truck" ? "вантаж
 5. Остаточний діагноз можливий лише після огляду — завжди це підкреслюй при діагностиці.
 `;
 
-async function getClientFromRequest(req: NextRequest) {
+async function getClientFromRequest(req: NextRequest): Promise<ClientLite | null> {
   const token = req.cookies.get("client_token")?.value;
   if (!token) return null;
   try {
@@ -37,7 +52,20 @@ async function getClientFromRequest(req: NextRequest) {
       where: { email },
       include: { bookings: { orderBy: { scheduledAt: "desc" }, take: 10 } },
     });
-    return client;
+    if (!client) return null;
+
+    return {
+      name: client.name,
+      email: client.email,
+      bookings: client.bookings.map((b) => ({
+        id: String(b.id),
+        service: (b as { service?: string | null; name?: string | null }).service ?? b.name ?? null,
+        scheduledAt: b.scheduledAt ?? b.date ?? null,
+        status: b.status ?? null,
+        carBrand: b.carBrand ?? null,
+        carModel: b.carModel ?? null,
+      })),
+    };
   } catch {
     return null;
   }
@@ -54,7 +82,6 @@ export async function POST(req: NextRequest) {
 
     const client = await getClientFromRequest(req);
 
-    // Контекст авторизованого користувача
     let userContext = "";
     if (client) {
       const activeBookings = client.bookings.filter((b) => b.status !== "cancelled" && b.status !== "done");
@@ -66,14 +93,12 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.OPENAI_API_KEY;
 
-    // Якщо немає ключа OpenAI — використовуємо вбудований rule-based режим
     if (!apiKey) {
       const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
       const reply = getRuleBasedReply(lastMsg, client);
       return NextResponse.json({ reply });
     }
 
-    // OpenAI режим
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -107,8 +132,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Rule-based fallback коли немає API ключа
-function getRuleBasedReply(msg: string, client: { name?: string | null; email: string; bookings: { id: number; service?: string | null; scheduledAt?: Date | null; status?: string | null; carBrand?: string | null; carModel?: string | null }[] } | null): string {
+function getRuleBasedReply(msg: string, client: ClientLite | null): string {
   if (msg.includes("привіт") || msg.includes("здравств") || msg.includes("добрий")) {
     return client
       ? "Привіт! 👋 Радий бачити вас знову. Чим можу допомогти?"
