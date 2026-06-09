@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Phone, User, Sun, Moon } from "lucide-react";
+import AiChat from "@/components/AiChat";
 
 const links = [
   { href: "/",           label: "Головна" },
@@ -281,6 +282,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </footer>
+
+      {/* ── AI CHAT ─────────────────────────────────────────── */}
+      <AiChat />
     </div>
   );
 }
