@@ -9,6 +9,11 @@ interface Message {
   bookingId?: string;
 }
 
+// Стан очікування email перед записом
+interface EmailPending {
+  bookData: Record<string, string>;
+}
+
 const QUICK_ACTIONS = [
   { label: "📅 Записатися",        text: "Хочу записатися на ремонт" },
   { label: "📋 Мої записи",        text: "Покажи мої записи" },
@@ -75,6 +80,10 @@ function isConfirmation(text: string): boolean {
   return ["так", "yes", "підтверджую", "підтвердити", "ок", "ok", "добре", "згоден", "погоджуюсь"].some((w) => t === w || t.startsWith(w));
 }
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
 export default function AiChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -83,6 +92,8 @@ export default function AiChat() {
   const [isAuth, setIsAuth] = useState(false);
   const [unread, setUnread] = useState(false);
   const [bookingPending, setBookingPending] = useState<{ data: Record<string, string>; msgIndex: number } | null>(null);
+  // Очікуємо email від незареєстрованого перед показом підтвердження
+  const [emailPending, setEmailPending] = useState<EmailPending | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const initialized = useRef(false);
@@ -108,19 +119,19 @@ export default function AiChat() {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
   }, [open]);
 
-  const confirmBooking = useCallback(async () => {
-    if (!bookingPending) return;
+  const doBooking = useCallback(async (bookData: Record<string, string>) => {
     setLoading(true);
     try {
       const res = await fetch("/api/ai/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingPending.data),
+        body: JSON.stringify(bookData),
       });
       const data = await res.json();
       if (data.ok) {
-        const successMsg = isAuth
-          ? `✅ Запис підтверджено! Номер вашого запису: #${data.bookingId}\n\nМи зв'яжемося з вами найближчим часом для підтвердження часу. Запис відображається у вашому особистому кабінеті.`
+        const hasEmail = !!bookData.email;
+        const successMsg = isAuth || hasEmail
+          ? `✅ Запис підтверджено! Номер вашого запису: #${data.bookingId}\n\nМи зв'яжемося з вами найближчим часом для підтвердження часу. На вашу пошту надійшло підтвердження з посиланням для входу в особистий кабінет.`
           : `✅ Запис підтверджено! Номер вашого запису: #${data.bookingId}\n\nМи зв'яжемося з вами найближчим часом для підтвердження часу.`;
         setMessages((prev) => [...prev, { role: "assistant", content: successMsg, bookingId: data.bookingId }]);
       } else {
@@ -131,11 +142,18 @@ export default function AiChat() {
     } finally {
       setLoading(false);
       setBookingPending(null);
+      setEmailPending(null);
     }
-  }, [bookingPending, isAuth]);
+  }, [isAuth]);
+
+  const confirmBooking = useCallback(async () => {
+    if (!bookingPending) return;
+    await doBooking(bookingPending.data);
+  }, [bookingPending, doBooking]);
 
   const cancelBooking = useCallback(() => {
     setBookingPending(null);
+    setEmailPending(null);
     setMessages((prev) => [...prev, { role: "assistant", content: "Запис скасовано. Якщо захочете — звертайтесь ще! 😊" }]);
   }, []);
 
@@ -144,6 +162,32 @@ export default function AiChat() {
     if (!content || loading) return;
     setInput("");
 
+    // Якщо чекаємо email від незареєстрованого
+    if (emailPending) {
+      setMessages((prev) => [...prev, { role: "user", content }]);
+      if (isValidEmail(content)) {
+        const bookDataWithEmail = { ...emailPending.bookData, email: content.trim() };
+        setEmailPending(null);
+        // Показуємо підтвердження вже з email
+        const bd = bookDataWithEmail;
+        const confirmText =
+          `Підготував запис:\n` +
+          `📋 Послуга: ${bd.service || "—"}\n` +
+          `🚛 Авто: ${bd.carBrand || "—"} ${bd.carModel || ""}\n` +
+          `📅 Дата: ${bd.date ? new Date(bd.date).toLocaleString("uk-UA") : "буде узгоджено"}\n` +
+          `👤 Ім'я: ${bd.name || "—"}\n` +
+          `📞 Телефон: ${bd.phone || "—"}\n` +
+          `📧 Email: ${bd.email}\n\n` +
+          `Підтвердити запис?`;
+        setMessages((prev) => [...prev, { role: "assistant", content: confirmText }]);
+        setBookingPending({ data: bookDataWithEmail, msgIndex: 0 });
+      } else {
+        setMessages((prev) => [...prev, { role: "assistant", content: "❗ Схоже, це не схоже на email-адресу. Будь ласка, вкажіть дійсний email (наприклад: ivan@gmail.com)" }]);
+      }
+      return;
+    }
+
+    // Якщо чекаємо підтвердження запису
     if (bookingPending && isConfirmation(content)) {
       setMessages((prev) => [...prev, { role: "user", content }]);
       confirmBooking();
@@ -167,14 +211,27 @@ export default function AiChat() {
       const bookAction = parseBookAction(rawReply);
       if (bookAction) {
         const { bookData, displayText } = bookAction;
+
+        // ЗАХИСТ: незареєстрований без email — спочатку запитати email
+        if (!isAuth && !bookData.email) {
+          const askEmailText =
+            (displayText ? displayText + "\n\n" : "") +
+            `📧 Майже готово! Залишилось вказати ваш email — на нього надійде підтвердження запису та посилання для входу в особистий кабінет де ви зможете стежити за статусом ремонту.\n\nВведіть ваш email:`;
+          setMessages((prev) => [...prev, { role: "assistant", content: askEmailText }]);
+          setEmailPending({ bookData });
+          return;
+        }
+
+        // Є email (або авторизований) — показуємо підтвердження
         const confirmText = displayText ||
           `Підготував запис:\n` +
           `📋 Послуга: ${bookData.service || "—"}\n` +
           `🚛 Авто: ${bookData.carBrand || "—"} ${bookData.carModel || ""}\n` +
           `📅 Дата: ${bookData.date ? new Date(bookData.date).toLocaleString("uk-UA") : "буде узгоджено"}\n` +
           `👤 Ім'я: ${bookData.name || "—"}\n` +
-          `📞 Телефон: ${bookData.phone || "—"}\n\n` +
-          `Підтвердити запис?`;
+          `📞 Телефон: ${bookData.phone || "—"}\n` +
+          (bookData.email ? `📧 Email: ${bookData.email}\n` : "") +
+          `\nПідтвердити запис?`;
         const msgIndex = next.length;
         setMessages((prev) => [...prev, { role: "assistant", content: confirmText }]);
         setBookingPending({ data: bookData, msgIndex });
@@ -186,7 +243,7 @@ export default function AiChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, messages, loading, bookingPending, confirmBooking]);
+  }, [input, messages, loading, bookingPending, emailPending, isAuth, confirmBooking]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -196,6 +253,13 @@ export default function AiChat() {
   };
 
   const handleOpen = () => { setOpen(true); setUnread(false); };
+
+  // Підказка placeholder залежно від стану
+  const getPlaceholder = () => {
+    if (emailPending) return "Введіть ваш email...";
+    if (bookingPending) return "Підтвердіть або скасуйте запис вище...";
+    return "Напишіть повідомлення...";
+  };
 
   return (
     <>
@@ -317,7 +381,26 @@ export default function AiChat() {
             </div>
           ))}
 
-          {bookingPending && !loading && (
+          {/* Підсвічений блок введення email */}
+          {emailPending && !loading && (
+            <div style={{
+              paddingLeft: 33,
+              padding: "8px 8px 8px 33px",
+            }}>
+              <div style={{
+                background: "rgba(220,38,38,0.06)",
+                border: "1px solid rgba(220,38,38,0.2)",
+                borderRadius: 10,
+                padding: "10px 12px",
+                fontSize: 12,
+                color: "var(--text-muted)",
+              }}>
+                📧 Введіть email у полі нижче для підтвердження запису
+              </div>
+            </div>
+          )}
+
+          {bookingPending && !loading && !emailPending && (
             <div style={{ display: "flex", gap: 8, paddingLeft: 33 }}>
               <button
                 onClick={confirmBooking}
@@ -419,21 +502,23 @@ export default function AiChat() {
 
         <div style={{
           padding: "10px 12px",
-          borderTop: "1px solid var(--border)",
+          borderTop: emailPending ? "1px solid rgba(220,38,38,0.3)" : "1px solid var(--border)",
           display: "flex", gap: 8, alignItems: "flex-end",
-          background: "var(--surface)", flexShrink: 0,
+          background: emailPending ? "rgba(220,38,38,0.03)" : "var(--surface)",
+          flexShrink: 0,
+          transition: "background 0.2s, border-color 0.2s",
         }}>
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={bookingPending ? "Підтвердіть або скасуйте запис вище..." : "Напишіть повідомлення..."}
+            placeholder={getPlaceholder()}
             disabled={loading}
             rows={1}
             style={{
               flex: 1, resize: "none",
-              border: "1px solid var(--border-strong)",
+              border: emailPending ? "1px solid rgba(220,38,38,0.4)" : "1px solid var(--border-strong)",
               borderRadius: 10,
               padding: "8px 12px",
               fontSize: 13, lineHeight: 1.5,
@@ -444,7 +529,7 @@ export default function AiChat() {
               transition: "border-color 0.2s",
             }}
             onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)"; }}
-            onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-strong)"; }}
+            onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = emailPending ? "rgba(220,38,38,0.4)" : "var(--border-strong)"; }}
           />
           <button
             onClick={() => sendMessage()}
