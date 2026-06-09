@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { services } from "@/lib/services";
 import { Wrench, Zap, Clock, Shield, ChevronRight, Phone, ArrowRight } from "lucide-react";
@@ -106,17 +108,16 @@ export default function HomePage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
           {featured.map((s) => (
-            <Link key={s.slug} href={`/services/${s.slug}`} style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderRadius: 12,
-              padding: "18px 18px",
-              textDecoration: "none",
-              transition: "box-shadow 0.2s, border-color 0.2s",
-              display: "block",
-            }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-md)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; }}
+            <Link key={s.slug} href={`/services/${s.slug}`}
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: "18px 18px",
+                textDecoration: "none",
+                display: "block",
+                transition: "box-shadow 0.18s, border-color 0.18s",
+              }}
             >
               <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>{s.title}</p>
               <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5, marginBottom: 12 }}>{s.short}</p>
@@ -141,7 +142,6 @@ export default function HomePage() {
                 background: "var(--surface)",
                 fontSize: 12, fontWeight: 500, color: "var(--text-muted)",
                 textDecoration: "none",
-                transition: "border-color 0.15s, color 0.15s",
               }}>
                 {cat}
               </Link>
