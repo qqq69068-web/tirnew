@@ -21,7 +21,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Default is always LIGHT unless user explicitly saved "dark"
     const saved = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
     const isDark = saved === "dark";
     setDark(isDark);
@@ -55,7 +54,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
-    <div style={{ background: "var(--bg)", color: "var(--text)", minHeight: "100dvh", display: "flex", flexDirection: "column", transition: "background 0.25s, color 0.2s" }}>
+    <div id="site-wrapper">
 
       {/* ── NAVBAR ──────────────────────────────────────────── */}
       <header style={{
