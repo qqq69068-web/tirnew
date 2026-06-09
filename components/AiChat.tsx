@@ -46,9 +46,7 @@ const WELCOME_AUTH = `Привіт! 👋
 
 Чим можу допомогти?`;
 
-// Парсимо BOOK_ACTION — підтримуємо і теги, і голий JSON
 function parseBookAction(text: string): { bookData: Record<string, string>; displayText: string } | null {
-  // 1. Теги <BOOK_ACTION>...</BOOK_ACTION>
   const tagMatch = text.match(/<BOOK_ACTION>([\s\S]*?)<\/BOOK_ACTION>/);
   if (tagMatch) {
     try {
@@ -59,7 +57,6 @@ function parseBookAction(text: string): { bookData: Record<string, string>; disp
     } catch { /* fall through */ }
   }
 
-  // 2. Голий JSON блок з потрібними полями (AI повернув без тегів)
   const jsonMatch = text.match(/\{[\s\S]*?"service"[\s\S]*?\}/);
   if (jsonMatch) {
     try {
@@ -73,7 +70,6 @@ function parseBookAction(text: string): { bookData: Record<string, string>; disp
   return null;
 }
 
-// Чи є відповідь користувача підтвердженням
 function isConfirmation(text: string): boolean {
   const t = text.trim().toLowerCase();
   return ["так", "yes", "підтверджую", "підтвердити", "ок", "ok", "добре", "згоден", "погоджуюсь"].some((w) => t === w || t.startsWith(w));
@@ -123,7 +119,9 @@ export default function AiChat() {
       });
       const data = await res.json();
       if (data.ok) {
-        const successMsg = `✅ Запис підтверджено! Номер вашого запису: #${data.bookingId}\n\nМи зв'яжемося з вами найближчим часом для підтвердження часу.\n${isAuth ? "Запис також відображається у вашому особистому кабінеті (/cabinet)." : "Рекомендуємо зареєструватись для відстеження статусу (/cabinet)."}`;
+        const successMsg = isAuth
+          ? `✅ Запис підтверджено! Номер вашого запису: #${data.bookingId}\n\nМи зв'яжемося з вами найближчим часом для підтвердження часу. Запис відображається у вашому особистому кабінеті.`
+          : `✅ Запис підтверджено! Номер вашого запису: #${data.bookingId}\n\nМи зв'яжемося з вами найближчим часом для підтвердження часу.`;
         setMessages((prev) => [...prev, { role: "assistant", content: successMsg, bookingId: data.bookingId }]);
       } else {
         setMessages((prev) => [...prev, { role: "assistant", content: `❌ Не вдалось створити запис: ${data.error || "помилка"}. Спробуйте ще раз або зателефонуйте: +38 (066) 418-88-26` }]);
@@ -146,7 +144,6 @@ export default function AiChat() {
     if (!content || loading) return;
     setInput("");
 
-    // Якщо є очікуваний запис і користувач написав "так" — підтверджуємо без запиту до AI
     if (bookingPending && isConfirmation(content)) {
       setMessages((prev) => [...prev, { role: "user", content }]);
       confirmBooking();
@@ -202,7 +199,6 @@ export default function AiChat() {
 
   return (
     <>
-      {/* FAB кнопка */}
       <button
         onClick={open ? () => setOpen(false) : handleOpen}
         aria-label="AI-помічник"
@@ -229,7 +225,6 @@ export default function AiChat() {
         )}
       </button>
 
-      {/* Чат вікно */}
       <div
         style={{
           position: "fixed",
@@ -247,7 +242,6 @@ export default function AiChat() {
           transition: "opacity 0.25s cubic-bezier(0.22,1,0.36,1), transform 0.25s cubic-bezier(0.22,1,0.36,1)",
         }}
       >
-        {/* Header */}
         <div style={{
           display: "flex", alignItems: "center", gap: 10,
           padding: "14px 16px",
@@ -282,7 +276,6 @@ export default function AiChat() {
           </button>
         </div>
 
-        {/* Messages */}
         <div style={{
           flex: 1, overflowY: "auto",
           padding: "14px 14px 6px",
@@ -324,7 +317,6 @@ export default function AiChat() {
             </div>
           ))}
 
-          {/* Кнопки підтвердження */}
           {bookingPending && !loading && (
             <div style={{ display: "flex", gap: 8, paddingLeft: 33 }}>
               <button
@@ -387,7 +379,6 @@ export default function AiChat() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Quick actions */}
         {messages.length <= 1 && (
           <div style={{
             padding: "6px 14px 8px",
@@ -426,7 +417,6 @@ export default function AiChat() {
           </div>
         )}
 
-        {/* Input */}
         <div style={{
           padding: "10px 12px",
           borderTop: "1px solid var(--border)",
