@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone, User } from "lucide-react";
+import { Menu, X, Phone, User, Sun, Moon } from "lucide-react";
 
 const links = [
   { href: "/",         label: "Головна" },
@@ -14,14 +14,33 @@ const links = [
 ];
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]     = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isClient, setIsClient] = useState<boolean | null>(null);
+  const [dark, setDark]     = useState(false);
   const pathname = usePathname();
 
+  // Init theme from localStorage or system preference
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handler);
+    const saved = typeof window !== "undefined" && localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = saved ? saved === "dark" : prefersDark;
+    setDark(isDark);
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setDark((prev) => {
+      const next = !prev;
+      document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+      localStorage.setItem("theme", next ? "dark" : "light");
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
@@ -33,139 +52,167 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       .catch(() => setIsClient(false));
   }, [pathname]);
 
-  // Якщо залогінений → "Кабінет", якщо ні → "Увійти"
-  const cabinetLabel = isClient ? "Кабінет" : "Увійти";
+  const cabinetLabel     = isClient ? "Кабінет" : "Увійти";
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div style={{ background: "var(--bg)", color: "var(--text)", minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
 
-      {/* NAVBAR */}
-      <header
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-[#09090b]/95 backdrop-blur-xl shadow-2xl" : "bg-[#09090b]/80 backdrop-blur-lg"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 md:px-10">
+      {/* ── NAVBAR ─────────────────────────────────────────────── */}
+      <header style={{
+        position: "sticky", top: 0, zIndex: 50,
+        background: scrolled ? "var(--nav-bg-scroll)" : "var(--nav-bg)",
+        backdropFilter: "blur(16px)",
+        borderBottom: "1px solid var(--border)",
+        boxShadow: scrolled ? "var(--shadow-sm)" : "none",
+        transition: "background 0.25s, box-shadow 0.25s",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div
-              style={{ background: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)" }}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-lg"
-            >
-              <span className="text-base font-black text-white">T</span>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#dc2626,#991b1b)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ color: "#fff", fontWeight: 900, fontSize: 16 }}>T</span>
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-sm font-black uppercase tracking-widest text-white">Tirnew</span>
-              <span className="text-[10px] text-red-400/80 tracking-wider uppercase">Truck Service</span>
+            <div style={{ lineHeight: 1.2 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text)" }}>Tirnew</div>
+              <div style={{ fontSize: 10, color: "var(--primary)", letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.8 }}>Truck Service</div>
             </div>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav style={{ display: "flex", alignItems: "center", gap: 2 }} className="hidden md:flex">
             {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                  pathname === l.href
-                    ? "bg-red-500/15 text-red-400"
-                    : "text-neutral-400 hover:bg-white/5 hover:text-white"
-                }`}
-              >
+              <Link key={l.href} href={l.href} style={{
+                padding: "6px 14px",
+                borderRadius: "var(--radius)",
+                fontSize: 14,
+                fontWeight: 500,
+                color: pathname === l.href ? "var(--primary)" : "var(--text-muted)",
+                background: pathname === l.href ? "rgba(220,38,38,0.08)" : "transparent",
+                transition: "background 0.15s, color 0.15s",
+                textDecoration: "none",
+              }}>
                 {l.label}
               </Link>
             ))}
           </nav>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-3">
-            <a
-              href="tel:+380664188826"
-              className="hidden items-center gap-1.5 text-sm text-neutral-400 transition hover:text-white md:flex"
-            >
-              <Phone size={14} />
+          {/* Right */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <a href="tel:+380664188826" className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-muted)", textDecoration: "none", transition: "color 0.15s" }}>
+              <Phone size={13} />
               <span>+380 66 418 88 26</span>
             </a>
 
-            {/* Cabinet / Login button */}
-            <Link
-              href="/cabinet"
-              className={`hidden h-9 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition md:inline-flex ${
-                pathname === "/cabinet"
-                  ? "border-teal-500/40 bg-teal-600/15 text-teal-400"
-                  : isClient
-                    ? "border-teal-500/30 text-teal-400 hover:border-teal-500/50 hover:text-teal-300"
-                    : "border-white/10 text-neutral-300 hover:border-white/20 hover:text-white"
-              }`}
-            >
-              <User size={14} />
+            {/* Theme toggle */}
+            <button onClick={toggleTheme} title={dark ? "Світла тема" : "Темна тема"} style={{
+              width: 34, height: 34, borderRadius: 8,
+              border: "1px solid var(--border-strong)",
+              background: "var(--surface)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "var(--text-muted)",
+              transition: "background 0.2s, color 0.2s",
+              cursor: "pointer",
+            }}>
+              {dark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+
+            <Link href="/cabinet" className="hidden md:inline-flex" style={{
+              height: 34, padding: "0 14px",
+              borderRadius: 8,
+              border: `1px solid ${pathname === "/cabinet" || isClient ? "var(--accent)" : "var(--border-strong)"}`,
+              background: pathname === "/cabinet" || isClient ? "rgba(15,118,110,0.08)" : "var(--surface)",
+              color: pathname === "/cabinet" || isClient ? "var(--accent)" : "var(--text-muted)",
+              fontSize: 13,
+              fontWeight: 500,
+              display: "flex", alignItems: "center", gap: 6,
+              textDecoration: "none",
+              transition: "all 0.15s",
+            }}>
+              <User size={13} />
               {cabinetLabel}
             </Link>
 
-            {/* CTA → contacts */}
-            <Link
-              href="/contacts"
-              className="hidden h-9 items-center rounded-full bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-500 active:scale-95 md:inline-flex"
-            >
+            <Link href="/contacts" className="hidden md:inline-flex" style={{
+              height: 34, padding: "0 16px",
+              borderRadius: 99,
+              background: "var(--primary)",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 600,
+              display: "flex", alignItems: "center",
+              textDecoration: "none",
+              transition: "background 0.15s",
+            }}>
               Зв&apos;язатись
             </Link>
 
-            <button
-              onClick={() => setOpen(!open)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 transition hover:bg-white/8 hover:text-white md:hidden"
-              aria-label="Меню"
-            >
-              {open ? <X size={20} /> : <Menu size={20} />}
+            {/* Burger */}
+            <button onClick={() => setOpen(!open)} className="flex md:hidden" style={{
+              width: 34, height: 34, borderRadius: 8,
+              border: "1px solid var(--border)",
+              background: "var(--surface)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "var(--text-muted)",
+            }} aria-label="Меню">
+              {open ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {open && (
-          <div
-            style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
-            className="bg-[#09090b] px-5 pb-5 pt-3 md:hidden"
-          >
-            <nav className="flex flex-col gap-1">
+          <div style={{ borderTop: "1px solid var(--border)", background: "var(--surface)", padding: "12px 16px 16px" }}>
+            <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {links.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`rounded-xl px-4 py-3 text-sm font-medium transition ${
-                    pathname === l.href
-                      ? "bg-red-500/15 text-red-400"
-                      : "text-neutral-300 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
+                <Link key={l.href} href={l.href} style={{
+                  padding: "10px 14px",
+                  borderRadius: "var(--radius)",
+                  fontSize: 14, fontWeight: 500,
+                  color: pathname === l.href ? "var(--primary)" : "var(--text)",
+                  background: pathname === l.href ? "rgba(220,38,38,0.07)" : "transparent",
+                  textDecoration: "none",
+                }}>
                   {l.label}
                 </Link>
               ))}
-              <Link
-                href="/cabinet"
-                className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition ${
-                  pathname === "/cabinet"
-                    ? "bg-teal-600/15 text-teal-400"
-                    : isClient
-                      ? "text-teal-400 hover:bg-teal-600/10"
-                      : "text-neutral-300 hover:bg-white/5 hover:text-white"
-                }`}
-              >
+              <Link href="/cabinet" style={{
+                padding: "10px 14px", borderRadius: "var(--radius)",
+                fontSize: 14, fontWeight: 500,
+                color: isClient ? "var(--accent)" : "var(--text)",
+                display: "flex", alignItems: "center", gap: 8,
+                textDecoration: "none",
+              }}>
                 <User size={15} /> {cabinetLabelFull}
               </Link>
-              <a
-                href="tel:+380664188826"
-                className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 text-sm font-medium text-neutral-300 mt-2"
-              >
-                <Phone size={14} />
-                +380 66 418 88 26
+
+              {/* Theme toggle in mobile */}
+              <button onClick={toggleTheme} style={{
+                padding: "10px 14px", borderRadius: "var(--radius)",
+                fontSize: 14, fontWeight: 500,
+                color: "var(--text-muted)",
+                display: "flex", alignItems: "center", gap: 8,
+                textAlign: "left",
+              }}>
+                {dark ? <Sun size={15} /> : <Moon size={15} />}
+                {dark ? "Світла тема" : "Темна тема"}
+              </button>
+
+              <a href="tel:+380664188826" style={{
+                marginTop: 8, height: 42, borderRadius: "var(--radius)",
+                border: "1px solid var(--border-strong)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                gap: 8, fontSize: 14, color: "var(--text)", textDecoration: "none",
+              }}>
+                <Phone size={14} /> +380 66 418 88 26
               </a>
-              <Link
-                href="/contacts"
-                className="mt-2 flex h-11 items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white"
-              >
+              <Link href="/contacts" style={{
+                marginTop: 6, height: 42, borderRadius: "var(--radius)",
+                background: "var(--primary)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 14, fontWeight: 600, color: "#fff", textDecoration: "none",
+              }}>
                 Зв&apos;язатись з нами
               </Link>
             </nav>
@@ -174,75 +221,65 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* PAGE */}
-      <div>{children}</div>
+      <main style={{ flex: 1 }}>{children}</main>
 
-      {/* FOOTER */}
-      <footer
-        style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
-        className="bg-[#060607]"
-      >
-        <div className="mx-auto max-w-7xl px-5 py-16 md:px-10">
-          <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+      {/* ── FOOTER ─────────────────────────────────────────────── */}
+      <footer style={{
+        background: "var(--surface)",
+        borderTop: "1px solid var(--border)",
+        marginTop: "auto",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 32, marginBottom: 32 }}>
 
             {/* Brand */}
-            <div className="sm:col-span-2">
-              <Link href="/" className="flex items-center gap-3">
-                <div
-                  style={{ background: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)" }}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl"
-                >
-                  <span className="text-base font-black text-white">T</span>
+            <div style={{ gridColumn: "span 2" }}>
+              <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", marginBottom: 12 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 9, background: "linear-gradient(135deg,#dc2626,#991b1b)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ color: "#fff", fontWeight: 900, fontSize: 15 }}>T</span>
                 </div>
-                <div className="flex flex-col leading-none">
-                  <span className="text-sm font-black uppercase tracking-widest text-white">Tirnew</span>
-                  <span className="text-[10px] text-red-400/80 tracking-wider uppercase">Truck Service</span>
+                <div style={{ lineHeight: 1.2 }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text)" }}>Tirnew</div>
+                  <div style={{ fontSize: 10, color: "var(--primary)", letterSpacing: "0.06em", textTransform: "uppercase", opacity: 0.8 }}>Truck Service</div>
                 </div>
               </Link>
-              <p className="mt-5 max-w-xs text-sm leading-relaxed text-neutral-500">
-                Сервіс вантажних автомобілів, причепів і напівпричепів.
-                Діагностика, ремонт, обслуговування.
+              <p style={{ fontSize: 13, color: "var(--text-faint)", lineHeight: 1.7, maxWidth: 260 }}>
+                Сервіс вантажних автомобілів, причепів і напівпричепів. Діагностика, ремонт, обслуговування.
               </p>
-              <div className="mt-5 flex flex-col gap-2">
-                <a href="tel:+380664188826" className="text-sm text-neutral-400 transition hover:text-white">
-                  +38 (066) 418-88-26
-                </a>
-                <span className="text-sm text-neutral-500">Рівненська обл., с. Велика Омеляна, вул. Шевченка 35</span>
-                <span className="text-sm text-neutral-500">Пн–Сб, 08:00–18:00</span>
+              <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 5 }}>
+                <a href="tel:+380664188826" style={{ fontSize: 13, color: "var(--text-muted)", textDecoration: "none" }}>+38 (066) 418-88-26</a>
+                <span style={{ fontSize: 12, color: "var(--text-faint)" }}>Рівненська обл., с. Велика Омеляна, вул. Шевченка 35</span>
+                <span style={{ fontSize: 12, color: "var(--text-faint)" }}>Пн–Сб, 08:00–18:00</span>
               </div>
             </div>
 
             {/* Nav */}
             <div>
-              <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-neutral-600">Навігація</p>
-              <div className="flex flex-col gap-3">
+              <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-faint)", marginBottom: 14 }}>Навігація</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {links.map((l) => (
-                  <Link key={l.href} href={l.href} className="text-sm text-neutral-400 transition hover:text-white">
-                    {l.label}
-                  </Link>
+                  <Link key={l.href} href={l.href} style={{ fontSize: 13, color: "var(--text-muted)", textDecoration: "none" }}>{l.label}</Link>
                 ))}
-                <Link href="/cabinet" className="text-sm text-neutral-400 transition hover:text-white flex items-center gap-1.5">
-                  <User size={13} /> Особистий кабінет
+                <Link href="/cabinet" style={{ fontSize: 13, color: "var(--text-muted)", textDecoration: "none", display: "flex", alignItems: "center", gap: 5 }}>
+                  <User size={12} /> Кабінет
                 </Link>
               </div>
             </div>
 
             {/* Services */}
             <div>
-              <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-neutral-600">Послуги</p>
-              <div className="flex flex-col gap-3 text-sm text-neutral-400">
+              <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-faint)", marginBottom: 14 }}>Послуги</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {["Ремонт двигунів","Ремонт КПП","Гальмівна система","Пневмосистема","Електрика"].map((s) => (
-                  <Link key={s} href="/services" className="transition hover:text-white">{s}</Link>
+                  <Link key={s} href="/services" style={{ fontSize: 13, color: "var(--text-muted)", textDecoration: "none" }}>{s}</Link>
                 ))}
               </div>
             </div>
           </div>
 
-          <div
-            style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-            className="mt-12 flex flex-col items-center justify-between gap-4 pt-8 text-xs text-neutral-600 sm:flex-row"
-          >
-            <span>© {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
-            <span>Розроблено як дипломний проєкт</span>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 18, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+            <span style={{ fontSize: 12, color: "var(--text-faint)" }}>© {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
+            <span style={{ fontSize: 12, color: "var(--text-faint)" }}>Дипломний проєкт</span>
           </div>
         </div>
       </footer>
