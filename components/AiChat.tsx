@@ -6,7 +6,7 @@ import { X, Send, Bot, ChevronDown, Loader2, Sparkles, CheckCircle2 } from "luci
 interface Message {
   role: "user" | "assistant";
   content: string;
-  bookingId?: string; // якщо це підтвердження запису
+  bookingId?: string;
 }
 
 const QUICK_ACTIONS = [
@@ -46,17 +46,37 @@ const WELCOME_AUTH = `Привіт! 👋
 
 Чим можу допомогти?`;
 
-// Парсимо BOOK_ACTION з відповіді AI
+// Парсимо BOOK_ACTION — підтримуємо і теги, і голий JSON
 function parseBookAction(text: string): { bookData: Record<string, string>; displayText: string } | null {
-  const match = text.match(/<BOOK_ACTION>([\s\S]*?)<\/BOOK_ACTION>/);
-  if (!match) return null;
-  try {
-    const bookData = JSON.parse(match[1].trim());
-    const displayText = text.replace(/<BOOK_ACTION>[\s\S]*?<\/BOOK_ACTION>/, "").trim();
-    return { bookData, displayText };
-  } catch {
-    return null;
+  // 1. Теги <BOOK_ACTION>...</BOOK_ACTION>
+  const tagMatch = text.match(/<BOOK_ACTION>([\s\S]*?)<\/BOOK_ACTION>/);
+  if (tagMatch) {
+    try {
+      const bookData = JSON.parse(tagMatch[1].trim());
+      if (!bookData.service) return null;
+      const displayText = text.replace(/<BOOK_ACTION>[\s\S]*?<\/BOOK_ACTION>/, "").trim();
+      return { bookData, displayText };
+    } catch { /* fall through */ }
   }
+
+  // 2. Голий JSON блок з потрібними полями (AI повернув без тегів)
+  const jsonMatch = text.match(/\{[\s\S]*?"service"[\s\S]*?\}/);
+  if (jsonMatch) {
+    try {
+      const bookData = JSON.parse(jsonMatch[0]);
+      if (!bookData.service) return null;
+      const displayText = text.replace(jsonMatch[0], "").trim();
+      return { bookData, displayText };
+    } catch { /* not valid JSON */ }
+  }
+
+  return null;
+}
+
+// Чи є відповідь користувача підтвердженням
+function isConfirmation(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  return ["так", "yes", "підтверджую", "підтвердити", "ок", "ok", "добре", "згоден", "погоджуюсь"].some((w) => t === w || t.startsWith(w));
 }
 
 export default function AiChat() {
@@ -92,7 +112,6 @@ export default function AiChat() {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
   }, [open]);
 
-  // Підтвердження запису
   const confirmBooking = useCallback(async () => {
     if (!bookingPending) return;
     setLoading(true);
@@ -127,6 +146,13 @@ export default function AiChat() {
     if (!content || loading) return;
     setInput("");
 
+    // Якщо є очікуваний запис і користувач написав "так" — підтверджуємо без запиту до AI
+    if (bookingPending && isConfirmation(content)) {
+      setMessages((prev) => [...prev, { role: "user", content }]);
+      confirmBooking();
+      return;
+    }
+
     const userMsg: Message = { role: "user", content };
     const next = [...messages, userMsg];
     setMessages(next);
@@ -141,20 +167,18 @@ export default function AiChat() {
       const data = await res.json();
       const rawReply: string = data.reply || "Вибачте, не вдалось отримати відповідь.";
 
-      // Перевіряємо чи є BOOK_ACTION
       const bookAction = parseBookAction(rawReply);
       if (bookAction) {
         const { bookData, displayText } = bookAction;
-        // Формуємо картку підтвердження
         const confirmText = displayText ||
           `Підготував запис:\n` +
           `📋 Послуга: ${bookData.service || "—"}\n` +
-          `🚛 Авто: ${bookData.carBrand || "—"} ${bookData.carModel || ""} \n` +
+          `🚛 Авто: ${bookData.carBrand || "—"} ${bookData.carModel || ""}\n` +
           `📅 Дата: ${bookData.date ? new Date(bookData.date).toLocaleString("uk-UA") : "буде узгоджено"}\n` +
           `👤 Ім'я: ${bookData.name || "—"}\n` +
           `📞 Телефон: ${bookData.phone || "—"}\n\n` +
           `Підтвердити запис?`;
-        const msgIndex = next.length; // індекс нового повідомлення
+        const msgIndex = next.length;
         setMessages((prev) => [...prev, { role: "assistant", content: confirmText }]);
         setBookingPending({ data: bookData, msgIndex });
       } else {
@@ -165,7 +189,7 @@ export default function AiChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, messages, loading]);
+  }, [input, messages, loading, bookingPending, confirmBooking]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -300,7 +324,7 @@ export default function AiChat() {
             </div>
           ))}
 
-          {/* Кнопки підтвердження запису */}
+          {/* Кнопки підтвердження */}
           {bookingPending && !loading && (
             <div style={{ display: "flex", gap: 8, paddingLeft: 33 }}>
               <button
@@ -402,7 +426,7 @@ export default function AiChat() {
           </div>
         )}
 
-        {/* Input area */}
+        {/* Input */}
         <div style={{
           padding: "10px 12px",
           borderTop: "1px solid var(--border)",
@@ -415,7 +439,7 @@ export default function AiChat() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={bookingPending ? "Підтвердіть або скасуйте запис вище..." : "Напишіть повідомлення..."}
-            disabled={!!bookingPending || loading}
+            disabled={loading}
             rows={1}
             style={{
               flex: 1, resize: "none",
@@ -423,26 +447,25 @@ export default function AiChat() {
               borderRadius: 10,
               padding: "8px 12px",
               fontSize: 13, lineHeight: 1.5,
-              background: bookingPending ? "var(--surface2)" : "var(--bg)",
+              background: "var(--bg)",
               color: "var(--text)", outline: "none",
               maxHeight: 100, overflowY: "auto",
               fontFamily: "inherit",
               transition: "border-color 0.2s",
-              opacity: bookingPending ? 0.5 : 1,
             }}
             onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)"; }}
             onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-strong)"; }}
           />
           <button
             onClick={() => sendMessage()}
-            disabled={!input.trim() || loading || !!bookingPending}
+            disabled={!input.trim() || loading}
             style={{
               width: 38, height: 38, borderRadius: 10,
-              background: input.trim() && !loading && !bookingPending ? "var(--primary)" : "var(--surface2)",
+              background: input.trim() && !loading ? "var(--primary)" : "var(--surface2)",
               border: "none",
-              cursor: input.trim() && !loading && !bookingPending ? "pointer" : "default",
+              cursor: input.trim() && !loading ? "pointer" : "default",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: input.trim() && !loading && !bookingPending ? "#fff" : "var(--text-faint)",
+              color: input.trim() && !loading ? "#fff" : "var(--text-faint)",
               transition: "background 0.2s, color 0.2s, transform 0.15s",
               flexShrink: 0,
             }}
