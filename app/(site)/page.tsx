@@ -77,8 +77,8 @@ export default function HomePage() {
       </section>
 
       {/* ADVANTAGES */}
-      <section style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", transition: "background 0.25s" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
+      <section style={{ padding: "0 20px", transition: "background 0.25s" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "28px 24px", marginTop: 0 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
             {advantages.map(({ icon: Icon, title, desc }) => (
               <div key={title} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -131,8 +131,8 @@ export default function HomePage() {
       </section>
 
       {/* CATEGORIES */}
-      <section style={{ background: "var(--surface2)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", transition: "background 0.25s" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 20px" }}>
+      <section style={{ padding: "0 20px", transition: "background 0.25s" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 14, padding: "24px 24px" }}>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 14 }}>Категорії послуг</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {categories.map((cat) => (
