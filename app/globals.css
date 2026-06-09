@@ -30,7 +30,6 @@
   --hero-badge-border: rgba(220,38,38,0.28);
   --hero-badge-text:   #b91c1c;
   --radius:            0.625rem;
-  --outer-bg:          #e8e6e1;
 }
 
 /* ── DARK THEME ──────────────────────────────────────────── */
@@ -59,7 +58,6 @@
   --hero-badge-bg:     rgba(220,38,38,0.15);
   --hero-badge-border: rgba(220,38,38,0.38);
   --hero-badge-text:   #fca5a5;
-  --outer-bg:          #080a0c;
 }
 
 /* ── BASE RESET ──────────────────────────────────────────── */
@@ -70,32 +68,26 @@ html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   scroll-padding-top: 4rem;
-  background: var(--outer-bg);
-  transition: background 0.25s;
 }
 
 body {
   min-height: 100dvh;
-  background: transparent;
+  background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 15px;
   line-height: 1.6;
   transition: background 0.25s, color 0.2s;
-  display: flex;
-  justify-content: center;
 }
 
-/* Site wrapper — centered column, max 1400px */
+/* Site wrapper — centered, max 1400px, no borders or shadows */
 #site-wrapper {
   width: 100%;
   max-width: 1400px;
   min-height: 100dvh;
-  background: var(--bg);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 4px 40px rgba(0,0,0,0.12);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  transition: background 0.25s;
 }
 
 a { color: inherit; text-decoration: none; }
