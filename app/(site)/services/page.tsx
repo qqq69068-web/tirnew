@@ -5,156 +5,111 @@ import Link from "next/link";
 import { services } from "@/lib/services";
 import { ArrowRight, CheckCircle2, Package, Truck, Car } from "lucide-react";
 
-const tirServices  = services.filter((s) => s.vehicleType === "truck");
-const carServices  = services.filter((s) => s.vehicleType === "car");
+const tirServices = services.filter((s) => s.vehicleType === "truck");
+const carServices = services.filter((s) => s.vehicleType === "car");
 
 export default function ServicesPage() {
   const [tab, setTab] = useState<"tir" | "car">("tir");
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2]">
+    <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
 
       {/* HERO */}
-      <section
-        className="relative overflow-hidden bg-[#0f1923] py-20 px-4 text-white"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-      >
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0f1923]/40 to-[#0f1923]" />
-        <div className="relative max-w-4xl mx-auto text-center">
-          <p className="text-sm uppercase tracking-widest text-red-400 mb-3 font-medium">Що ми робимо</p>
-          <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-4">Наші послуги</h1>
-          <p className="text-lg text-neutral-300 max-w-xl mx-auto">
+      <section style={{ position: "relative", overflow: "hidden", padding: "72px 16px 64px", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80)", backgroundSize: "cover", backgroundPosition: "center", opacity: 0.12 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.85))" }} />
+        <div style={{ position: "relative", maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--primary)", marginBottom: 10 }}>Що ми робимо</p>
+          <h1 style={{ fontSize: "clamp(2rem,5vw,3.2rem)", fontWeight: 800, lineHeight: 1.1, color: "#fff", marginBottom: 12 }}>Наші послуги</h1>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.65)", maxWidth: 480, margin: "0 auto" }}>
             Повний цикл ремонту та обслуговування вантажного транспорту, причіпної техніки та легкових автомобілів.
           </p>
         </div>
       </section>
 
       {/* TABS */}
-      <div className="bg-white border-b border-gray-200 sticky top-[65px] z-30">
-        <div className="max-w-5xl mx-auto px-4 flex">
-          <button
-            onClick={() => setTab("tir")}
-            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
-              tab === "tir"
-                ? "border-red-600 text-red-600"
-                : "border-transparent text-gray-500 hover:text-gray-800"
-            }`}
-          >
-            <Truck size={16} />
-            Вантажні / ТІР
-          </button>
-          <button
-            onClick={() => setTab("car")}
-            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
-              tab === "car"
-                ? "border-red-600 text-red-600"
-                : "border-transparent text-gray-500 hover:text-gray-800"
-            }`}
-          >
-            <Car size={16} />
-            Легкові
-          </button>
+      <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", position: "sticky", top: 58, zIndex: 30 }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 16px", display: "flex" }}>
+          {(["tir", "car"] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "12px 20px",
+              fontSize: 13, fontWeight: 600,
+              borderBottom: `2px solid ${tab === t ? "var(--primary)" : "transparent"}`,
+              color: tab === t ? "var(--primary)" : "var(--text-muted)",
+              background: "none", border: "none",
+              borderBottom: `2px solid ${tab === t ? "var(--primary)" : "transparent"}`,
+              cursor: "pointer", transition: "color 0.15s",
+            }}>
+              {t === "tir" ? <Truck size={15} /> : <Car size={15} />}
+              {t === "tir" ? "Вантажні / ТІР" : "Легкові"}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* CONTENT */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
+      <section style={{ maxWidth: 860, margin: "0 auto", padding: "32px 16px" }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>
+            {tab === "tir" ? "Вантажні автомобілі і ТІР" : "Легкові автомобілі"}
+          </h2>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
+            {tab === "tir" ? "Повний перелік послуг для вантажного транспорту та причіпної техніки" : "Повний перелік послуг для легкового транспорту"}
+          </p>
+        </div>
 
-        {tab === "tir" && (
-          <div>
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Вантажні автомобілі і ТІР</h2>
-              <p className="text-gray-500 text-sm">Повний перелік послуг для вантажного транспорту та причіпної техніки</p>
-            </div>
-            <ul className="space-y-2 mb-12">
-              {tirServices.map((s) => (
-                <li key={s.slug}>
-                  <Link
-                    href={`/services/${s.slug}`}
-                    className="group flex items-start gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
-                  >
-                    <CheckCircle2 size={18} className="text-teal-500 mt-0.5 shrink-0 group-hover:text-teal-600" />
-                    <span className="flex-1 text-gray-800 text-sm leading-snug group-hover:text-red-600 transition-colors">
-                      {s.title}
-                    </span>
-                    <ArrowRight size={15} className="text-gray-300 group-hover:text-red-400 group-hover:translate-x-0.5 transition-all mt-0.5 shrink-0" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <PartsOrderCard />
-          </div>
-        )}
+        <ul style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 24 }}>
+          {(tab === "tir" ? tirServices : carServices).map((s) => (
+            <li key={s.slug}>
+              <Link href={`/services/${s.slug}`} style={{
+                display: "flex", alignItems: "center", gap: 10,
+                background: "var(--surface)", borderRadius: 10,
+                padding: "12px 16px",
+                border: "1px solid var(--border)",
+                textDecoration: "none",
+                transition: "border-color 0.15s, box-shadow 0.15s",
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)"; (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+              >
+                <CheckCircle2 size={16} style={{ color: "var(--accent)", flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>{s.title}</span>
+                <ArrowRight size={14} style={{ color: "var(--text-faint)", flexShrink: 0 }} />
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-        {tab === "car" && (
-          <div>
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Легкові автомобілі</h2>
-              <p className="text-gray-500 text-sm">Повний перелік послуг для легкового транспорту</p>
-            </div>
-            <ul className="space-y-2 mb-12">
-              {carServices.map((s) => (
-                <li key={s.slug}>
-                  <Link
-                    href={`/services/${s.slug}`}
-                    className="group flex items-start gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
-                  >
-                    <CheckCircle2 size={18} className="text-teal-500 mt-0.5 shrink-0 group-hover:text-teal-600" />
-                    <span className="flex-1 text-gray-800 text-sm leading-snug group-hover:text-red-600 transition-colors">
-                      {s.title}
-                    </span>
-                    <ArrowRight size={15} className="text-gray-300 group-hover:text-red-400 group-hover:translate-x-0.5 transition-all mt-0.5 shrink-0" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <PartsOrderCard />
+        {/* Parts card */}
+        <Link href="/parts-order" style={{
+          display: "flex", alignItems: "center", gap: 14,
+          background: "var(--surface2)", borderRadius: 12,
+          padding: "16px 20px",
+          border: "1px solid var(--border)",
+          textDecoration: "none",
+        }}>
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: "rgba(15,118,110,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Package size={20} style={{ color: "var(--accent)" }} />
           </div>
-        )}
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Замовлення запчастин через нашу фірму</p>
+            <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Підберемо оригінал або перевірений аналог, організуємо доставку</p>
+          </div>
+          <span style={{ color: "var(--accent)" }}>→</span>
+        </Link>
       </section>
 
       {/* CTA */}
-      <section
-        style={{ borderTop: "1px solid rgba(0,0,0,0.07)" }}
-        className="bg-[#0f1923] text-white py-16 px-4 text-center"
-      >
-        <h2 className="text-3xl font-bold mb-3">Не знаєте, яка послуга потрібна?</h2>
-        <p className="text-neutral-400 mb-8 max-w-md mx-auto">
+      <section style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", padding: "48px 16px", textAlign: "center" }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Не знаєте, яка послуга потрібна?</h2>
+        <p style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 24, maxWidth: 360, margin: "0 auto 24px" }}>
           Зв&apos;яжіться з нами — майстер підкаже та запише на зручний час.
         </p>
-        <Link
-          href="/contacts"
-          className="inline-block bg-red-600 hover:bg-red-500 text-white font-semibold px-8 py-3 rounded-full transition-colors"
-        >
+        <Link href="/contacts" style={{ display: "inline-block", background: "var(--primary)", color: "#fff", fontWeight: 600, fontSize: 14, padding: "11px 28px", borderRadius: 99, textDecoration: "none" }}>
           Зв&apos;язатись з нами
         </Link>
       </section>
     </main>
-  );
-}
-
-function PartsOrderCard() {
-  return (
-    <Link
-      href="/parts-order"
-      className="group flex items-center gap-4 bg-teal-50 border border-teal-200 rounded-2xl px-6 py-5 hover:bg-teal-100 hover:border-teal-300 transition-all"
-    >
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-600/15">
-        <Package size={22} className="text-teal-600" />
-      </div>
-      <div className="flex-1">
-        <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-900">Замовлення запчастин через нашу фірму</p>
-        <p className="text-xs text-teal-600 mt-0.5">Підберемо оригінал або перевірений аналог, організуємо доставку</p>
-      </div>
-      <span className="text-teal-500 group-hover:translate-x-1 transition-transform">→</span>
-    </Link>
   );
 }

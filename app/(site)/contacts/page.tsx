@@ -11,107 +11,61 @@ export default function ContactsPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    if (name === "name") {
-      // Only letters (Ukrainian, Latin) and spaces/hyphens
-      if (!/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
-    }
-    if (name === "phone") {
-      // Only digits, +, spaces, dashes, parentheses
-      if (!/^[0-9+()\-\s]*$/.test(value)) return;
-    }
+    if (name === "name" && !/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
+    if (name === "phone" && !/^[0-9+()\-\s]*$/.test(value)) return;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
       if (!res.ok) throw new Error();
       setSubmitted(true);
-    } catch {
-      setError("Помилка відправки. Спробуйте ще раз або зателефонуйте нам.");
-    } finally {
-      setLoading(false);
-    }
+    } catch { setError("Помилка відправки. Спробуйте ще раз або зателефонуйте нам."); }
+    finally { setLoading(false); }
   };
 
   const info = [
-    {
-      icon: Phone,
-      label: "Телефон",
-      value: "+38 (066) 418-88-26",
-      href: "tel:+380664188826",
-    },
-    {
-      icon: MapPin,
-      label: "Адреса",
-      value: "Рівненська обл., с. Велика Омеляна, вул. Шевченка 35",
-      href: "https://maps.google.com/?q=Велика+Омеляна+вул.Шевченка+35",
-    },
-    {
-      icon: Clock,
-      label: "Графік роботи",
-      value: "Пн–Сб: 08:00 – 18:00",
-      href: null,
-    },
+    { icon: Phone, label: "Телефон", value: "+38 (066) 418-88-26", href: "tel:+380664188826" },
+    { icon: MapPin, label: "Адреса", value: "Рівненська обл., с. Велика Омеляна, вул. Шевченка 35", href: "https://maps.google.com/?q=Велика+Омеляна+вул.Шевченка+35" },
+    { icon: Clock, label: "Графік роботи", value: "Пн–Сб: 08:00 – 18:00", href: null },
   ];
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%", borderRadius: 10, padding: "10px 14px", fontSize: 13,
+    color: "var(--text)", background: "var(--surface2)",
+    border: "1px solid var(--border)", outline: "none",
+    transition: "border-color 0.15s",
+  };
+
   return (
-    <main className="min-h-screen bg-[#09090b]">
+    <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
 
       {/* HERO */}
-      <section className="relative overflow-hidden py-20 px-4 text-center">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(220,38,38,0.12) 0%, transparent 70%)",
-          }}
-        />
-        <p className="relative text-xs font-semibold uppercase tracking-widest text-red-400 mb-3">
-          Зв'язатись з нами
-        </p>
-        <h1 className="relative text-4xl md:text-5xl font-black text-white mb-4">
-          Контакти
-        </h1>
-        <p className="relative text-neutral-400 max-w-md mx-auto text-base">
-          Маєте питання або хочете записатись? Напишіть нам або зателефонуйте — відповімо швидко.
+      <section style={{ position: "relative", overflow: "hidden", padding: "56px 16px 48px", textAlign: "center", borderBottom: "1px solid var(--border)" }}>
+        <div aria-hidden style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(220,38,38,0.08) 0%, transparent 70%)" }} />
+        <p style={{ position: "relative", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--primary)", marginBottom: 10 }}>Зв&apos;язатись з нами</p>
+        <h1 style={{ position: "relative", fontSize: "clamp(2rem,5vw,3rem)", fontWeight: 800, color: "var(--text)", marginBottom: 10 }}>Контакти</h1>
+        <p style={{ position: "relative", fontSize: 14, color: "var(--text-muted)", maxWidth: 380, margin: "0 auto" }}>
+          Маєте питання або хочете записатись? Напишіть нам або зателефонуйте.
         </p>
       </section>
 
       {/* INFO CARDS */}
-      <section className="max-w-5xl mx-auto px-4 pb-8">
-        <div className="grid gap-4 sm:grid-cols-3">
+      <section style={{ maxWidth: 860, margin: "0 auto", padding: "24px 16px 16px" }}>
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
           {info.map(({ icon: Icon, label, value, href }) => (
-            <div
-              key={label}
-              style={{ border: "1px solid rgba(255,255,255,0.07)" }}
-              className="rounded-2xl bg-white/[0.03] p-6"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600/15 mb-4">
-                <Icon size={18} className="text-red-400" />
+            <div key={label} style={{ background: "var(--surface)", borderRadius: 12, padding: "18px 18px", border: "1px solid var(--border)" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(220,38,38,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+                <Icon size={16} style={{ color: "var(--primary)" }} />
               </div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
-                {label}
-              </p>
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-faint)", marginBottom: 4 }}>{label}</p>
               {href ? (
-                <a
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-white hover:text-red-400 transition-colors"
-                >
-                  {value}
-                </a>
+                <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", textDecoration: "none" }}>{value}</a>
               ) : (
-                <p className="text-sm font-medium text-white">{value}</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{value}</p>
               )}
             </div>
           ))}
@@ -119,112 +73,64 @@ export default function ContactsPage() {
       </section>
 
       {/* MAP + FORM */}
-      <section className="max-w-5xl mx-auto px-4 pb-20">
-        <div className="grid gap-6 lg:grid-cols-2">
+      <section style={{ maxWidth: 860, margin: "0 auto", padding: "16px 16px 48px" }}>
+        <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
 
-          {/* Google Maps embed */}
-          <div
-            style={{ border: "1px solid rgba(255,255,255,0.07)" }}
-            className="rounded-2xl overflow-hidden bg-white/[0.03] min-h-[360px]"
-          >
+          {/* MAP */}
+          <div style={{ background: "var(--surface)", borderRadius: 12, border: "1px solid var(--border)", overflow: "hidden", minHeight: 320 }}>
             <iframe
               title="Tirnew на карті"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2541.0!2d26.2300!3d50.6200!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z0JLQtdC70LjQutCwINCe0LzQtdC70Y_QvdCwLCDQstGD0LsuINCo0LXQstGH0LXQvdC60LAsMzU!5e0!3m2!1suk!2sua!4v1700000000000"
-              width="100%"
-              height="100%"
-              style={{ minHeight: "360px", filter: "invert(90%) hue-rotate(180deg)" }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
+              width="100%" height="100%"
+              style={{ minHeight: 320, display: "block" }}
+              allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
 
-          {/* Contact form */}
-          <div
-            style={{ border: "1px solid rgba(255,255,255,0.07)" }}
-            className="rounded-2xl bg-white/[0.03] p-8"
-          >
+          {/* FORM */}
+          <div style={{ background: "var(--surface)", borderRadius: 12, border: "1px solid var(--border)", padding: "24px 20px" }}>
             {submitted ? (
-              <div className="flex flex-col items-center justify-center h-full py-10 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/15 mb-5">
-                  <CheckCircle2 size={32} className="text-green-400" />
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 0", textAlign: "center" }}>
+                <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(34,197,94,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                  <CheckCircle2 size={28} style={{ color: "#22c55e" }} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Повідомлення надіслано!</h3>
-                <p className="text-neutral-400 text-sm max-w-xs">
-                  Ми отримали ваше повідомлення і зв'яжемось з вами найближчим часом.
-                </p>
-                <button
-                  onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", message: "" }); }}
-                  className="mt-6 text-sm text-red-400 hover:text-red-300 transition-colors"
-                >
-                  Надіслати ще одне
-                </button>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>Повідомлення надіслано!</h3>
+                <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 260 }}>Ми отримали ваше повідомлення і зв&apos;яжемось найближчим часом.</p>
+                <button onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", message: "" }); }} style={{ marginTop: 20, fontSize: 13, color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>Надіслати ще одне</button>
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600/15">
-                    <MessageSquare size={16} className="text-red-400" />
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(220,38,38,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <MessageSquare size={15} style={{ color: "var(--primary)" }} />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-white">Напишіть нам</h2>
-                    <p className="text-xs text-neutral-500">Відповімо протягом робочого дня</p>
+                    <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Напишіть нам</h2>
+                    <p style={{ fontSize: 12, color: "var(--text-faint)" }}>Відповімо протягом робочого дня</p>
                   </div>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   <div>
-                    <label className="block text-xs font-medium text-neutral-400 mb-1.5" htmlFor="name">
-                      Ім'я *
-                    </label>
-                    <input
-                      id="name" name="name" required
-                      value={form.name} onChange={handleChange}
-                      placeholder="Олексій"
-                      autoComplete="name"
-                      className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 bg-white/5 border border-white/10 focus:outline-none focus:border-red-500/50 focus:bg-white/[0.07] transition-all"
-                    />
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 5 }} htmlFor="name">Ім&apos;я *</label>
+                    <input id="name" name="name" required value={form.name} onChange={handleChange} placeholder="Олексій" autoComplete="name" style={inputStyle}
+                      onFocus={e => e.currentTarget.style.borderColor = "var(--primary)"}
+                      onBlur={e => e.currentTarget.style.borderColor = "var(--border)"} />
                   </div>
-
                   <div>
-                    <label className="block text-xs font-medium text-neutral-400 mb-1.5" htmlFor="phone">
-                      Телефон *
-                    </label>
-                    <input
-                      id="phone" name="phone" type="tel" required
-                      value={form.phone} onChange={handleChange}
-                      placeholder="+380 66 418 88 26"
-                      autoComplete="tel"
-                      inputMode="numeric"
-                      className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 bg-white/5 border border-white/10 focus:outline-none focus:border-red-500/50 focus:bg-white/[0.07] transition-all"
-                    />
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 5 }} htmlFor="phone">Телефон *</label>
+                    <input id="phone" name="phone" type="tel" required value={form.phone} onChange={handleChange} placeholder="+380 66 418 88 26" autoComplete="tel" inputMode="numeric" style={inputStyle}
+                      onFocus={e => e.currentTarget.style.borderColor = "var(--primary)"}
+                      onBlur={e => e.currentTarget.style.borderColor = "var(--border)"} />
                   </div>
-
                   <div>
-                    <label className="block text-xs font-medium text-neutral-400 mb-1.5" htmlFor="message">
-                      Повідомлення *
-                    </label>
-                    <textarea
-                      id="message" name="message" required rows={5}
-                      value={form.message} onChange={handleChange}
-                      placeholder="Ваше питання або проблема..."
-                      className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 bg-white/5 border border-white/10 focus:outline-none focus:border-red-500/50 focus:bg-white/[0.07] transition-all resize-none"
-                    />
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 5 }} htmlFor="message">Повідомлення *</label>
+                    <textarea id="message" name="message" required rows={4} value={form.message} onChange={handleChange} placeholder="Ваше питання або проблема..." style={{ ...inputStyle, resize: "none" }}
+                      onFocus={e => e.currentTarget.style.borderColor = "var(--primary)"}
+                      onBlur={e => e.currentTarget.style.borderColor = "var(--border)"} />
                   </div>
-
-                  {error && (
-                    <p className="text-sm text-red-400">{error}</p>
-                  )}
-
-                  <button
-                    type="submit" disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm"
-                  >
-                    {loading ? (
-                      <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
-                    ) : (
-                      <Send size={15} />
-                    )}
+                  {error && <p style={{ fontSize: 13, color: "var(--primary)" }}>{error}</p>}
+                  <button type="submit" disabled={loading} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "var(--primary)", color: "#fff", fontWeight: 600, fontSize: 13, padding: "12px", borderRadius: 10, border: "none", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.65 : 1 }}>
+                    {loading ? <span style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", animation: "spin 0.7s linear infinite", display: "inline-block" }} /> : <Send size={14} />}
                     {loading ? "Надсилається..." : "Надіслати повідомлення"}
                   </button>
                 </form>

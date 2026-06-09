@@ -4,101 +4,81 @@ import { Clock, Wrench, ChevronRight } from "lucide-react";
 
 export const metadata = {
   title: "Прайс на роботи — TIR Truck Service",
-  description: "Вартість ремонтних робіт для вантажних автомобілів і причепів. Нормогодина від 120 до 200 грн.",
+  description: "Вартість ремонтних робіт для вантажних автомобілів і причепів.",
 };
 
 const categories = Array.from(new Set(services.map((s) => s.category)));
 
 export default function PricePage() {
   return (
-    <main className="min-h-screen bg-[#f7f6f2]">
-      {/* Hero */}
-      <section className="relative bg-[#0f1923] text-white py-20 px-4 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0f1923]/90" />
-        <div className="relative max-w-4xl mx-auto">
-          <p className="text-sm uppercase tracking-widest text-red-400 mb-3 font-medium">Вартість робіт</p>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Прайс на послуги</h1>
-          <p className="text-gray-300 max-w-xl text-lg">
+    <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
+
+      {/* HERO */}
+      <section style={{ position: "relative", overflow: "hidden", padding: "64px 16px 56px", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80)", backgroundSize: "cover", backgroundPosition: "center", opacity: 0.1 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.85))" }} />
+        <div style={{ position: "relative", maxWidth: 760, margin: "0 auto" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--primary)", marginBottom: 10 }}>Вартість робіт</p>
+          <h1 style={{ fontSize: "clamp(1.9rem,5vw,3rem)", fontWeight: 800, color: "#fff", marginBottom: 10 }}>Прайс на послуги</h1>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", maxWidth: 480 }}>
             Вартість розраховується за нормогодинами. Кінцева ціна — після огляду та дефектації.
           </p>
-          {/* Rate badge */}
-          <div className="mt-8 inline-flex items-center gap-3 bg-white/10 border border-white/20 rounded-2xl px-6 py-4 backdrop-blur-sm">
-            <Clock size={22} className="text-red-400" />
+          <div style={{ marginTop: 24, display: "inline-flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 14, padding: "12px 20px", backdropFilter: "blur(8px)" }}>
+            <Clock size={20} style={{ color: "var(--primary)" }} />
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Нормогодина</p>
-              <p className="text-2xl font-bold">{HOUR_RATE_MIN}–{HOUR_RATE_MAX} <span className="text-base font-normal text-gray-300">грн</span></p>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 2 }}>Нормогодина</p>
+              <p style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{HOUR_RATE_MIN}–{HOUR_RATE_MAX} <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.6)" }}>грн</span></p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Note */}
-      <div className="max-w-5xl mx-auto px-4 pt-10">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 flex gap-3 items-start text-sm text-amber-800">
-          <span className="text-amber-500 mt-0.5">ℹ️</span>
-          <p>
-            Ціни вказані орієнтовно на основі нормогодин. Точна вартість визначається після огляду автомобіля та узгоджується з клієнтом до початку робіт.
-            Запчастини оплачуються окремо.
-          </p>
+      {/* NOTE */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "20px 16px 0" }}>
+        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13, color: "var(--text-muted)" }}>
+          <span style={{ marginTop: 1 }}>ℹ️</span>
+          <p>Ціни вказані орієнтовно на основі нормогодин. Точна вартість — після огляду. Запчастини оплачуються окремо.</p>
         </div>
       </div>
 
-      {/* Price tables by category */}
-      <section className="max-w-5xl mx-auto px-4 py-10 space-y-10">
+      {/* PRICE TABLES */}
+      <section style={{ maxWidth: 860, margin: "0 auto", padding: "20px 16px 40px", display: "flex", flexDirection: "column", gap: 20 }}>
         {categories.map((cat) => {
           const items = services.filter((s) => s.category === cat);
           return (
-            <div key={cat} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="bg-[#0f1923] px-6 py-4 flex items-center gap-2">
-                <Wrench size={16} className="text-red-400" />
-                <h2 className="text-white font-semibold text-sm uppercase tracking-wider">{cat}</h2>
+            <div key={cat} style={{ background: "var(--surface)", borderRadius: 12, border: "1px solid var(--border)", overflow: "hidden", boxShadow: "var(--shadow-sm)" }}>
+              <div style={{ background: "var(--surface2)", borderBottom: "1px solid var(--border)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                <Wrench size={14} style={{ color: "var(--primary)" }} />
+                <h2 style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-muted)" }}>{cat}</h2>
               </div>
-              <table className="w-full">
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                    <th className="text-left px-6 py-3 font-medium">Послуга</th>
-                    <th className="text-center px-4 py-3 font-medium whitespace-nowrap">Нормогодини</th>
-                    <th className="text-right px-6 py-3 font-medium whitespace-nowrap">Вартість</th>
-                    <th className="px-4 py-3"></th>
+                  <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                    <th style={{ textAlign: "left", padding: "8px 14px", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-faint)" }}>Послуга</th>
+                    <th style={{ textAlign: "center", padding: "8px 10px", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-faint)", whiteSpace: "nowrap" }}>Н/год</th>
+                    <th style={{ textAlign: "right", padding: "8px 14px", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-faint)", whiteSpace: "nowrap" }}>Вартість</th>
+                    <th style={{ padding: "8px 10px" }}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map((s, i) => (
-                    <tr
-                      key={s.slug}
-                      className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                        i === items.length - 1 ? "border-b-0" : ""
-                      }`}
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-gray-900 text-sm">{s.title}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{s.short}</p>
+                    <tr key={s.slug} style={{ borderBottom: i < items.length - 1 ? "1px solid var(--border)" : "none" }}>
+                      <td style={{ padding: "10px 14px" }}>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{s.title}</p>
+                        <p style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>{s.short}</p>
                       </td>
-                      <td className="px-4 py-4 text-center">
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-100 rounded-full px-3 py-1">
-                          <Clock size={11} />
-                          {s.hours}
+                      <td style={{ padding: "10px", textAlign: "center" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--text-muted)", background: "var(--surface2)", borderRadius: 99, padding: "3px 10px", border: "1px solid var(--border)" }}>
+                          <Clock size={10} />{s.hours}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <p className="font-bold text-gray-900 text-sm">{s.price}</p>
-                        <p className="text-xs text-gray-400">до {s.priceMax.toLocaleString("uk-UA")} грн</p>
+                      <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{s.price}</p>
+                        <p style={{ fontSize: 12, color: "var(--text-faint)" }}>до {s.priceMax.toLocaleString("uk-UA")} грн</p>
                       </td>
-                      <td className="px-4 py-4">
-                        <Link
-                          href={`/services/${s.slug}`}
-                          className="text-gray-300 hover:text-red-500 transition-colors"
-                          title="Детальніше"
-                        >
-                          <ChevronRight size={18} />
+                      <td style={{ padding: "10px" }}>
+                        <Link href={`/services/${s.slug}`} style={{ color: "var(--text-faint)", display: "flex" }}>
+                          <ChevronRight size={16} />
                         </Link>
                       </td>
                     </tr>
@@ -111,15 +91,12 @@ export default function PricePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0f1923] text-white py-14 px-4 text-center">
-        <h2 className="text-2xl font-bold mb-3">Потрібен точний розрахунок?</h2>
-        <p className="text-gray-400 mb-8 max-w-md mx-auto text-sm">
+      <section style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", padding: "40px 16px", textAlign: "center" }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Потрібен точний розрахунок?</h2>
+        <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, margin: "0 auto 20px" }}>
           Привезіть авто на огляд — майстер визначить обсяг робіт і озвучить фінальну ціну.
         </p>
-        <Link
-          href="/booking"
-          className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-full transition-colors"
-        >
+        <Link href="/contacts" style={{ display: "inline-block", background: "var(--primary)", color: "#fff", fontWeight: 600, fontSize: 13, padding: "10px 26px", borderRadius: 99, textDecoration: "none" }}>
           Записатись на огляд
         </Link>
       </section>
