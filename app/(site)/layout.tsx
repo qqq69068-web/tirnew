@@ -54,7 +54,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
-    <div id="site-wrapper">
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
 
       {/* ── NAVBAR ──────────────────────────────────────────── */}
       <header style={{
@@ -222,7 +222,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer style={{
-        background: "var(--surface)",
+        background: "var(--bg)",
         borderTop: "1px solid var(--border)",
         marginTop: "auto",
         transition: "background 0.25s",

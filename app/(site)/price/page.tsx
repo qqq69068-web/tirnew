@@ -11,7 +11,7 @@ const categories = Array.from(new Set(services.map((s) => s.category)));
 
 export default function PricePage() {
   return (
-    <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", transition: "background 0.25s, color 0.2s" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", transition: "background 0.25s, color 0.2s" }}>
 
       {/* HERO */}
       <section style={{ position: "relative", overflow: "hidden", padding: "56px 16px 48px", borderBottom: "1px solid var(--border)" }}>
@@ -91,15 +91,17 @@ export default function PricePage() {
       </section>
 
       {/* CTA */}
-      <section style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", padding: "36px 16px", textAlign: "center", transition: "background 0.25s" }}>
-        <h2 style={{ fontSize: 19, fontWeight: 700, color: "var(--text)", marginBottom: 7 }}>Потрібен точний розрахунок?</h2>
-        <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 340, margin: "0 auto 18px" }}>
-          Привезіть авто на огляд — майстер визначить обсяг робіт і озвучить фінальну ціну.
-        </p>
-        <Link href="/contacts" style={{ display: "inline-block", background: "var(--primary)", color: "#fff", fontWeight: 600, fontSize: 13, padding: "10px 24px", borderRadius: 99, textDecoration: "none" }}>
-          Записатись на огляд
-        </Link>
+      <section style={{ padding: "0 16px 36px" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "32px 28px", textAlign: "center" }}>
+          <h2 style={{ fontSize: 19, fontWeight: 700, color: "var(--text)", marginBottom: 7 }}>Потрібен точний розрахунок?</h2>
+          <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 340, margin: "0 auto 18px" }}>
+            Привезіть авто на огляд — майстер визначить обсяг робіт і озвучить фінальну ціну.
+          </p>
+          <Link href="/contacts" style={{ display: "inline-block", background: "var(--primary)", color: "#fff", fontWeight: 600, fontSize: 13, padding: "10px 24px", borderRadius: 99, textDecoration: "none" }}>
+            Записатись на огляд
+          </Link>
+        </div>
       </section>
-    </main>
+    </div>
   );
 }
