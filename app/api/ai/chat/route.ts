@@ -16,6 +16,7 @@ type ClientBookingLite = {
 
 type ClientLite = {
   name?: string | null;
+  phone?: string | null;
   email: string;
   bookings: ClientBookingLite[];
 };
@@ -34,12 +35,27 @@ const SYSTEM_INFO = `
 Послуги сервісу (список):
 ${services.map((s) => `- ${s.title} (${s.vehicleType === "truck" ? "вантажні/ТІР" : "легкові"}): ${s.price || "уточнюйте"}`).join("\n")}
 
+ФУНКЦІЯ ЗАПИСУ:
+Ти МОЖЕШ безпосередньо записати клієнта на послугу — не тільки перенаправляти на /booking.
+Коли клієнт хоче записатися — збери через діалог:
+1. Послуга (яку хоче виконати)
+2. Марка авто (carBrand) і модель (carModel)
+3. Бажана дата і час
+4. Якщо клієнт НЕ авторизований — ім'я та номер телефону
+
+Як тільки маєш всі дані — поверни ТІЛЬКИ json-блок такого формату (нічого іншого!):
+<BOOK_ACTION>
+{"service":"...","carBrand":"...","carModel":"...","date":"YYYY-MM-DDTHH:MM:SS","name":"...","phone":"...","message":"..."}
+</BOOK_ACTION>
+
+ВАЖЛИВО: якщо клієнт авторизований і ти вже знаєш його ім'я та телефон — все одно передавай name і phone в json (береш з контексту).
+Якщо date невідома — передай пустий рядок.
+
 Правила:
 1. Якщо запитують про запис, перегляд записів чи історію ремонтів — перевір контекст авторизації.
 2. Ніколи не згадуй чужі дані.
-3. Якщо не знаєш точної відповіді — чесно скажи про це і запропонуй зателефонувати.
-4. Для запису уточнюй: тип авто, марку/модель, послугу/проблему, бажану дату.
-5. Остаточний діагноз можливий лише після огляду — завжди це підкреслюй при діагностиці.
+3. Якщо не знаєш точної відповіді — чесно скажи і запропонуй зателефонувати.
+4. Остаточний діагноз можливий лише після огляду.
 `;
 
 async function getClientFromRequest(req: NextRequest): Promise<ClientLite | null> {
@@ -53,13 +69,13 @@ async function getClientFromRequest(req: NextRequest): Promise<ClientLite | null
       include: { bookings: { orderBy: { scheduledAt: "desc" }, take: 10 } },
     });
     if (!client) return null;
-
     return {
       name: client.name,
+      phone: client.phone,
       email: client.email,
       bookings: client.bookings.map((b) => ({
         id: String(b.id),
-        service: (b as { service?: string | null; name?: string | null }).service ?? b.name ?? null,
+        service: (b as Record<string, unknown>).service as string | null ?? b.name ?? null,
         scheduledAt: b.scheduledAt ?? b.date ?? null,
         status: b.status ?? null,
         carBrand: b.carBrand ?? null,
@@ -86,9 +102,9 @@ export async function POST(req: NextRequest) {
     if (client) {
       const activeBookings = client.bookings.filter((b) => b.status !== "cancelled" && b.status !== "done");
       const doneBookings = client.bookings.filter((b) => b.status === "done");
-      userContext = `\n\nПОТОЧНИЙ АВТОРИЗОВАНИЙ КОРИСТУВАЧ:\n- Email: ${client.email}\n- Ім'я: ${client.name || "не вказано"}\n- Активні записи (${activeBookings.length}): ${activeBookings.length === 0 ? "немає" : activeBookings.map((b) => `#${b.id} — ${b.service || "послуга"}, авто: ${b.carBrand || ""} ${b.carModel || ""}, час: ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "не вказано"}, статус: ${b.status}`).join("; ")}\n- Виконані ремонти (${doneBookings.length}): ${doneBookings.length === 0 ? "немає" : doneBookings.slice(0, 5).map((b) => `${b.service || "послуга"} (${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"})`).join("; ")}\n`;
+      userContext = `\n\nПОТОЧНИЙ АВТОРИЗОВАНИЙ КОРИСТУВАЧ:\n- Email: ${client.email}\n- Ім'я: ${client.name || "не вказано"}\n- Телефон: ${client.phone || "не вказано"}\n- Активні записи (${activeBookings.length}): ${activeBookings.length === 0 ? "немає" : activeBookings.map((b) => `#${b.id} — ${b.service || "послуга"}, авто: ${b.carBrand || ""} ${b.carModel || ""}, час: ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "не вказано"}, статус: ${b.status}`).join("; ")}\n- Виконані ремонти (${doneBookings.length}): ${doneBookings.length === 0 ? "немає" : doneBookings.slice(0, 5).map((b) => `${b.service || "послуга"} (${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"})`).join("; ")}\n`;
     } else {
-      userContext = "\n\nКОРИСТУВАЧ НЕ АВТОРИЗОВАНИЙ. Якщо запитує про свої записи або історію — запропонуй увійти в кабінет на /cabinet";
+      userContext = "\n\nКОРИСТУВАЧ НЕ АВТОРИЗОВАНИЙ. Якщо записується — обов'язково запитай ім'я та телефон. Якщо запитує про свої записи або історію — запропонуй увійти в кабінет на /cabinet";
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
@@ -109,10 +125,10 @@ export async function POST(req: NextRequest) {
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: SYSTEM_INFO + userContext },
-          ...messages.slice(-12),
+          ...messages.slice(-14),
         ],
-        max_tokens: 600,
-        temperature: 0.5,
+        max_tokens: 700,
+        temperature: 0.4,
       }),
     });
 
@@ -139,9 +155,9 @@ function getRuleBasedReply(msg: string, client: ClientLite | null): string {
       : "Привіт! 👋 Я AI-помічник Tirnew Truck Service. Чим можу допомогти?";
   }
   if (msg.includes("запис") || msg.includes("записат")) {
-    if (!client) return "Для запису на ремонт, будь ласка, увійдіть у свій кабінет: /cabinet — або зателефонуйте нам: +38 (066) 418-88-26";
+    if (!client) return "Для запису вкажіть, будь ласка:\n1. Послугу\n2. Марку та модель авто\n3. Бажану дату\n4. Ваше ім'я та телефон\n\nАбо увійдіть у кабінет /cabinet";
     const active = client.bookings.filter((b) => b.status !== "cancelled" && b.status !== "done");
-    if (active.length === 0) return "У вас немає активних записів. Хочете записатися? Перейдіть на /booking або натисніть \"Записатися\".";
+    if (active.length === 0) return "У вас немає активних записів. Хочете записатися? Напишіть, яка послуга потрібна.";
     return `Ваші активні записи:\n${active.map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "час не вказано"}`).join("\n")}`;
   }
   if (msg.includes("ціна") || msg.includes("прайс") || msg.includes("вартість") || msg.includes("скільки")) {
@@ -157,7 +173,7 @@ function getRuleBasedReply(msg: string, client: ClientLite | null): string {
     return "⏰ Ми працюємо:\nПонеділок–Субота: 08:00–18:00\nНеділя: вихідний";
   }
   if (msg.includes("abs") || msg.includes("гальм") || msg.includes("підвіска") || msg.includes("двигун") || msg.includes("кпп")) {
-    return "Дякую за опис проблеми. Я можу запропонувати можливі причини, але остаточний діагноз можливий лише після огляду автомобіля майстром.\n\nРекомендую записатися на діагностику. Перейдіть на /booking або зателефонуйте: +38 (066) 418-88-26";
+    return "Дякую за опис проблеми. Рекомендую записатися на діагностику.\n\nПерейдіть на /booking або зателефонуйте: +38 (066) 418-88-26";
   }
   if (msg.includes("історія") || msg.includes("ремонтів")) {
     if (!client) return "Для перегляду історії ремонтів увійдіть у свій кабінет: /cabinet";
