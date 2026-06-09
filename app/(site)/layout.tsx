@@ -21,9 +21,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" && localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const isDark = saved ? saved === "dark" : prefersDark;
+    // Default is always LIGHT unless user explicitly saved "dark"
+    const saved = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+    const isDark = saved === "dark";
     setDark(isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
   }, []);
@@ -57,7 +57,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{ background: "var(--bg)", color: "var(--text)", minHeight: "100dvh", display: "flex", flexDirection: "column", transition: "background 0.25s, color 0.2s" }}>
 
-      {/* ── NAVBAR ─────────────────────────────────────────── */}
+      {/* ── NAVBAR ──────────────────────────────────────────── */}
       <header style={{
         position: "sticky", top: 0, zIndex: 50,
         background: scrolled ? "var(--nav-bg-scroll)" : "var(--nav-bg)",
@@ -221,7 +221,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       {/* PAGE */}
       <main style={{ flex: 1 }}>{children}</main>
 
-      {/* ── FOOTER ─────────────────────────────────────────── */}
+      {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer style={{
         background: "var(--surface)",
         borderTop: "1px solid var(--border)",
