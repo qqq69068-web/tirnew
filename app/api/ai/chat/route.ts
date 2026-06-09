@@ -41,16 +41,19 @@ ${services.map((s) => `- ${s.title} (${s.vehicleType === "truck" ? "вантаж
 1. Яку послугу потрібно виконати
 2. Марка та модель автомобіля
 3. Бажана дата і час
-4. Якщо клієнт НЕ авторизований — ім'я та номер телефону
+4. Якщо клієнт НЕ авторизований — збери по порядку (не всі відразу):
+   a) Ім'я
+   b) Номер телефону
+   c) Е-мейл — ОБОВ'ЯЗКОВО! Пояснюй: "Будь ласка, вкажіть ваш email — це потрібно щоб надіслати підтвердження запису та дати доступ до особистого кабінету."
 
 Як тільки маєш всі дані — поверни ТІЛЬКИ json-блок такого формату (нічого іншого!):
 <BOOK_ACTION>
-{"service":"...","carBrand":"...","carModel":"...","date":"YYYY-MM-DDTHH:MM:SS","name":"...","phone":"...","message":"..."}
+{"service":"...","carBrand":"...","carModel":"...","date":"YYYY-MM-DDTHH:MM:SS","name":"...","phone":"...","email":"...","message":"..."}
 </BOOK_ACTION>
 
 ВАЖЛИВО:
-- Поля carBrand, carModel, date, name, phone — це ВНУТРІШНІ назви полів для json. У повідомленнях до клієнта НІКОЛИ не використовуй ці технічні назви. Питай по-людськи: "Яка марка вашого авто?", "Яка модель?", "Ваше ім'я?", "Номер телефону?".
-- Якщо клієнт авторизований і ти вже знаєш його ім'я та телефон — передавай їх у json автоматично, не питай.
+- carBrand, carModel, date, name, phone, email — це ВНУТРІШНІ назви полів для json. У повідомленнях до клієнта НІКОЛИ не використовуй ці технічні назви. Питай по-людськи.
+- Якщо клієнт авторизований і ти вже знаєш його ім'я, телефон і email — передавай їх автоматично, не питай.
 - Якщо date невідома — передай пустий рядок.
 
 Правила:
@@ -106,7 +109,11 @@ export async function POST(req: NextRequest) {
       const doneBookings = client.bookings.filter((b) => b.status === "done");
       userContext = `\n\nПОТОЧНИЙ АВТОРИЗОВАНИЙ КОРИСТУВАЧ:\n- Email: ${client.email}\n- Ім'я: ${client.name || "не вказано"}\n- Телефон: ${client.phone || "не вказано"}\n- Активні записи (${activeBookings.length}): ${activeBookings.length === 0 ? "немає" : activeBookings.map((b) => `#${b.id} — ${b.service || "послуга"}, авто: ${b.carBrand || ""} ${b.carModel || ""}, час: ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "не вказано"}, статус: ${b.status}`).join("; ")}\n- Виконані ремонти (${doneBookings.length}): ${doneBookings.length === 0 ? "немає" : doneBookings.slice(0, 5).map((b) => `${b.service || "послуга"} (${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"})`).join("; ")}\n`;
     } else {
-      userContext = "\n\nКОРИСТУВАЧ НЕ АВТОРИЗОВАНИЙ. Якщо записується — обов'язково запитай ім'я та телефон. Якщо запитує про свої записи або історію — запропонуй увійти в кабінет на /cabinet";
+      userContext = `\n\nКОРИСТУВАЧ НЕ АВТОРИЗОВАНИЙ.
+Якщо хоче записатися — обов'язково збери ім'я, телефон і email.
+Email обов'язковий! Поясни природно: "Будь ласка, вкажіть ваш email — це потрібно щоб надіслати підтвердження запису та посилання для входу в особистий кабінет де ви зможете бачити свій запис."
+BEZ email-а не створюй запис!
+Якщо запитують про свої записи або історію — запропонуй відправити посилання для входу (не згадуй посилання на /cabinet в тексті — тільки запропонуй ввести email для отримання посилання).`;
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
@@ -157,7 +164,7 @@ function getRuleBasedReply(msg: string, client: ClientLite | null): string {
       : "Привіт! 👋 Я AI-помічник Tirnew Truck Service. Чим можу допомогти?";
   }
   if (msg.includes("запис") || msg.includes("записат")) {
-    if (!client) return "Для запису вкажіть, будь ласка:\n1. Послугу\n2. Марку та модель авто\n3. Бажану дату\n4. Ваше ім'я та телефон\n\nАбо увійдіть у кабінет /cabinet";
+    if (!client) return "Для запису вкажіть, будь ласка:\n1. Послугу\n2. Марку та модель авто\n3. Бажану дату\n4. Ім'я\n5. Телефон\n6. Email (для підтвердження запису)";
     const active = client.bookings.filter((b) => b.status !== "cancelled" && b.status !== "done");
     if (active.length === 0) return "У вас немає активних записів. Хочете записатися? Напишіть, яка послуга потрібна.";
     return `Ваші активні записи:\n${active.map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "час не вказано"}`).join("\n")}`;
@@ -174,11 +181,8 @@ function getRuleBasedReply(msg: string, client: ClientLite | null): string {
   if (msg.includes("графік") || msg.includes("час роботи") || msg.includes("коли працює")) {
     return "⏰ Ми працюємо:\nПонеділок–Субота: 08:00–18:00\nНеділя: вихідний";
   }
-  if (msg.includes("abs") || msg.includes("гальм") || msg.includes("підвіска") || msg.includes("двигун") || msg.includes("кпп")) {
-    return "Дякую за опис проблеми. Рекомендую записатися на діагностику.\n\nПерейдіть на /booking або зателефонуйте: +38 (066) 418-88-26";
-  }
   if (msg.includes("історія") || msg.includes("ремонтів")) {
-    if (!client) return "Для перегляду історії ремонтів увійдіть у свій кабінет: /cabinet";
+    if (!client) return "Для перегляду історії ремонтів надішлеміть ваш email — ми відправимо посилання для входу.";
     const done = client.bookings.filter((b) => b.status === "done");
     if (done.length === 0) return "У вас поки немає завершених ремонтів в системі.";
     return `Ваші останні ремонти:\n${done.slice(0, 5).map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"}`).join("\n")}`;
