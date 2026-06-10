@@ -324,7 +324,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           box-shadow: var(--shadow-md);
         }
         .site-nav__inner {
-          height: 64px;
+          height: 44px;
           display: flex; align-items: center; justify-content: space-between;
           gap: var(--space-4);
         }
@@ -467,7 +467,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .mobile-menu--open .mobile-menu__ctas { opacity: 1; transform: translateY(0); }
         .mobile-menu__backdrop {
-          position: fixed; inset: 0; top: 64px;
+          position: fixed; inset: 0; top: 44px;
           background: rgba(0,0,0,0.30); z-index: -1; backdrop-filter: blur(2px);
           animation: backdropIn 0.22s ease both;
         }
