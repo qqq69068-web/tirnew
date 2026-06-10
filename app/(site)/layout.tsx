@@ -30,7 +30,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
-  /* ── Theme init ───────────────────────────────────────── */
+  /* ── Theme init ──────────────────────────────────────────── */
   useEffect(() => {
     const saved = localStorage.getItem("tirnew-theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -48,14 +48,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  /* ── Scroll detection ──────────────────────────────── */
+  /* ── Scroll detection ───────────────────────────────────── */
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  /* ── Page progress bar ────────────────────────────── */
+  /* ── Page progress bar ─────────────────────────────────── */
   useEffect(() => {
     setProgVisible(true);
     setProgress(0);
@@ -71,17 +71,17 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     };
   }, [pathname]);
 
-  /* ── Close mobile menu on route change ───────────────── */
+  /* ── Close mobile menu on route change ────────────────────── */
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  /* ── Auth check ────────────────────────────────────── */
+  /* ── Auth check ────────────────────────────────────────────────── */
   useEffect(() => {
     fetch("/api/client/me")
       .then((r) => setIsClient(r.ok))
       .catch(() => setIsClient(false));
   }, [pathname]);
 
-  /* ── Lock body scroll when mobile menu open ───────────── */
+  /* ── Lock body scroll when mobile menu open ─────────────────── */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -93,7 +93,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="site-wrapper">
 
-      {/* ══ PAGE PROGRESS BAR ════════════════════════════════════ */}
+      {/* ══ PAGE PROGRESS BAR ════════════════════════════════════════════════════════ */}
       <div
         aria-hidden
         className="page-progress"
@@ -106,7 +106,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* ══ NAVBAR ═══════════════════════════════════════════════ */}
+      {/* ══ NAVBAR ═════════════════════════════════════════════════════════════════ */}
       <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner container-wide">
 
@@ -255,10 +255,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         )}
       </header>
 
-      {/* ══ PAGE CONTENT ══════════════════════════════════════════════ */}
-      <main>{children}</main>
+      {/* ══ PAGE CONTENT ══════════════════════════════════════════════════════════════ */}
+      {/* id=main-content targets the skip link from root layout */}
+      <main id="main-content" style={{ flex: 1 }}>{children}</main>
 
-      {/* ══ FOOTER ═════════════════════════════════════════════════ */}
+      {/* ══ FOOTER ═════════════════════════════════════════════════════════════════ */}
       <footer className="site-footer theme-transition">
         <div className="site-footer__top">
           <div className="container-wide site-footer__grid">
@@ -318,10 +319,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      {/* ══ AI CHAT ═════════════════════════════════════════════════ */}
+      {/* ══ AI CHAT ════════════════════════════════════════════════════════════════════ */}
       <AiChat />
 
-      {/* ══ STYLES ═══════════════════════════════════════════════════ */}
+      {/* ══ STYLES ═══════════════════════════════════════════════════════════════════════ */}
       <style>{`
         .site-wrapper {
           display: flex;
@@ -362,7 +363,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           box-shadow: var(--shadow-md);
         }
         .site-nav__inner {
-          height: 60px;
+          /* 60→64px: більш преміум відчуття, зберігає вирівнювання лого та елементів */
+          height: 64px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -517,15 +519,16 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text);
           border-color: var(--border-strong);
         }
+        /* Auth state: amber/teal accent — uses --accent (teal) tokens */
         .site-nav__cabinet--auth {
-          border-color: rgba(217,119,6,0.4);
-          background: rgba(217,119,6,0.06);
+          border-color: var(--accent-border);
+          background: var(--accent-subtle);
           color: var(--accent);
         }
         .site-nav__cabinet--auth:hover {
-          background: rgba(217,119,6,0.10);
-          color: var(--accent);
-          border-color: rgba(217,119,6,0.55);
+          background: var(--accent-subtle);
+          color: var(--accent-h);
+          border-color: var(--accent);
         }
 
         /* ── BURGER ────────────────────────────────────────── */
@@ -640,7 +643,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .mobile-menu--open .mobile-menu__ctas { opacity: 1; transform: translateY(0); }
         .mobile-menu__backdrop {
-          position: fixed; inset: 0; top: 60px;
+          position: fixed; inset: 0; top: 64px;
           background: rgba(0,0,0,0.30);
           z-index: -1;
           backdrop-filter: blur(2px);
@@ -718,7 +721,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .footer-link:hover { color: var(--text); }
 
-        /* підкреслення при hover — лише ефект, не впливає на видимість тексту */
+        /* підкреслення при hover */
         .hover-underline { position: relative; }
         .hover-underline::after {
           content: '';
