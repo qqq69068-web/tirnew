@@ -30,7 +30,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
-  /* ── Theme init ─────────────────────────────────────────── */
+  /* ── Theme init ───────────────────────────────────────── */
   useEffect(() => {
     const saved = localStorage.getItem("tirnew-theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -48,14 +48,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  /* ── Scroll detection ───────────────────────────────────── */
+  /* ── Scroll detection ──────────────────────────────── */
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  /* ── Page progress bar ──────────────────────────────────── */
+  /* ── Page progress bar ────────────────────────────── */
   useEffect(() => {
     setProgVisible(true);
     setProgress(0);
@@ -71,23 +71,23 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     };
   }, [pathname]);
 
-  /* ── Close mobile menu on route change ─────────────────── */
+  /* ── Close mobile menu on route change ───────────────── */
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  /* ── Auth check ─────────────────────────────────────────── */
+  /* ── Auth check ────────────────────────────────────── */
   useEffect(() => {
     fetch("/api/client/me")
       .then((r) => setIsClient(r.ok))
       .catch(() => setIsClient(false));
   }, [pathname]);
 
-  /* ── Lock body scroll when mobile menu open ─────────────── */
+  /* ── Lock body scroll when mobile menu open ───────────── */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  /* ── Custom cursor (fine pointer devices only) ───────────── */
+  /* ── Custom cursor (fine pointer devices only) ─────────── */
   useEffect(() => {
     const mq = window.matchMedia("(pointer: fine)");
     if (!mq.matches) return;
@@ -168,11 +168,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="site-wrapper">
 
-      {/* ══ CUSTOM CURSOR ════════════════════════════════════ */}
+      {/* ══ CUSTOM CURSOR ═══════════════════════════════════════════ */}
       <div id="cursor-dot"  className="cursor-dot"  aria-hidden="true" />
       <div id="cursor-ring" className="cursor-ring" aria-hidden="true" />
 
-      {/* ══ PAGE PROGRESS BAR ════════════════════════════════ */}
+      {/* ══ PAGE PROGRESS BAR ════════════════════════════════════ */}
       <div
         aria-hidden
         className="page-progress"
@@ -185,7 +185,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* ══ NAVBAR ══════════════════════════════════════════ */}
+      {/* ══ NAVBAR ═══════════════════════════════════════════════ */}
       <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner container-wide">
 
@@ -334,10 +334,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         )}
       </header>
 
-      {/* ══ PAGE CONTENT ════════════════════════════════════ */}
+      {/* ══ PAGE CONTENT ══════════════════════════════════════════════ */}
       <main>{children}</main>
 
-      {/* ══ FOOTER ══════════════════════════════════════════ */}
+      {/* ══ FOOTER ═════════════════════════════════════════════════ */}
       <footer className="site-footer theme-transition">
         <div className="site-footer__top">
           <div className="container-wide site-footer__grid">
@@ -397,10 +397,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      {/* ══ AI CHAT ═════════════════════════════════════════ */}
+      {/* ══ AI CHAT ═════════════════════════════════════════════════ */}
       <AiChat />
 
-      {/* ══ STYLES ══════════════════════════════════════════ */}
+      {/* ══ STYLES ═══════════════════════════════════════════════════ */}
       <style>{`
         .site-wrapper {
           display: flex;
@@ -408,7 +408,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           min-height: 100dvh;
         }
 
-        /* ── PAGE PROGRESS BAR ─────────────────────────── */
+        /* ── PAGE PROGRESS BAR ───────────────────────────── */
         .page-progress {
           position: fixed;
           top: 0; left: 0;
@@ -421,7 +421,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-radius: 0 2px 2px 0;
         }
 
-        /* ── NAVBAR ────────────────────────────────────── */
+        /* ── NAVBAR ────────────────────────────────────────── */
         .site-nav {
           position: sticky;
           top: 0;
@@ -607,7 +607,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-color: rgba(217,119,6,0.55);
         }
 
-        /* ── BURGER ──────────────────────────────────────── */
+        /* ── BURGER ────────────────────────────────────────── */
         .site-nav__burger {
           width: 34px;
           height: 34px;
@@ -649,7 +649,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .burger-line--mid.open { opacity: 0; transform: scaleX(0); }
         .burger-line--bot.open { transform: translateY(-5.25px) rotate(-45deg); }
 
-        /* ── MOBILE MENU ─────────────────────────────────── */
+        /* ── MOBILE MENU ──────────────────────────────────── */
         .mobile-menu {
           border-top: 1px solid var(--border);
           background: var(--surface);
@@ -727,7 +727,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ── FOOTER ──────────────────────────────────────── */
+        /* ── FOOTER ────────────────────────────────────────── */
         .site-footer {
           background: var(--bg2);
           border-top: 1px solid var(--border);
@@ -754,14 +754,22 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-footer__contacts { display: flex; flex-direction: column; gap: var(--space-1); }
         .site-footer__phone { font-size: var(--text-sm); font-weight: 600; }
-        .site-footer__meta { font-size: var(--text-xs); color: var(--text-faint); line-height: 1.5; }
+
+        /* FIX: адреса та години роботи — повна видимість */
+        .site-footer__meta {
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          line-height: 1.5;
+        }
+
+        /* FIX: заголовки колонок — чітко видно */
         .site-footer__col-title {
           font-family: var(--font-display);
           font-size: 10px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.12em;
-          color: var(--text-faint);
+          color: var(--text-muted);
           margin-bottom: var(--space-4);
         }
         .site-footer__col-links { display: flex; flex-direction: column; gap: var(--space-2); }
@@ -788,15 +796,20 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           transition: transform 0.24s cubic-bezier(0.22,1,0.36,1);
         }
         .hover-underline:hover::after { transform: scaleX(1); }
+
+        /* FIX: нижня смужка копірайт — розбірлива */
         .site-footer__bottom { padding-block: var(--space-4); }
         .site-footer__bottom-inner {
           display: flex; align-items: center;
           justify-content: space-between;
           flex-wrap: wrap; gap: var(--space-2);
         }
-        .site-footer__copy { font-size: var(--text-xs); color: var(--text-faint); }
+        .site-footer__copy {
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+        }
 
-        /* ── RESPONSIVE ──────────────────────────────────── */
+        /* ── RESPONSIVE ─────────────────────────────────────── */
         @media (max-width: 768px) {
           .site-footer__grid { grid-template-columns: 1fr 1fr; }
           .site-footer__brand { grid-column: span 2; }
@@ -806,7 +819,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           .site-footer__brand { grid-column: span 1; }
         }
 
-        /* ── REDUCED MOTION ──────────────────────────────── */
+        /* ── REDUCED MOTION ───────────────────────────────── */
         @media (prefers-reduced-motion: reduce) {
           .page-progress { transition: none !important; }
           .mobile-menu {
