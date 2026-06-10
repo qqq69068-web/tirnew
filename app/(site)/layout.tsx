@@ -104,7 +104,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         <div className="site-nav__inner">
 
           <Link href="/" className="site-nav__logo">
-            <TirnewLogo size={34} />
+            <TirnewLogo size={26} />
             <div className="site-nav__brand">
               <span className="site-nav__brand-name">Tirnew</span>
               <span className="site-nav__brand-sub">Truck Service</span>
@@ -141,8 +141,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             >
               <span className={`theme-icon${dark ? " theme-icon--sun" : " theme-icon--moon"}`}>
                 {dark
-                  ? <Sun  size={15} strokeWidth={2} aria-hidden />
-                  : <Moon size={15} strokeWidth={2} aria-hidden />}
+                  ? <Sun  size={14} strokeWidth={2} aria-hidden />
+                  : <Moon size={14} strokeWidth={2} aria-hidden />}
               </span>
             </button>
 
@@ -150,7 +150,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               href="/cabinet"
               className={`site-nav__cabinet hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
             >
-              <User size={13} strokeWidth={2} aria-hidden />
+              <User size={12} strokeWidth={2} aria-hidden />
               {cabinetLabel}
             </Link>
 
@@ -323,8 +323,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-bottom-color: var(--border-strong);
           box-shadow: var(--shadow-md);
         }
+        /* padding-block = (33px total - 27px buttons) / 2 = 3px each side */
         .site-nav__inner {
-          height: 33px;
+          padding-block: 3px;
           display: flex; align-items: center; justify-content: space-between;
           gap: var(--space-4);
         }
@@ -339,11 +340,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .site-nav__brand { display: flex; flex-direction: column; line-height: 1.15; gap: 1px; }
         .site-nav__brand-name {
           font-family: var(--font-display);
-          font-size: 16px; font-weight: 900;
+          font-size: 14px; font-weight: 900;
           letter-spacing: 0.05em; text-transform: uppercase; color: var(--text);
         }
         .site-nav__brand-sub {
-          font-size: 9px; color: var(--text-muted);
+          font-size: 8px; color: var(--text-muted);
           letter-spacing: 0.18em; text-transform: uppercase;
         }
 
@@ -351,16 +352,16 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .site-nav__links { align-items: center; gap: var(--space-1); }
         .nav-link {
           position: relative; display: inline-flex; flex-direction: column;
-          align-items: center; gap: 0; padding: 6px 12px;
+          align-items: center; gap: 0; padding: 4px 10px;
           border-radius: var(--radius);
-          font-family: var(--font-display); font-size: 15px; font-weight: 600;
+          font-family: var(--font-display); font-size: 14px; font-weight: 600;
           color: var(--text-muted); text-decoration: none; overflow: visible;
           transition: color var(--transition-fast), background var(--transition-fast);
         }
         .nav-link:hover { color: var(--text); background: var(--surface2); }
         .nav-link.active { color: var(--text); }
         .nav-link__bar {
-          position: absolute; bottom: -1px; left: 12px; right: 12px;
+          position: absolute; bottom: -1px; left: 10px; right: 10px;
           height: 2px; background: var(--primary); border-radius: 2px;
           animation: navBarSlide 0.28s cubic-bezier(0.22,1,0.36,1) both;
         }
@@ -373,7 +374,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .site-nav__controls { display: flex; align-items: center; gap: var(--space-2); }
         .site-nav__phone {
           display: flex; align-items: center; gap: 5px;
-          font-size: 13px; color: var(--text-muted); text-decoration: none;
+          font-size: 12px; color: var(--text-muted); text-decoration: none;
           padding: 0 var(--space-2); white-space: nowrap;
           transition: color var(--transition-fast);
         }
@@ -402,7 +403,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           height: 27px; padding: 0 12px; border-radius: var(--radius);
           border: 1px solid var(--border-strong); background: var(--surface);
           color: var(--text-muted); font-family: var(--font-display);
-          font-size: 13px; font-weight: 600;
+          font-size: 12px; font-weight: 600;
           display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
           transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
         }
@@ -420,15 +421,15 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-nav__burger.open { background: var(--surface2); border-color: var(--border-strong); }
         .site-nav__burger:hover { background: var(--surface2); color: var(--text); }
-        .burger-icon { width: 16px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+        .burger-icon { width: 14px; height: 10px; display: flex; flex-direction: column; justify-content: space-between; }
         .burger-line {
           display: block; width: 100%; height: 1.5px; background: currentColor; border-radius: 2px;
           transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease;
           transform-origin: center center;
         }
-        .burger-line--top.open { transform: translateY(5.25px) rotate(45deg); }
+        .burger-line--top.open { transform: translateY(4.25px) rotate(45deg); }
         .burger-line--mid.open { opacity: 0; transform: scaleX(0); }
-        .burger-line--bot.open { transform: translateY(-5.25px) rotate(-45deg); }
+        .burger-line--bot.open { transform: translateY(-4.25px) rotate(-45deg); }
 
         /* Mobile menu */
         .mobile-menu {
