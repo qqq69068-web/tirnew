@@ -87,90 +87,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  /* ── Custom cursor (fine pointer devices only) ─────────── */
-  useEffect(() => {
-    const mq = window.matchMedia("(pointer: fine)");
-    if (!mq.matches) return;
-    // Respect reduced motion preference
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const dot  = document.getElementById("cursor-dot");
-    const ring = document.getElementById("cursor-ring");
-    if (!dot || !ring) return;
-
-    let dotX = 0, dotY = 0;
-    let ringX = 0, ringY = 0;
-    let raf: number;
-
-    const onMove = (e: MouseEvent) => {
-      dotX = e.clientX;
-      dotY = e.clientY;
-    };
-
-    // Ring follows with lerp for smooth trailing effect
-    const animate = () => {
-      ringX += (dotX - ringX) * 0.12;
-      ringY += (dotY - ringY) * 0.12;
-      dot.style.transform  = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
-      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-      raf = requestAnimationFrame(animate);
-    };
-    raf = requestAnimationFrame(animate);
-
-    const onEnter = (e: Event) => {
-      const el = e.currentTarget as HTMLElement;
-      if (el.matches('a, button, [role="button"], input, textarea, select, label')) {
-        dot.classList.add("hover");
-        ring.classList.add("hover");
-      }
-    };
-    const onLeave = () => {
-      dot.classList.remove("hover");
-      ring.classList.remove("hover");
-    };
-    const onDocLeave = () => {
-      dot.classList.add("hidden");
-      ring.classList.add("hidden");
-    };
-    const onDocEnter = () => {
-      dot.classList.remove("hidden");
-      ring.classList.remove("hidden");
-    };
-
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseleave", onDocLeave);
-    document.addEventListener("mouseenter", onDocEnter);
-
-    // Delegate hover to all interactive elements
-    const interactive = document.querySelectorAll(
-      'a, button, [role="button"], input, textarea, select, label'
-    );
-    interactive.forEach((el) => {
-      el.addEventListener("mouseenter", onEnter);
-      el.addEventListener("mouseleave", onLeave);
-    });
-
-    return () => {
-      cancelAnimationFrame(raf);
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseleave", onDocLeave);
-      document.removeEventListener("mouseenter", onDocEnter);
-      interactive.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnter);
-        el.removeEventListener("mouseleave", onLeave);
-      });
-    };
-  }, []);
-
   const cabinetLabel     = isClient ? "Кабінет" : "Увійти";
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
     <div className="site-wrapper">
-
-      {/* ══ CUSTOM CURSOR ═══════════════════════════════════════════ */}
-      <div id="cursor-dot"  className="cursor-dot"  aria-hidden="true" />
-      <div id="cursor-ring" className="cursor-ring" aria-hidden="true" />
 
       {/* ══ PAGE PROGRESS BAR ════════════════════════════════════ */}
       <div
@@ -475,7 +396,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .site-nav__brand-sub {
           font-family: var(--font-body);
           font-size: 9px;
-          color: var(--text-faint);
+          color: var(--text-muted);
           letter-spacing: 0.18em;
           text-transform: uppercase;
         }
@@ -753,16 +674,24 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           margin-bottom: var(--space-4);
         }
         .site-footer__contacts { display: flex; flex-direction: column; gap: var(--space-1); }
-        .site-footer__phone { font-size: var(--text-sm); font-weight: 600; }
 
-        /* FIX: адреса та години роботи — повна видимість */
+        /* телефон у футері — завжди видимий */
+        .site-footer__phone {
+          font-size: var(--text-sm);
+          font-weight: 600;
+          color: var(--text) !important;
+        }
+        .site-footer__phone:hover { color: var(--primary) !important; }
+
+        /* адреса та години — завжди читабельні */
         .site-footer__meta {
           font-size: var(--text-xs);
           color: var(--text-muted);
           line-height: 1.5;
+          opacity: 1;
         }
 
-        /* FIX: заголовки колонок — чітко видно */
+        /* заголовки колонок — чітко видно */
         .site-footer__col-title {
           font-family: var(--font-display);
           font-size: 10px;
@@ -771,8 +700,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           letter-spacing: 0.12em;
           color: var(--text-muted);
           margin-bottom: var(--space-4);
+          opacity: 1;
         }
         .site-footer__col-links { display: flex; flex-direction: column; gap: var(--space-2); }
+
+        /* посилання у футері — завжди видимі, не лише при hover */
         .footer-link {
           font-family: var(--font-body);
           font-size: var(--text-xs);
@@ -781,9 +713,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           display: inline-flex;
           align-items: center;
           gap: 4px;
+          opacity: 1;
           transition: color var(--transition-fast);
         }
         .footer-link:hover { color: var(--text); }
+
+        /* підкреслення при hover — лише ефект, не впливає на видимість тексту */
         .hover-underline { position: relative; }
         .hover-underline::after {
           content: '';
@@ -797,7 +732,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .hover-underline:hover::after { transform: scaleX(1); }
 
-        /* FIX: нижня смужка копірайт — розбірлива */
+        /* нижня смужка копірайт */
         .site-footer__bottom { padding-block: var(--space-4); }
         .site-footer__bottom-inner {
           display: flex; align-items: center;
@@ -807,6 +742,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .site-footer__copy {
           font-size: var(--text-xs);
           color: var(--text-muted);
+          opacity: 1;
         }
 
         /* ── RESPONSIVE ─────────────────────────────────────── */
