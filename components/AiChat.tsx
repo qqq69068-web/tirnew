@@ -166,18 +166,22 @@ export default function AiChat() {
     if (emailPending) {
       setMessages((prev) => [...prev, { role: "user", content }]);
       if (isValidEmail(content)) {
-        const bookDataWithEmail = { ...emailPending.bookData, email: content.trim() };
+        // Явна типізація щоб TypeScript знав повний тип
+        const bookDataWithEmail: Record<string, string> = {
+          ...emailPending.bookData,
+          email: content.trim(),
+        };
         setEmailPending(null);
         // Показуємо підтвердження вже з email
         const bd = bookDataWithEmail;
         const confirmText =
           `Підготував запис:\n` +
-          `📋 Послуга: ${bd.service || "—"}\n` +
-          `🚛 Авто: ${bd.carBrand || "—"} ${bd.carModel || ""}\n` +
-          `📅 Дата: ${bd.date ? new Date(bd.date).toLocaleString("uk-UA") : "буде узгоджено"}\n` +
-          `👤 Ім'я: ${bd.name || "—"}\n` +
-          `📞 Телефон: ${bd.phone || "—"}\n` +
-          `📧 Email: ${bd.email}\n\n` +
+          `📋 Послуга: ${bd["service"] || "—"}\n` +
+          `🚛 Авто: ${bd["carBrand"] || "—"} ${bd["carModel"] || ""}\n` +
+          `📅 Дата: ${bd["date"] ? new Date(bd["date"]).toLocaleString("uk-UA") : "буде узгоджено"}\n` +
+          `👤 Ім'я: ${bd["name"] || "—"}\n` +
+          `📞 Телефон: ${bd["phone"] || "—"}\n` +
+          `📧 Email: ${bd["email"]}\n\n` +
           `Підтвердити запис?`;
         setMessages((prev) => [...prev, { role: "assistant", content: confirmText }]);
         setBookingPending({ data: bookDataWithEmail, msgIndex: 0 });
