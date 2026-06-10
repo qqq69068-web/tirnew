@@ -140,8 +140,6 @@ export default function HomePage() {
           />
           <div className="hp-hero__overlay" />
           <div className="hp-hero__radial" />
-          <div className="hp-hero__grid" aria-hidden />
-          <div className="hp-hero__scanline" aria-hidden />
         </div>
 
         <div className="container hp-hero__content">
@@ -360,27 +358,6 @@ export default function HomePage() {
           position: absolute; inset: 0;
           background: radial-gradient(ellipse 50% 60% at 5% 70%, rgba(185,28,28,0.22) 0%, transparent 65%);
         }
-        .hp-hero__grid {
-          position: absolute; inset: 0;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-          background-size: 64px 64px;
-          mask-image: radial-gradient(ellipse 100% 100% at 50% 100%, transparent 0%, black 55%);
-          pointer-events: none;
-        }
-        .hp-hero__scanline {
-          position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(185,28,28,0.5) 30%, rgba(185,28,28,0.8) 50%, rgba(185,28,28,0.5) 70%, transparent 100%);
-          animation: scanDown 8s ease-in-out infinite;
-          pointer-events: none; z-index: 1;
-        }
-        @keyframes scanDown {
-          0%   { top: -2px; opacity: 0; }
-          5%   { opacity: 1; }
-          95%  { opacity: 0.4; }
-          100% { top: 100%; opacity: 0; }
-        }
         .hp-hero__bottom-fade {
           position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
           background: linear-gradient(to bottom, transparent, var(--bg));
@@ -557,7 +534,6 @@ export default function HomePage() {
         .hp-process__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; max-width: 28ch; }
 
         /* ── CATEGORIES ─────────────────────────────────── */
-        /* FIX: container тепер має явний фон і бордер для видимості на --bg */
         .hp-cats {
           padding: var(--space-5) var(--space-6);
           background: var(--surface);
@@ -573,7 +549,6 @@ export default function HomePage() {
         }
         .hp-cats__list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
-        /* FIX: пілюлі — явний фон surface2, сильніший бордер, читабельний колір */
         .hp-cat-tag {
           display: inline-flex; align-items: center;
           padding: 6px 16px;
@@ -633,7 +608,6 @@ export default function HomePage() {
           background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
           pointer-events: none;
         }
-        /* FIX: min-width збільшений щоб текст не переносився передчасно */
         .hp-cta__content { position: relative; z-index: 1; flex: 1; min-width: 280px; }
         .hp-cta__eyebrow {
           font-size: var(--text-xs); font-weight: 600;
@@ -646,7 +620,6 @@ export default function HomePage() {
           font-family: var(--font-display); font-size: var(--text-xl);
           font-weight: 800; color: #fff; line-height: 1.1;
         }
-        /* FIX: max-width збільшений з 44ch → 52ch, nowrap тексту виключено */
         .hp-cta__sub {
           font-size: var(--text-sm); color: rgba(255,255,255,0.75);
           margin-top: var(--space-2); max-width: 52ch; line-height: 1.6;
@@ -703,7 +676,6 @@ export default function HomePage() {
 
         @media (prefers-reduced-motion: reduce) {
           .hp-hero__img { animation: none; }
-          .hp-hero__scanline { animation: none; opacity: 0; }
           .hp-hero__scroll-thumb { animation: none; }
           .hp-svc-card:hover { transform: none; }
           .hp-svc-card__img img { transition: none; }
