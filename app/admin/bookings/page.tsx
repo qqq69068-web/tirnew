@@ -144,7 +144,7 @@ export default function AdminBookingsPage() {
               </svg>
             </div>
             <h3>Замовлень поки немає</h3>
-            <p>Нові записи клієнтів з’являться тут після бронювання.</p>
+            <p>Нові записи клієнтів з'являться тут після бронювання.</p>
           </div>
         </div>
       )}
@@ -222,7 +222,7 @@ export default function AdminBookingsPage() {
                       <select
                         value={currentProgress}
                         onChange={(e) => setEdit(b.id, "progress", e.target.value)}
-                        className="input"
+                        className="input bk-input"
                       >
                         {PROGRESS_OPTIONS.map((p) => (
                           <option key={p.value} value={p.value}>{p.label}</option>
@@ -239,7 +239,7 @@ export default function AdminBookingsPage() {
                         type="datetime-local"
                         value={scheduledValue}
                         onChange={(e) => setEdit(b.id, "scheduledAt", e.target.value)}
-                        className="input"
+                        className="input bk-input"
                       />
                     </div>
 
@@ -250,7 +250,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.price || ""}
                         onChange={(e) => setEdit(b.id, "price", e.target.value)}
                         placeholder="0"
-                        className="input"
+                        className="input bk-input"
                       />
                     </div>
 
@@ -264,7 +264,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.partsCost || ""}
                         onChange={(e) => setEdit(b.id, "partsCost", e.target.value)}
                         placeholder="0"
-                        className="input"
+                        className="input bk-input"
                       />
                     </div>
 
@@ -278,7 +278,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.clientEmail || ""}
                         onChange={(e) => setEdit(b.id, "clientEmail", e.target.value)}
                         placeholder="client@email.com"
-                        className="input"
+                        className="input bk-input"
                       />
                     </div>
                   </div>
@@ -314,7 +314,7 @@ export default function AdminBookingsPage() {
                         onChange={(e) => setNewWorkItem((prev) => ({ ...prev, [b.id]: e.target.value }))}
                         onKeyDown={(e) => e.key === "Enter" && addWorkItem(b.id)}
                         placeholder="Наприклад: Заміна масла..."
-                        className="input"
+                        className="input bk-input"
                       />
                       <button
                         onClick={() => addWorkItem(b.id)}
@@ -506,6 +506,7 @@ export default function AdminBookingsPage() {
           flex-direction: column;
           gap: var(--space-5);
           animation: fadeIn 0.18s ease both;
+          background: var(--surface2);
         }
 
         /* Client message */
@@ -535,6 +536,44 @@ export default function AdminBookingsPage() {
           grid-column: 1 / -1;
         }
 
+        /* ── Force correct colors on all inputs inside expanded panel ── */
+        .bk-input,
+        .bk-card__body .input {
+          background: var(--surface) !important;
+          color: var(--text) !important;
+          border-color: var(--border-strong) !important;
+        }
+        .bk-input:focus,
+        .bk-card__body .input:focus {
+          border-color: var(--primary) !important;
+          box-shadow: 0 0 0 3px var(--primary-glow) !important;
+          outline: none;
+        }
+        .bk-input::placeholder,
+        .bk-card__body .input::placeholder {
+          color: var(--text-faint) !important;
+        }
+        /* Fix native select dropdown option colors */
+        .bk-input option,
+        .bk-card__body .input option {
+          background: var(--surface);
+          color: var(--text);
+        }
+        /* Fix datetime-local calendar icon color in dark mode */
+        .bk-input::-webkit-calendar-picker-indicator {
+          filter: var(--calendar-icon-filter, none);
+          opacity: 0.6;
+          cursor: pointer;
+        }
+        [data-theme="dark"] .bk-input::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+          opacity: 0.5;
+        }
+        /* form-label inside body */
+        .bk-card__body .form-label {
+          color: var(--text-muted);
+        }
+
         /* Work items list */
         .bk-worklist {
           display: flex;
@@ -553,7 +592,7 @@ export default function AdminBookingsPage() {
           display: flex;
           align-items: center;
           gap: var(--space-2);
-          background: var(--surface2);
+          background: var(--surface);
           border: 1px solid var(--border);
           border-radius: var(--radius);
           padding: var(--space-2) var(--space-3);
