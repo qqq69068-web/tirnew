@@ -161,10 +161,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`nav-link${active ? " active nav-link--boxed" : ""}`}
+                  className={`nav-link${active ? " active" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >
                   {l.label}
+                  {active && <span className="nav-link__bar" aria-hidden />}
                 </Link>
               );
             })}
@@ -172,7 +173,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
           {/* DESKTOP CONTROLS */}
           <div className="site-nav__controls">
-            {/* Phone with custom icon style */}
+            {/* Phone */}
             <a href="tel:+380664188826" className="site-nav__phone hidden md:flex">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -194,6 +195,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               </span>
             </button>
 
+            {/* Cabinet — outlined accent */}
             <Link
               href="/cabinet"
               className={`site-nav__cabinet site-nav__cabinet--outlined hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
@@ -306,7 +308,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           <div className="site-footer__brand">
             <Link href="/" className="site-footer__logo">
               <TirnewLogo size={28} />
-              <span className="site-footer__logo-name">Tirnew</span>
+              <div className="site-footer__logo-brand">
+                <span className="site-footer__logo-name">Tirnew</span>
+                <span className="site-footer__logo-sub">Truck Service</span>
+              </div>
             </Link>
             <p className="site-footer__desc">
               Сервіс вантажних автомобілів,<br />
