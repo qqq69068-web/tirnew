@@ -3,59 +3,17 @@ import { useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone, User, Sun, Moon, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, User, Sun, Moon } from "lucide-react";
 import AiChat from "@/components/AiChat";
+import { TirnewLogo } from "@/components/TirnewLogo";
 
 const links = [
-  { href: "/",            label: "Головна" },
-  { href: "/services",    label: "Послуги" },
-  { href: "/price",       label: "Прайс" },
-  { href: "/gallery",     label: "Галерея" },
-  { href: "/contacts",    label: "Контакти" },
+  { href: "/",         label: "Головна" },
+  { href: "/services", label: "Послуги" },
+  { href: "/price",    label: "Прайс" },
+  { href: "/gallery",  label: "Галерея" },
+  { href: "/contacts", label: "Контакти" },
 ];
-
-/* ── SVG Logo ─────────────────────────────────────────── */
-function TirnewLogo({ size = 32 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 40 40"
-      fill="none"
-      aria-label="Tirnew logo"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Hexagonal frame */}
-      <path
-        d="M20 3L35 11.5V28.5L20 37L5 28.5V11.5L20 3Z"
-        fill="var(--primary)"
-        opacity="0.12"
-      />
-      <path
-        d="M20 3L35 11.5V28.5L20 37L5 28.5V11.5L20 3Z"
-        stroke="var(--primary)"
-        strokeWidth="1.5"
-        fill="none"
-      />
-      {/* T letterform */}
-      <path
-        d="M13 14H27M20 14V27"
-        stroke="var(--primary)"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Speed accent */}
-      <path
-        d="M14 22H20"
-        stroke="var(--primary)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        opacity="0.6"
-      />
-    </svg>
-  );
-}
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen]         = useState(false);
@@ -103,85 +61,28 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
-    <div id="site-wrapper">
+    <div className="site-wrapper">
 
-      {/* ══ NAVBAR ══════════════════════════════════════════ */}
-      <header
-        className="theme-transition"
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-          background: scrolled ? "var(--nav-bg-scroll)" : "var(--nav-bg)",
-          backdropFilter: "blur(20px) saturate(1.4)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-          borderBottom: scrolled ? "1px solid var(--border-strong)" : "1px solid var(--border)",
-          boxShadow: scrolled ? "var(--shadow-md)" : "none",
-          transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "0 clamp(16px, 4vw, 40px)",
-            height: 60,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-          }}
-        >
+      {/* ══ NAVBAR ══════════════════════════════════════════════ */}
+      <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
+        <div className="site-nav__inner container-wide">
+
           {/* Logo */}
-          <Link
-            href="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              textDecoration: "none",
-              flexShrink: 0,
-            }}
-          >
+          <Link href="/" className="site-nav__logo">
             <TirnewLogo size={36} />
-            <div style={{ lineHeight: 1.15 }}>
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 15,
-                  fontWeight: 900,
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                  color: "var(--text)",
-                }}
-              >
-                Tirnew
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 9,
-                  color: "var(--text-faint)",
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  marginTop: 1,
-                }}
-              >
-                Truck Service
-              </div>
+            <div className="site-nav__brand">
+              <span className="site-nav__brand-name">Tirnew</span>
+              <span className="site-nav__brand-sub">Truck Service</span>
             </div>
           </Link>
 
           {/* Desktop nav */}
-          <nav
-            className="hidden md:flex"
-            style={{ alignItems: "center", gap: 28 }}
-          >
+          <nav className="site-nav__links hidden md:flex" aria-label="Головне меню">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`nav-link ${pathname === l.href ? "active" : ""}`}
+                className={`nav-link${pathname === l.href ? " active" : ""}`}
               >
                 {l.label}
               </Link>
@@ -189,24 +90,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Right controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <a
-              href="tel:+380664188826"
-              className="hidden md:flex"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                fontFamily: "var(--font-body)",
-                fontSize: 12,
-                color: "var(--text-muted)",
-                textDecoration: "none",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
-            >
-              <Phone size={11} strokeWidth={2} />
+          <div className="site-nav__controls">
+
+            {/* Phone */}
+            <a href="tel:+380664188826" className="site-nav__phone hidden md:flex">
+              <Phone size={11} strokeWidth={2} aria-hidden />
               <span>+380 66 418 88 26</span>
             </a>
 
@@ -214,220 +102,71 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             <button
               onClick={toggleTheme}
               aria-label={dark ? "Світла тема" : "Темна тема"}
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--border-strong)",
-                background: "var(--surface)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--text-muted)",
-                cursor: "pointer",
-                transition: "background 0.2s, color 0.2s, border-color 0.2s",
-                flexShrink: 0,
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = "var(--text)";
-                (e.currentTarget as HTMLButtonElement).style.background = "var(--surface2)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)";
-                (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)";
-              }}
+              className="btn-icon btn-icon--nav"
             >
-              {dark ? <Sun size={14} strokeWidth={2} /> : <Moon size={14} strokeWidth={2} />}
+              {dark
+                ? <Sun  size={14} strokeWidth={2} aria-hidden />
+                : <Moon size={14} strokeWidth={2} aria-hidden />}
             </button>
 
             {/* Cabinet */}
             <Link
               href="/cabinet"
-              className="hidden md:inline-flex"
-              style={{
-                height: 34,
-                padding: "0 14px",
-                borderRadius: "var(--radius)",
-                border: `1px solid ${
-                  pathname === "/cabinet" || isClient
-                    ? "rgba(217,119,6,0.4)"
-                    : "var(--border-strong)"
-                }`,
-                background:
-                  pathname === "/cabinet" || isClient
-                    ? "rgba(217,119,6,0.08)"
-                    : "var(--surface)",
-                color:
-                  pathname === "/cabinet" || isClient
-                    ? "var(--accent)"
-                    : "var(--text-muted)",
-                fontFamily: "var(--font-display)",
-                fontSize: 12,
-                fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                textDecoration: "none",
-                transition: "all 0.2s ease",
-              }}
+              className={`site-nav__cabinet hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
             >
-              <User size={12} strokeWidth={2} />
+              <User size={12} strokeWidth={2} aria-hidden />
               {cabinetLabel}
             </Link>
 
             {/* CTA */}
-            <Link
-              href="/contacts"
-              className="btn-primary hidden md:inline-flex"
-              style={{ height: 34, padding: "0 16px", fontSize: 12, fontWeight: 700 }}
-            >
-              Зв’язатись
+            <Link href="/contacts" className="btn btn-primary btn-sm hidden md:inline-flex">
+              Зв&apos;язатись
             </Link>
 
             {/* Burger */}
             <button
               onClick={() => setOpen(!open)}
-              className="flex md:hidden"
+              className={`site-nav__burger flex md:hidden${open ? " open" : ""}`}
               aria-label="Меню"
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--border)",
-                background: open ? "var(--surface2)" : "var(--surface)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--text-muted)",
-                transition: "background 0.2s, color 0.2s",
-              }}
+              aria-expanded={open}
             >
-              {open ? <X size={16} /> : <Menu size={16} />}
+              {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
             </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {open && (
-          <div
-            className="mobile-menu-enter"
-            style={{
-              borderTop: "1px solid var(--border)",
-              background: "var(--surface)",
-              padding: "var(--space-3) var(--space-4) var(--space-5)",
-            }}
-          >
-            <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <div className="mobile-menu mobile-menu-enter" role="navigation" aria-label="Мобільне меню">
+            <nav className="mobile-menu__nav">
               {links.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
-                  style={{
-                    padding: "10px var(--space-3)",
-                    borderRadius: "var(--radius)",
-                    fontFamily: "var(--font-display)",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: pathname === l.href ? "var(--primary)" : "var(--text)",
-                    background: pathname === l.href ? "var(--primary-glow)" : "transparent",
-                    textDecoration: "none",
-                    transition: "background 0.15s, color 0.15s",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
+                  className={`mobile-nav-link${pathname === l.href ? " active" : ""}`}
                 >
                   {l.label}
-                  {pathname === l.href && (
-                    <span
-                      style={{
-                        width: 5,
-                        height: 5,
-                        borderRadius: "50%",
-                        background: "var(--primary)",
-                        display: "inline-block",
-                      }}
-                    />
-                  )}
+                  {pathname === l.href && <span className="mobile-nav-link__dot" aria-hidden />}
                 </Link>
               ))}
               <Link
                 href="/cabinet"
-                style={{
-                  padding: "10px var(--space-3)",
-                  borderRadius: "var(--radius)",
-                  fontFamily: "var(--font-display)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: isClient ? "var(--accent)" : "var(--text)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  textDecoration: "none",
-                }}
+                className={`mobile-nav-link${isClient ? " mobile-nav-link--auth" : ""}`}
               >
-                <User size={14} /> {cabinetLabelFull}
+                <User size={14} aria-hidden /> {cabinetLabelFull}
               </Link>
-              <button
-                onClick={toggleTheme}
-                style={{
-                  padding: "10px var(--space-3)",
-                  borderRadius: "var(--radius)",
-                  fontFamily: "var(--font-display)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: "var(--text-muted)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  textAlign: "left",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                {dark ? <Sun size={14} /> : <Moon size={14} />}
+              <button onClick={toggleTheme} className="mobile-nav-link mobile-nav-link--btn">
+                {dark ? <Sun size={14} aria-hidden /> : <Moon size={14} aria-hidden />}
                 {dark ? "Світла тема" : "Темна тема"}
               </button>
             </nav>
 
-            <div
-              style={{
-                marginTop: "var(--space-3)",
-                paddingTop: "var(--space-3)",
-                borderTop: "1px solid var(--border)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "var(--space-2)",
-              }}
-            >
-              <a
-                href="tel:+380664188826"
-                style={{
-                  height: 42,
-                  borderRadius: "var(--radius)",
-                  border: "1px solid var(--border-strong)",
-                  background: "var(--surface2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  fontFamily: "var(--font-display)",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "var(--text)",
-                  textDecoration: "none",
-                }}
-              >
-                <Phone size={13} /> +380 66 418 88 26
+            <div className="mobile-menu__ctas">
+              <a href="tel:+380664188826" className="btn btn-outline" style={{ justifyContent: "center", height: 42 }}>
+                <Phone size={13} aria-hidden /> +380 66 418 88 26
               </a>
-              <Link
-                href="/contacts"
-                className="btn-primary"
-                style={{ justifyContent: "center", height: 42, borderRadius: "var(--radius)" }}
-              >
-                Зв’язатись з нами
+              <Link href="/contacts" className="btn btn-primary" style={{ justifyContent: "center", height: 42 }}>
+                Зв&apos;язатись з нами
               </Link>
             </div>
           </div>
@@ -435,224 +174,421 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* PAGE */}
-      <main style={{ flex: 1 }}>{children}</main>
+      <main>{children}</main>
 
-      {/* ══ FOOTER ═══════════════════════════════════════════ */}
-      <footer
-        className="theme-transition"
-        style={{
-          background: "var(--bg2)",
-          borderTop: "1px solid var(--border)",
-          marginTop: "auto",
-        }}
-      >
-        {/* Top bar */}
-        <div
-          style={{
-            borderBottom: "1px solid var(--border)",
-            background: "var(--surface)",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: 1200,
-              margin: "0 auto",
-              padding: "clamp(20px, 3vw, 32px) clamp(16px, 4vw, 40px)",
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-              gap: 32,
-              alignItems: "start",
-            }}
-          >
+      {/* ══ FOOTER ═══════════════════════════════════════════════ */}
+      <footer className="site-footer theme-transition">
+        <div className="site-footer__top">
+          <div className="container-wide site-footer__grid">
+
             {/* Brand col */}
-            <div style={{ gridColumn: "span 2" }}>
-              <Link
-                href="/"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 10,
-                  textDecoration: "none",
-                  marginBottom: 14,
-                }}
-              >
+            <div className="site-footer__brand">
+              <Link href="/" className="site-nav__logo" style={{ marginBottom: "var(--space-4)" }}>
                 <TirnewLogo size={32} />
-                <div style={{ lineHeight: 1.15 }}>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: 14,
-                      fontWeight: 900,
-                      letterSpacing: "0.05em",
-                      textTransform: "uppercase",
-                      color: "var(--text)",
-                    }}
-                  >
-                    Tirnew
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: 9,
-                      color: "var(--text-faint)",
-                      letterSpacing: "0.18em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Truck Service
-                  </div>
+                <div className="site-nav__brand">
+                  <span className="site-nav__brand-name" style={{ fontSize: 14 }}>Tirnew</span>
+                  <span className="site-nav__brand-sub">Truck Service</span>
                 </div>
               </Link>
-              <p
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  lineHeight: 1.7,
-                  maxWidth: 260,
-                  marginBottom: 16,
-                }}
-              >
-                Сервіс вантажних автомобілів, причепів і напівпричепів. Діагностика, ремонт,
-                обслуговування.
+              <p className="site-footer__desc">
+                Сервіс вантажних автомобілів, причепів і напівпричепів.
+                Діагностика, ремонт, обслуговування.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <a
-                  href="tel:+380664188826"
-                  className="footer-link"
-                  style={{ fontSize: 13, fontWeight: 600 }}
-                >
+              <div className="site-footer__contacts">
+                <a href="tel:+380664188826" className="footer-link site-footer__phone">
                   +38 (066) 418-88-26
                 </a>
-                <span
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: 11,
-                    color: "var(--text-faint)",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  Рівненська обл., с. Велика Омеляна, вул. Шевченка 35
-                </span>
-                <span
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: 11,
-                    color: "var(--text-faint)",
-                  }}
-                >
-                  Пн–Сб, 08:00–18:00
-                </span>
+                <span className="site-footer__meta">Рівненська обл., с. Велика Омеляна, вул. Шевченка 35</span>
+                <span className="site-footer__meta">Пн–Сб, 08:00–18:00</span>
               </div>
             </div>
 
             {/* Nav col */}
-            <div>
-              <p
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                  color: "var(--text-faint)",
-                  marginBottom: 14,
-                }}
-              >
-                Навігація
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="site-footer__col">
+              <p className="site-footer__col-title">Навігація</p>
+              <div className="site-footer__col-links">
                 {links.map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    className="footer-link hover-underline"
-                  >
-                    {l.label}
-                  </Link>
+                  <Link key={l.href} href={l.href} className="footer-link hover-underline">{l.label}</Link>
                 ))}
-                <Link
-                  href="/cabinet"
-                  className="footer-link hover-underline"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
-                  <User size={11} /> Кабінет
+                <Link href="/cabinet" className="footer-link hover-underline">
+                  <User size={11} aria-hidden /> Кабінет
                 </Link>
               </div>
             </div>
 
             {/* Services col */}
-            <div>
-              <p
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                  color: "var(--text-faint)",
-                  marginBottom: 14,
-                }}
-              >
-                Послуги
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {["Ремонт двигунів", "Ремонт КПП", "Гальмівна система", "Пневмосистема", "Електрика"].map(
-                  (s) => (
-                    <Link
-                      key={s}
-                      href="/services"
-                      className="footer-link hover-underline"
-                    >
-                      {s}
-                    </Link>
-                  )
-                )}
+            <div className="site-footer__col">
+              <p className="site-footer__col-title">Послуги</p>
+              <div className="site-footer__col-links">
+                {["Ремонт двигунів", "Ремонт КПП", "Гальмівна система", "Пневмосистема", "Електрика"].map((s) => (
+                  <Link key={s} href="/services" className="footer-link hover-underline">{s}</Link>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "14px clamp(16px, 4vw, 40px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 8,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: 11,
-              color: "var(--text-faint)",
-            }}
-          >
-            &copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: 11,
-              color: "var(--text-faint)",
-            }}
-          >
-            Дипломний проєкт
-          </span>
+        <div className="site-footer__bottom">
+          <div className="container-wide site-footer__bottom-inner">
+            <span className="site-footer__copy">
+              &copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.
+            </span>
+            <span className="site-footer__copy">Дипломний проєкт</span>
+          </div>
         </div>
       </footer>
 
-      {/* ══ AI CHAT ════════════════════════════════════════════ */}
+      {/* ══ AI CHAT ══════════════════════════════════════════════ */}
       <AiChat />
+
+      {/* ══ NAV + FOOTER STYLES ═════════════════════════════════ */}
+      <style>{`
+        .site-wrapper {
+          display: flex;
+          flex-direction: column;
+          min-height: 100dvh;
+        }
+
+        /* ── NAVBAR BASE ──────────────────────────────────────── */
+        .site-nav {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: var(--nav-bg);
+          backdrop-filter: blur(20px) saturate(1.4);
+          -webkit-backdrop-filter: blur(20px) saturate(1.4);
+          border-bottom: 1px solid var(--border);
+          transition:
+            background var(--transition-base),
+            box-shadow var(--transition-base),
+            border-color var(--transition-base);
+        }
+        .site-nav--scrolled {
+          background: var(--nav-bg-scroll);
+          border-bottom-color: var(--border-strong);
+          box-shadow: var(--shadow-md);
+        }
+        .site-nav__inner {
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: var(--space-4);
+        }
+
+        /* Logo */
+        .site-nav__logo {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          text-decoration: none;
+          flex-shrink: 0;
+          transition: opacity var(--transition-fast);
+        }
+        .site-nav__logo:hover { opacity: 0.85; }
+        .site-nav__brand {
+          display: flex;
+          flex-direction: column;
+          line-height: 1.15;
+          gap: 2px;
+        }
+        .site-nav__brand-name {
+          font-family: var(--font-display);
+          font-size: 15px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: var(--text);
+        }
+        .site-nav__brand-sub {
+          font-family: var(--font-body);
+          font-size: 9px;
+          color: var(--text-faint);
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
+
+        /* Desktop nav links */
+        .site-nav__links {
+          align-items: center;
+          gap: var(--space-1);
+        }
+
+        /* Right controls */
+        .site-nav__controls {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+        }
+        .site-nav__phone {
+          display: flex;
+          align-items: center;
+          gap: var(--space-1);
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          text-decoration: none;
+          padding: 0 var(--space-2);
+          transition: color var(--transition-fast);
+          white-space: nowrap;
+        }
+        .site-nav__phone:hover { color: var(--text); }
+
+        /* Theme + burger icon button */
+        .btn-icon--nav {
+          width: 34px;
+          height: 34px;
+          border-radius: var(--radius);
+          border: 1px solid var(--border-strong);
+          background: var(--surface);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-muted);
+          transition:
+            background var(--transition-fast),
+            color var(--transition-fast),
+            border-color var(--transition-fast);
+          flex-shrink: 0;
+        }
+        .btn-icon--nav:hover {
+          background: var(--surface2);
+          color: var(--text);
+          border-color: var(--border-accent);
+        }
+
+        /* Cabinet button */
+        .site-nav__cabinet {
+          height: 34px;
+          padding: 0 14px;
+          border-radius: var(--radius);
+          border: 1px solid var(--border-strong);
+          background: var(--surface);
+          color: var(--text-muted);
+          font-family: var(--font-display);
+          font-size: var(--text-xs);
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-1);
+          text-decoration: none;
+          transition:
+            background var(--transition-fast),
+            color var(--transition-fast),
+            border-color var(--transition-fast);
+        }
+        .site-nav__cabinet:hover {
+          background: var(--surface2);
+          color: var(--text);
+          border-color: var(--border-strong);
+        }
+        .site-nav__cabinet--auth {
+          border-color: rgba(217,119,6,0.4);
+          background: rgba(217,119,6,0.06);
+          color: var(--accent);
+        }
+        .site-nav__cabinet--auth:hover {
+          background: rgba(217,119,6,0.10);
+          color: var(--accent);
+          border-color: rgba(217,119,6,0.55);
+        }
+
+        /* Burger */
+        .site-nav__burger {
+          width: 34px;
+          height: 34px;
+          border-radius: var(--radius);
+          border: 1px solid var(--border);
+          background: var(--surface);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-muted);
+          transition:
+            background var(--transition-fast),
+            color var(--transition-fast),
+            border-color var(--transition-fast);
+        }
+        .site-nav__burger.open {
+          background: var(--surface2);
+          border-color: var(--border-strong);
+          color: var(--text);
+        }
+        .site-nav__burger:hover {
+          background: var(--surface2);
+          color: var(--text);
+        }
+
+        /* ── MOBILE MENU ──────────────────────────────────── */
+        .mobile-menu {
+          border-top: 1px solid var(--border);
+          background: var(--surface);
+          padding: var(--space-3) var(--space-4) var(--space-5);
+        }
+        .mobile-menu__nav {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .mobile-nav-link {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          justify-content: space-between;
+          padding: 10px var(--space-3);
+          border-radius: var(--radius);
+          font-family: var(--font-display);
+          font-size: var(--text-sm);
+          font-weight: 600;
+          color: var(--text);
+          text-decoration: none;
+          transition: background var(--transition-fast), color var(--transition-fast);
+        }
+        .mobile-nav-link:hover { background: var(--surface2); }
+        .mobile-nav-link.active {
+          color: var(--primary);
+          background: var(--primary-subtle);
+        }
+        .mobile-nav-link--auth { color: var(--accent); }
+        .mobile-nav-link--btn {
+          width: 100%;
+          background: none;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+          color: var(--text-muted);
+          justify-content: flex-start;
+        }
+        .mobile-nav-link__dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: var(--primary);
+          display: inline-block;
+          flex-shrink: 0;
+        }
+        .mobile-menu__ctas {
+          margin-top: var(--space-3);
+          padding-top: var(--space-3);
+          border-top: 1px solid var(--border);
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-2);
+        }
+
+        /* ── FOOTER ────────────────────────────────────────── */
+        .site-footer {
+          background: var(--bg2);
+          border-top: 1px solid var(--border);
+          margin-top: auto;
+        }
+        .site-footer__top {
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+        }
+        .site-footer__grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr;
+          gap: var(--space-8);
+          padding-block: clamp(var(--space-6), 3vw, var(--space-10));
+          align-items: start;
+        }
+        .site-footer__brand { display: flex; flex-direction: column; }
+        .site-footer__desc {
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          line-height: 1.7;
+          max-width: 26ch;
+          margin-bottom: var(--space-4);
+        }
+        .site-footer__contacts {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-1);
+        }
+        .site-footer__phone {
+          font-size: var(--text-sm);
+          font-weight: 600;
+        }
+        .site-footer__meta {
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+          line-height: 1.5;
+        }
+        .site-footer__col-title {
+          font-family: var(--font-display);
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: var(--text-faint);
+          margin-bottom: var(--space-4);
+        }
+        .site-footer__col-links {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-2);
+        }
+        .footer-link {
+          font-family: var(--font-body);
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          transition: color var(--transition-fast);
+        }
+        .footer-link:hover { color: var(--text); }
+        .hover-underline {
+          position: relative;
+        }
+        .hover-underline::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background: var(--primary);
+          transform: scaleX(0);
+          transform-origin: left center;
+          transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .hover-underline:hover::after { transform: scaleX(1); }
+        .site-footer__bottom {
+          padding-block: var(--space-4);
+        }
+        .site-footer__bottom-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: var(--space-2);
+        }
+        .site-footer__copy {
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────────────── */
+        @media (max-width: 768px) {
+          .site-footer__grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          .site-footer__brand {
+            grid-column: span 2;
+          }
+        }
+        @media (max-width: 480px) {
+          .site-footer__grid {
+            grid-template-columns: 1fr;
+          }
+          .site-footer__brand {
+            grid-column: span 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
