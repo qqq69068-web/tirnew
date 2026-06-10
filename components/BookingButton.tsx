@@ -189,12 +189,6 @@ export default function BookingButton({
       .catch(() => setStatus("guest"));
   }, []);
 
-  /* Body scroll lock when open */
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
-
   const handleBrandChange = (val: string) => {
     setCarBrand(val);
     setCarModel("");
