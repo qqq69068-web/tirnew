@@ -354,7 +354,7 @@ a { color: inherit; text-decoration: none; }
 
 .site-nav__inner {
   height: 100%;
-  max-width: 1280px;
+  max-width: 1920px;
   margin-inline: auto;
   padding-inline: clamp(var(--space-4), 4vw, var(--space-12));
   display: flex;
