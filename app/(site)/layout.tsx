@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Phone, User, Sun, Moon, ChevronDown } from "lucide-react";
+import { User, Sun, Moon } from "lucide-react";
 import AiChat from "@/components/AiChat";
 import { TirnewLogo } from "@/components/TirnewLogo";
 
@@ -12,6 +12,14 @@ const links = [
   { href: "/services", label: "Послуги" },
   { href: "/price",    label: "Прайс" },
   { href: "/contacts", label: "Контакти" },
+];
+
+const footerServices = [
+  { href: "/services/engine-repair",     label: "Ремонт двигунів" },
+  { href: "/services/gearbox-repair",    label: "Ремонт КПП" },
+  { href: "/services/brake-system",      label: "Гальмівна система" },
+  { href: "/services/pneumo-system",     label: "Пневмосистема" },
+  { href: "/services/electrics",         label: "Електрика" },
 ];
 
 function isActive(href: string, pathname: string): boolean {
@@ -79,33 +87,27 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   // ── GLOBAL REVEAL OBSERVER ─────────────────────────────────────────
-  // Handles .reveal, .reveal-left, .reveal-scale, .reveal-clip
-  // on every page. Re-runs on pathname change to catch new elements.
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) =>
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add("visible");
-            obs.unobserve(e.target); // unobserve after triggered — perf
+            obs.unobserve(e.target);
           }
         }),
       { threshold: 0.08 }
     );
-
-    // Small delay so the new page's DOM is painted before we query
     const timer = setTimeout(() => {
       document.querySelectorAll(REVEAL_SELECTOR).forEach((el) => {
         if (!el.classList.contains("visible")) obs.observe(el);
       });
     }, 60);
-
     return () => {
       clearTimeout(timer);
       obs.disconnect();
     };
   }, [pathname]);
-  // ──────────────────────────────────────────────────────────────────
 
   // Close on outside click
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const cabinetLabel     = isClient ? "Кабінет" : "Увійти";
+  const cabinetLabel     = isClient ? "Кабінет" : "Кабінет";
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
@@ -151,7 +153,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             </div>
           </Link>
 
-          {/* DESKTOP NAV LINKS */}
+          {/* DESKTOP NAV LINKS — centered */}
           <nav className="site-nav__links hidden md:flex" aria-label="Головне меню">
             {links.map((l) => {
               const active = isActive(l.href, pathname);
@@ -159,11 +161,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`nav-link${active ? " active" : ""}`}
+                  className={`nav-link${active ? " active nav-link--boxed" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >
                   {l.label}
-                  {active && <span className="nav-link__bar" aria-hidden />}
                 </Link>
               );
             })}
@@ -171,8 +172,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
           {/* DESKTOP CONTROLS */}
           <div className="site-nav__controls">
+            {/* Phone with custom icon style */}
             <a href="tel:+380664188826" className="site-nav__phone hidden md:flex">
-              <Phone size={13} strokeWidth={2} aria-hidden />
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
               <span>+380 66 418 88 26</span>
             </a>
 
@@ -192,7 +196,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
             <Link
               href="/cabinet"
-              className={`site-nav__cabinet hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
+              className={`site-nav__cabinet site-nav__cabinet--outlined hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
             >
               <User size={13} strokeWidth={2} aria-hidden />
               {cabinetLabel}
@@ -272,7 +276,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                   style={{ transitionDelay: open ? `${(links.length + 2) * 30}ms` : "0ms" }}
                 >
                   <a href="tel:+380664188826" className="mobile-dd-cta mobile-dd-cta--outline">
-                    <Phone size={12} aria-hidden />
                     +380 66 418 88 26
                   </a>
                   <Link href="/contacts" className="mobile-dd-cta mobile-dd-cta--primary">
@@ -299,41 +302,53 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <footer className="site-footer">
         <div className="container site-footer__inner">
 
+          {/* COL 1 — Brand + contacts */}
           <div className="site-footer__brand">
             <Link href="/" className="site-footer__logo">
               <TirnewLogo size={28} />
               <span className="site-footer__logo-name">Tirnew</span>
             </Link>
             <p className="site-footer__desc">
-              Сервіс вантажних і легкових автомобілів, причепів і напівпричепів.
-              Діагностика, ремонт, обслуговування.
+              Сервіс вантажних автомобілів,<br />
+              причепів і напівпричепів. Діагностика,<br />
+              ремонт, обслуговування.
             </p>
             <div className="site-footer__contacts">
-              <a href="tel:+380664188826" className="site-footer__contact">
-                <Phone size={12} aria-hidden />
-                +380 66 418 88 26
+              <a href="tel:+380664188826" className="site-footer__contact site-footer__contact--phone">
+                +38 (066) 418-88-26
               </a>
+              <span className="site-footer__contact site-footer__contact--address">
+                Рівненська обл., с. Велика Омеляна, вул. Шевченка 35
+              </span>
+              <span className="site-footer__contact site-footer__contact--hours">
+                Пн—Сб, 08:00—18:00
+              </span>
             </div>
           </div>
 
+          {/* COL 2 — Navigation */}
           <nav className="site-footer__nav" aria-label="Навігація футер">
             <p className="site-footer__nav-title">Навігація</p>
             {links.map((l) => (
               <Link key={l.href} href={l.href} className="site-footer__link">{l.label}</Link>
             ))}
+            <Link href="/cabinet" className="site-footer__link">Кабінет</Link>
           </nav>
 
+          {/* COL 3 — Services */}
           <div className="site-footer__extra">
-            <p className="site-footer__nav-title">Сервіс</p>
-            <Link href="/booking"  className="site-footer__link">Запис на ремонт</Link>
-            <Link href="/price"    className="site-footer__link">Прайс-ліст</Link>
-            <Link href="/cabinet"  className="site-footer__link">Особистий кабінет</Link>
+            <p className="site-footer__nav-title">Послуги</p>
+            {footerServices.map((s) => (
+              <Link key={s.href} href={s.href} className="site-footer__link">{s.label}</Link>
+            ))}
           </div>
 
         </div>
+
         <div className="site-footer__bottom">
           <div className="container site-footer__bottom-inner">
             <span className="site-footer__copy">&copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
+            <span className="site-footer__copy">Дипломний проект</span>
           </div>
         </div>
       </footer>
