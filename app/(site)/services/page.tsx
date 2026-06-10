@@ -50,7 +50,7 @@ export default function ServicesPage() {
     <>
       <div ref={ref} className="services-page">
 
-        {/* ════ HERO ════════════════════════════════════════════ */}
+        {/* ════ HERO ═════════════════════════════════════════════════ */}
         <section className="services-hero" aria-label="Заголовок">
           <div
             className="services-hero__bg"
@@ -61,7 +61,7 @@ export default function ServicesPage() {
           <div className="container services-hero__content fade-in">
             <span className="section-eyebrow">
               <Wrench size={10} aria-hidden />
-              Що ми робимо
+              Каталог
             </span>
             <h1 className="services-hero__title">Каталог послуг</h1>
             <p className="services-hero__sub">
@@ -83,7 +83,7 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* ════ TABS ════════════════════════════════════════════ */}
+        {/* ════ TABS ═════════════════════════════════════════════════ */}
         <div className="services-tabs-bar">
           <div className="container services-tabs-bar__inner">
             {(["tir", "car"] as const).map((t) => (
@@ -106,7 +106,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        {/* ════ SERVICES LIST ═══════════════════════════════════ */}
+        {/* ════ SERVICES LIST ═══════════════════════════════════════════════ */}
         <section className="services-list-section">
           <div className="container">
 
@@ -182,7 +182,7 @@ export default function ServicesPage() {
         </section>
       </div>
 
-      {/* ════ SCOPED STYLES ═══════════════════════════════════ */}
+      {/* ════ SCOPED STYLES ═══════════════════════════════════════════════ */}
       <style>{`
         .services-page {
           min-height: 100vh;
@@ -190,7 +190,7 @@ export default function ServicesPage() {
           color: var(--text);
         }
 
-        /* ── HERO ────────────────────────────────────────── */
+        /* ── HERO ──────────────────────────────────────────── */
         .services-hero {
           position: relative;
           overflow: hidden;
@@ -264,7 +264,7 @@ export default function ServicesPage() {
           white-space: nowrap;
         }
 
-        /* ── TABS BAR ──────────────────────────────────── */
+        /* ── TABS BAR ──────────────────────────────────────── */
         .services-tabs-bar {
           background: var(--surface);
           border-bottom: 1px solid var(--border);
@@ -325,7 +325,7 @@ export default function ServicesPage() {
           color: var(--primary);
         }
 
-        /* ── LIST SECTION ───────────────────────────────── */
+        /* ── LIST SECTION ──────────────────────────────────────── */
         .services-list-section {
           padding: clamp(var(--space-6), 4vw, var(--space-10)) 0 var(--space-12);
         }
@@ -357,7 +357,7 @@ export default function ServicesPage() {
           padding: 0;
         }
 
-        /* ── SERVICE ROW v2 ────────────────────────────── */
+        /* ── SERVICE ROW v2 ─────────────────────────────────────── */
         .service-row-v2 {
           display: flex;
           align-items: center;
@@ -425,7 +425,7 @@ export default function ServicesPage() {
           color: var(--primary);
         }
 
-        /* ── PARTS BANNER ──────────────────────────────── */
+        /* ── PARTS BANNER ────────────────────────────────────────── */
         .parts-banner {
           display: flex;
           align-items: center;
@@ -483,7 +483,7 @@ export default function ServicesPage() {
           color: var(--primary);
         }
 
-        /* ── CTA BLOCK ─────────────────────────────────── */
+        /* ── CTA BLOCK ───────────────────────────────────────────── */
         .services-cta {
           background: var(--surface);
           border: 1px solid var(--border);
@@ -516,7 +516,7 @@ export default function ServicesPage() {
           line-height: 1.6;
         }
 
-        /* ── RESPONSIVE ──────────────────────────────────── */
+        /* ── RESPONSIVE ────────────────────────────────────────────── */
         @media (max-width: 640px) {
           .services-hero__stats { flex-wrap: wrap; border-radius: var(--radius); }
           .services-hero__stat { border-right: none; border-bottom: 1px solid var(--border); width: 50%; }
