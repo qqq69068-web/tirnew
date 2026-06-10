@@ -323,7 +323,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-bottom-color: var(--border-strong);
           box-shadow: var(--shadow-md);
         }
-        /* padding-block = (33px total - 27px buttons) / 2 = 3px each side */
         .site-nav__inner {
           padding-block: 3px;
           display: flex; align-items: center; justify-content: space-between;
@@ -398,13 +397,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           to   { opacity: 1; transform: rotate(0deg) scale(1); }
         }
 
-        /* Cabinet */
+        /* Cabinet — line-height:1 fixes vertical text centering */
         .site-nav__cabinet {
           height: 27px; padding: 0 12px; border-radius: var(--radius);
           border: 1px solid var(--border-strong); background: var(--surface);
           color: var(--text-muted); font-family: var(--font-display);
-          font-size: 12px; font-weight: 600;
-          display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+          font-size: 12px; font-weight: 600; line-height: 1;
+          display: inline-flex; align-items: center; justify-content: center;
+          gap: 5px; text-decoration: none;
           transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
         }
         .site-nav__cabinet:hover { background: var(--surface2); color: var(--text); }
