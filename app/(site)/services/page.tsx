@@ -28,7 +28,6 @@ export default function ServicesPage() {
   const ref = useReveal();
   const list = tab === "tir" ? tirServices : carServices;
 
-  /* Re-trigger reveal when tab changes */
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -49,7 +48,7 @@ export default function ServicesPage() {
     <>
       <div ref={ref} className="services-page">
 
-        {/* ════ HERO ═══════════════════════════════════════════════ */}
+        {/* ════ HERO ════════════════════════════════ */}
         <section className="services-hero" aria-label="Заголовок">
           <div
             className="services-hero__bg"
@@ -81,7 +80,7 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* ════ TABS ═══════════════════════════════════════════════ */}
+        {/* ════ TABS ════════════════════════════════ */}
         <div className="services-tabs-bar">
           <div className="container services-tabs-bar__inner">
             {(["tir", "car"] as const).map((t) => (
@@ -104,11 +103,11 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        {/* ════ SERVICES LIST ══════════════════════════════════════ */}
+        {/* ════ SERVICES LIST ══════════════════════════ */}
         <section className="services-list-section">
           <div className="container">
 
-            {/* Section header — centered, no booking button */}
+            {/* Centered header */}
             <div className="services-list__header reveal">
               <h2 className="services-list__title">
                 {tab === "tir" ? "Вантажні автомобілі і ТІР" : "Легкові автомобілі"}
@@ -120,44 +119,49 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            {/* Service rows */}
-            <ul className="services-list" role="list">
-              {list.map((s, i) => (
-                <li
-                  key={s.slug}
-                  className={`reveal reveal-delay-${Math.min(i % 6 + 1, 6)}`}
-                  style={{ listStyle: "none" }}
-                >
-                  <Link href={`/services/${s.slug}`} className="service-row-v2">
-                    <span className="service-row-v2__index" aria-hidden>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <CheckCircle2
-                      size={14}
-                      className="service-row-v2__check"
-                      aria-hidden
-                    />
-                    <span className="service-row-v2__title">{s.title}</span>
-                    {s.price && (
-                      <span className="service-row-v2__price">{s.price}</span>
-                    )}
-                    <ArrowRight size={13} className="service-row-v2__arrow" aria-hidden />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Centered wrapper for list + parts banner */}
+            <div className="services-list-wrap">
 
-            {/* Parts banner */}
-            <Link href="/parts-order" className="parts-banner reveal">
-              <div className="parts-banner__icon" aria-hidden>
-                <Package size={18} />
-              </div>
-              <div className="parts-banner__body">
-                <p className="parts-banner__title">Замовлення запчастин через нашу фірму</p>
-                <p className="parts-banner__sub">Підберемо оригінал або перевірений аналог, організуємо доставку</p>
-              </div>
-              <ArrowRight size={16} className="parts-banner__arrow" aria-hidden />
-            </Link>
+              {/* Service rows */}
+              <ul className="services-list" role="list">
+                {list.map((s, i) => (
+                  <li
+                    key={s.slug}
+                    className={`reveal reveal-delay-${Math.min(i % 6 + 1, 6)}`}
+                    style={{ listStyle: "none" }}
+                  >
+                    <Link href={`/services/${s.slug}`} className="service-row-v2">
+                      <span className="service-row-v2__index" aria-hidden>
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <CheckCircle2
+                        size={14}
+                        className="service-row-v2__check"
+                        aria-hidden
+                      />
+                      <span className="service-row-v2__title">{s.title}</span>
+                      {s.price && (
+                        <span className="service-row-v2__price">{s.price}</span>
+                      )}
+                      <ArrowRight size={13} className="service-row-v2__arrow" aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Parts banner */}
+              <Link href="/parts-order" className="parts-banner reveal">
+                <div className="parts-banner__icon" aria-hidden>
+                  <Package size={18} />
+                </div>
+                <div className="parts-banner__body">
+                  <p className="parts-banner__title">Замовлення запчастин через нашу фірму</p>
+                  <p className="parts-banner__sub">Підберемо оригінал або перевірений аналог, організуємо доставку</p>
+                </div>
+                <ArrowRight size={16} className="parts-banner__arrow" aria-hidden />
+              </Link>
+
+            </div>{/* /services-list-wrap */}
 
             {/* CTA */}
             <div className="services-cta reveal">
@@ -175,7 +179,7 @@ export default function ServicesPage() {
         </section>
       </div>
 
-      {/* ════ SCOPED STYLES ══════════════════════════════════════ */}
+      {/* ════ SCOPED STYLES ══════════════════════════ */}
       <style>{`
         .services-page {
           min-height: 100vh;
@@ -183,7 +187,7 @@ export default function ServicesPage() {
           color: var(--text);
         }
 
-        /* ── HERO ────────────────────────────────────────────── */
+        /* ── HERO ─────────────────────────────── */
         .services-hero {
           position: relative; overflow: hidden;
           padding: clamp(var(--space-8), 6vw, var(--space-16)) var(--space-4) clamp(var(--space-6), 4vw, var(--space-10));
@@ -232,7 +236,7 @@ export default function ServicesPage() {
           letter-spacing: 0.1em; color: var(--text-faint); white-space: nowrap;
         }
 
-        /* ── TABS BAR ───────────────────────────────────────── */
+        /* ── TABS BAR ────────────────────────────── */
         .services-tabs-bar {
           background: var(--surface); border-bottom: 1px solid var(--border);
           position: sticky; top: 56px; z-index: 30;
@@ -260,12 +264,10 @@ export default function ServicesPage() {
           background: var(--primary-subtle); border-color: transparent; color: var(--primary);
         }
 
-        /* ── LIST SECTION ───────────────────────────────────── */
+        /* ── LIST SECTION ──────────────────────────── */
         .services-list-section {
           padding: clamp(var(--space-6), 4vw, var(--space-10)) 0 var(--space-12);
         }
-
-        /* Centered header — no flex space-between */
         .services-list__header {
           text-align: center;
           margin-bottom: var(--space-6);
@@ -279,16 +281,26 @@ export default function ServicesPage() {
         .services-list__subtitle {
           font-size: var(--text-xs); color: var(--text-muted);
         }
+
+        /* Centered wrapper: max-width + auto margins */
+        .services-list-wrap {
+          max-width: 860px;
+          margin-inline: auto;
+        }
+
         .services-list {
-          display: flex; flex-direction: column; gap: var(--space-1);
+          display: flex; flex-direction: column;
+          gap: var(--space-2);   /* було space-1, тепер ширша відстань */
           margin-bottom: var(--space-5); padding: 0;
         }
 
-        /* ── SERVICE ROW v2 ─────────────────────────────────── */
+        /* ── SERVICE ROW v2 ─────────────────────────── */
         .service-row-v2 {
           display: flex; align-items: center; gap: var(--space-3);
           background: var(--surface); border: 1px solid var(--border);
-          border-radius: var(--radius); padding: var(--space-3) var(--space-4);
+          border-radius: var(--radius);
+          /* більший padding — рядки вищі та просторіші */
+          padding: var(--space-4) var(--space-5);
           text-decoration: none; color: var(--text);
           transition: background var(--transition-fast), border-color var(--transition-fast),
             box-shadow var(--transition-fast), transform var(--transition-spring);
@@ -299,7 +311,7 @@ export default function ServicesPage() {
         }
         .service-row-v2__index {
           font-family: var(--font-display); font-size: 10px; font-weight: 700;
-          color: var(--text-faint); min-width: 20px; letter-spacing: 0.05em;
+          color: var(--text-faint); min-width: 22px; letter-spacing: 0.05em;
         }
         .service-row-v2__check { color: var(--accent); flex-shrink: 0; transition: color var(--transition-fast); }
         .service-row-v2:hover .service-row-v2__check { color: var(--primary); }
@@ -309,7 +321,7 @@ export default function ServicesPage() {
         .service-row-v2__price {
           font-family: var(--font-display); font-size: var(--text-xs); font-weight: 700;
           color: var(--accent); white-space: nowrap;
-          padding: 2px 8px; border-radius: var(--radius-pill);
+          padding: 3px 10px; border-radius: var(--radius-pill);
           background: rgba(15,118,110,0.08); border: 1px solid rgba(15,118,110,0.18);
         }
         .service-row-v2__arrow {
@@ -318,11 +330,11 @@ export default function ServicesPage() {
         }
         .service-row-v2:hover .service-row-v2__arrow { transform: translateX(4px); color: var(--primary); }
 
-        /* ── PARTS BANNER ───────────────────────────────────── */
+        /* ── PARTS BANNER ───────────────────────────── */
         .parts-banner {
           display: flex; align-items: center; gap: var(--space-3);
           background: var(--surface); border: 1px solid var(--border);
-          border-radius: var(--radius-lg); padding: var(--space-4);
+          border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5);
           text-decoration: none; margin-bottom: var(--space-5);
           transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
@@ -342,7 +354,7 @@ export default function ServicesPage() {
         }
         .parts-banner:hover .parts-banner__arrow { transform: translateX(4px); color: var(--primary); }
 
-        /* ── CTA BLOCK ───────────────────────────────────────── */
+        /* ── CTA BLOCK ─────────────────────────────── */
         .services-cta {
           background: var(--surface); border: 1px solid var(--border);
           border-radius: var(--radius-lg);
@@ -363,7 +375,10 @@ export default function ServicesPage() {
           max-width: 34ch; line-height: 1.6;
         }
 
-        /* ── RESPONSIVE ────────────────────────────────────────── */
+        /* ── RESPONSIVE ────────────────────────────── */
+        @media (max-width: 900px) {
+          .services-list-wrap { max-width: 100%; }
+        }
         @media (max-width: 640px) {
           .services-hero__stats { flex-wrap: wrap; border-radius: var(--radius); }
           .services-hero__stat { border-right: none; border-bottom: 1px solid var(--border); width: 50%; }
@@ -371,6 +386,7 @@ export default function ServicesPage() {
           .services-hero__stat:last-child { border-bottom: none; width: 100%; }
           .service-row-v2__index { display: none; }
           .service-row-v2__price { display: none; }
+          .service-row-v2 { padding: var(--space-3) var(--space-4); }
         }
 
         @media (prefers-reduced-motion: reduce) {
