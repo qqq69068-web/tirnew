@@ -5,8 +5,6 @@ import { useEffect, useRef } from "react";
 import { services } from "@/lib/services";
 import { Phone, ArrowRight, ChevronRight, ClipboardList, Wrench, CheckCircle, Headphones } from "lucide-react";
 
-const categories = Array.from(new Set(services.map((s) => s.category)));
-
 const stats = [
   { value: 20,      suffix: "+", label: "Років досвіду" },
   { value: services.length, suffix: "+", label: "Видів послуг" },
@@ -277,50 +275,6 @@ export default function HomePage() {
                 <p className="hp-process__desc">{step.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ╔═══ CATEGORIES — inline tags, no box ══════════════════╗ */}
-      <section className="section-sm">
-        <div className="container">
-          <div className="reveal hp-cats">
-            <p className="hp-cats__label">Напрямки робіт:</p>
-            <div className="hp-cats__list">
-              {categories.map((c, i) => (
-                <span key={c} className={`hp-cat reveal d-${(i % 4) + 1}`}>{c}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ╔═══ CTA BANNER — crimson brand panel ═════════════════════╗ */}
-      <section className="hp-cta-section">
-        <div className="container">
-          <div className="reveal hp-cta">
-            {/* Engineering grid overlay */}
-            <div className="hp-cta__grid" aria-hidden />
-            {/* Subtle right-side glow */}
-            <div className="hp-cta__glow" aria-hidden />
-
-            <div className="hp-cta__content">
-              <p className="hp-cta__eyebrow">Запис на ремонт</p>
-              <h2 className="hp-cta__title">Готові записатись?</h2>
-              <p className="hp-cta__sub">
-                Запишіться онлайн або зателефонуйте. Працюємо з вантажними автомобілями,
-                причепами, напівпричепами та легковими авто.
-              </p>
-            </div>
-
-            <div className="hp-cta__actions">
-              <Link href="/booking" className="btn btn-white btn-lg">
-                Записатись онлайн
-              </Link>
-              <a href="tel:+380664188826" className="btn btn-outline-white btn-lg">
-                <Phone size={15} aria-hidden /> +380 66 418 88 26
-              </a>
-            </div>
           </div>
         </div>
       </section>
@@ -717,109 +671,6 @@ export default function HomePage() {
         .hp-process__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; max-width: none; }
         @media (max-width: 900px) { .hp-process { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 540px) { .hp-process { grid-template-columns: 1fr; gap: var(--space-1); } }
-
-        /* ═══ CATEGORIES ══════════════════════════════════════════════ */
-        .hp-cats {
-          display: flex;
-          align-items: center;
-          gap: var(--space-4);
-          flex-wrap: wrap;
-        }
-        .hp-cats__label {
-          font-size: var(--text-xs);
-          font-weight: 600;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          flex-shrink: 0;
-          max-width: none;
-        }
-        .hp-cats__list { display: flex; gap: var(--space-2); flex-wrap: wrap; }
-        .hp-cat {
-          display: inline-block;
-          padding: var(--space-1) var(--space-3);
-          font-size: var(--text-xs);
-          font-weight: 500;
-          color: var(--text-muted);
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-full);
-          transition: color 0.2s, border-color 0.2s, background 0.2s;
-          cursor: default;
-        }
-        .hp-cat:hover {
-          color: var(--primary);
-          border-color: var(--primary);
-          background: oklch(from var(--primary) l c h / 0.06);
-        }
-
-        /* ═══ CTA SECTION ═════════════════════════════════════════════ */
-        .hp-cta-section {
-          padding-block: var(--space-16);
-        }
-        .hp-cta {
-          position: relative;
-          background: var(--primary);
-          border-radius: var(--radius-xl);
-          padding: var(--space-12) var(--space-12);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: var(--space-8);
-          overflow: hidden;
-        }
-        .hp-cta__grid {
-          position: absolute; inset: 0;
-          background-image:
-            linear-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1px),
-            linear-gradient(90deg, oklch(1 0 0 / 0.06) 1px, transparent 1px);
-          background-size: 32px 32px;
-          pointer-events: none;
-        }
-        .hp-cta__glow {
-          position: absolute;
-          top: -40%; right: -10%;
-          width: 50%; height: 200%;
-          background: radial-gradient(ellipse at center, oklch(1 0 0 / 0.08) 0%, transparent 70%);
-          pointer-events: none;
-        }
-        .hp-cta__content { position: relative; z-index: 1; flex: 1; }
-        .hp-cta__eyebrow {
-          font-size: var(--text-xs);
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: oklch(1 0 0 / 0.6);
-          margin-bottom: var(--space-3);
-        }
-        .hp-cta__title {
-          font-family: var(--font-display);
-          font-size: clamp(1.75rem, 3vw, 2.5rem);
-          font-weight: 900;
-          color: #fff;
-          line-height: 1.1;
-          letter-spacing: -0.02em;
-          margin-bottom: var(--space-3);
-        }
-        .hp-cta__sub {
-          font-size: var(--text-sm);
-          color: oklch(1 0 0 / 0.7);
-          line-height: 1.6;
-          max-width: 48ch;
-        }
-        .hp-cta__actions {
-          position: relative;
-          z-index: 1;
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-3);
-          flex-shrink: 0;
-        }
-        @media (max-width: 768px) {
-          .hp-cta { flex-direction: column; padding: var(--space-8); }
-          .hp-cta__actions { width: 100%; }
-          .hp-cta__actions .btn { width: 100%; justify-content: center; }
-        }
 
         /* ═══ ANIMATIONS ══════════════════════════════════════════════ */
         @keyframes fadeInUp {
