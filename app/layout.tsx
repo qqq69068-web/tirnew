@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Tirnew — Сервіс вантажних автомобілів", template: "%s | Tirnew" },
-  description: "Діагностика, ремонт та обслуговування вантажних автомобілів, причепів і напівпричепів. Власний склад запчастин.",
+  title: { default: "Tirnew — Сервіс вантажних і легкових автомобілів", template: "%s | Tirnew" },
+  description: "Діагностика, ремонт та обслуговування вантажних і легкових автомобілів, причепів і напівпричепів. Власний склад запчастин.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -46,12 +46,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {children}
 
-        {/* ── SCROLL REVEAL OBSERVER ──────────────────────────────────
+        {/* ── SCROLL REVEAL OBSERVER ──────────────────────────────────────────────
             Activates .reveal / .reveal-left / .reveal-scale / .reveal-clip
             by adding .visible class when element enters the viewport.
             Runs once per element (unobserves after trigger).
             Respects prefers-reduced-motion — skips animation, shows instantly.
-        ─────────────────────────────────────────────────────────── */}
+        ───────────────────────────────────────────────────────────── */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
