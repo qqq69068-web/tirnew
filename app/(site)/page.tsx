@@ -556,28 +556,38 @@ export default function HomePage() {
         .hp-process__title { font-family: var(--font-display); font-size: var(--text-base); font-weight: 700; color: var(--text); line-height: 1.2; }
         .hp-process__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; max-width: 28ch; }
 
-        /* ── CATEGORIES — no box, inline ─────────────────── */
+        /* ── CATEGORIES ─────────────────────────────────── */
+        /* FIX: container тепер має явний фон і бордер для видимості на --bg */
         .hp-cats {
-          padding: var(--space-2) 0;
-          border-top: 1px solid var(--border);
+          padding: var(--space-5) var(--space-6);
+          background: var(--surface);
+          border: 1px solid var(--border-strong);
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-sm);
         }
         .hp-cats__label {
           font-size: var(--text-xs); font-weight: 700;
           text-transform: uppercase; letter-spacing: 0.12em;
           color: var(--text-faint);
           margin-bottom: var(--space-4);
-          padding-top: var(--space-4);
         }
         .hp-cats__list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+        /* FIX: пілюлі — явний фон surface2, сильніший бордер, читабельний колір */
         .hp-cat-tag {
           display: inline-flex; align-items: center;
-          padding: 5px 14px;
+          padding: 6px 16px;
           border-radius: var(--radius-pill);
-          border: 1px solid var(--border);
-          background: transparent;
-          font-size: var(--text-sm); font-weight: 500; color: var(--text-muted);
+          border: 1px solid var(--border-strong);
+          background: var(--bg);
+          font-size: var(--text-sm); font-weight: 500;
+          color: var(--text-muted);
           text-decoration: none;
-          transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-spring);
+          transition:
+            background var(--transition-fast),
+            color var(--transition-fast),
+            border-color var(--transition-fast),
+            transform var(--transition-spring);
         }
         .hp-cat-tag:hover {
           background: var(--primary-subtle);
@@ -587,7 +597,6 @@ export default function HomePage() {
         }
 
         /* ── CTA BANNER — CRIMSON BRAND PANEL ───────────── */
-        /* Full-width section with brand color bg */
         .hp-cta-section {
           background: var(--primary);
           margin-top: var(--space-4);
@@ -595,7 +604,6 @@ export default function HomePage() {
           position: relative;
           overflow: hidden;
         }
-        /* Subtle dark overlay top+bottom edges */
         .hp-cta-section::before,
         .hp-cta-section::after {
           content: ''; position: absolute; left: 0; right: 0; height: 1px;
@@ -611,7 +619,6 @@ export default function HomePage() {
           gap: var(--space-8);
           color: #fff;
         }
-        /* Engineering grid on crimson */
         .hp-cta__grid {
           position: absolute; inset: -40px;
           background-image:
@@ -620,14 +627,14 @@ export default function HomePage() {
           background-size: 48px 48px;
           pointer-events: none;
         }
-        /* Lighter glow top-right */
         .hp-cta__glow {
           position: absolute; top: -60px; right: -60px;
           width: 300px; height: 300px; border-radius: 50%;
           background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
           pointer-events: none;
         }
-        .hp-cta__content { position: relative; z-index: 1; flex: 1; min-width: 220px; }
+        /* FIX: min-width збільшений щоб текст не переносився передчасно */
+        .hp-cta__content { position: relative; z-index: 1; flex: 1; min-width: 280px; }
         .hp-cta__eyebrow {
           font-size: var(--text-xs); font-weight: 600;
           letter-spacing: 0.14em; text-transform: uppercase;
@@ -639,15 +646,16 @@ export default function HomePage() {
           font-family: var(--font-display); font-size: var(--text-xl);
           font-weight: 800; color: #fff; line-height: 1.1;
         }
+        /* FIX: max-width збільшений з 44ch → 52ch, nowrap тексту виключено */
         .hp-cta__sub {
-          font-size: var(--text-sm); color: rgba(255,255,255,0.65);
-          margin-top: var(--space-2); max-width: 44ch; line-height: 1.6;
+          font-size: var(--text-sm); color: rgba(255,255,255,0.75);
+          margin-top: var(--space-2); max-width: 52ch; line-height: 1.6;
         }
         .hp-cta__actions {
           position: relative; z-index: 1;
           display: flex; gap: var(--space-3); flex-wrap: wrap; flex-shrink: 0;
+          align-items: center;
         }
-        /* Outline button on crimson */
         .hp-cta__btn-outline {
           display: inline-flex; align-items: center; gap: var(--space-2);
           padding: 0 var(--space-5); height: 44px;
@@ -660,7 +668,6 @@ export default function HomePage() {
           transition: background var(--transition-fast), border-color var(--transition-fast);
         }
         .hp-cta__btn-outline:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.55); color: #fff; }
-        /* Solid white button on crimson */
         .hp-cta__btn-solid {
           display: inline-flex; align-items: center; gap: var(--space-2);
           padding: 0 var(--space-6); height: 44px;
@@ -691,6 +698,7 @@ export default function HomePage() {
           .hp-cta__actions .hp-cta__btn-solid { flex: 1; justify-content: center; }
           .hp-process { grid-template-columns: 1fr; }
           .hp-svc-card__img { height: 120px; }
+          .hp-cats { padding: var(--space-4); }
         }
 
         @media (prefers-reduced-motion: reduce) {
