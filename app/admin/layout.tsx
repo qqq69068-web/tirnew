@@ -126,13 +126,66 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           font-size: 0.875rem;
           font-weight: 700;
           letter-spacing: 0.08em;
-          color: var(--text);
+          color: var(--admin-sidebar-text);
           line-height: 1.1;
         }
         .admin-sidebar__brand-sub {
           font-size: 0.6875rem;
-          color: var(--text-muted);
+          color: var(--admin-sidebar-muted);
           letter-spacing: 0.03em;
+        }
+
+        /* ── Nav section label ── */
+        .admin-nav-section {
+          font-size: 0.625rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--admin-sidebar-muted);
+          padding: 20px 16px 8px;
+          flex-shrink: 0;
+        }
+
+        /* ── Nav container ── */
+        .admin-sidebar-nav {
+          display: flex;
+          flex-direction: column;
+          padding: 4px 8px;
+          flex: 1;
+          gap: 2px;
+        }
+
+        /* ── Nav link ── */
+        .admin-nav-link {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 9px 12px;
+          border-radius: 8px;
+          font-size: 0.8125rem;
+          font-weight: 500;
+          color: var(--admin-sidebar-text);
+          text-decoration: none;
+          transition: background 0.18s ease, color 0.18s ease;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+        .admin-nav-link:hover {
+          background: var(--admin-sidebar-hover-bg);
+          color: #fff;
+        }
+        .admin-nav-link.active {
+          background: var(--admin-sidebar-active-bg);
+          color: var(--admin-sidebar-active-text);
+          font-weight: 600;
+        }
+        .admin-nav-link svg {
+          flex-shrink: 0;
+          opacity: 0.85;
+        }
+        .admin-nav-link.active svg {
+          opacity: 1;
         }
 
         /* Footer */
@@ -167,7 +220,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         }
         .admin-sidebar__user-email {
           font-size: 0.6875rem;
-          color: var(--text-muted);
+          color: var(--admin-sidebar-muted);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -264,6 +317,32 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         [data-theme="light"] .admin-sidebar__footer,
         :root:not([data-theme="dark"]) .admin-sidebar__footer {
           border-top-color: var(--border);
+        }
+        [data-theme="light"] .admin-sidebar__brand-name,
+        :root:not([data-theme="dark"]) .admin-sidebar__brand-name {
+          color: var(--text);
+        }
+        [data-theme="light"] .admin-nav-link,
+        :root:not([data-theme="dark"]) .admin-nav-link {
+          color: var(--text-muted);
+        }
+        [data-theme="light"] .admin-nav-link:hover,
+        :root:not([data-theme="dark"]) .admin-nav-link:hover {
+          color: var(--text);
+          background: var(--surface2);
+        }
+        [data-theme="light"] .admin-nav-link.active,
+        :root:not([data-theme="dark"]) .admin-nav-link.active {
+          color: var(--primary);
+          background: var(--primary-subtle);
+        }
+        [data-theme="light"] .admin-nav-section,
+        :root:not([data-theme="dark"]) .admin-nav-section {
+          color: var(--text-faint);
+        }
+        [data-theme="light"] .admin-sidebar__user-email,
+        :root:not([data-theme="dark"]) .admin-sidebar__user-email {
+          color: var(--text-muted);
         }
       `}</style>
 
