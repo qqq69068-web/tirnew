@@ -19,6 +19,8 @@ function isActive(href: string, pathname: string): boolean {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
+const REVEAL_SELECTOR = ".reveal, .reveal-left, .reveal-scale, .reveal-clip";
+
 export default function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen]               = useState(false);
   const [scrolled, setScrolled]       = useState(false);
@@ -75,6 +77,35 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       .then((r) => setIsClient(r.ok))
       .catch(() => setIsClient(false));
   }, [pathname]);
+
+  // ── GLOBAL REVEAL OBSERVER ─────────────────────────────────────────
+  // Handles .reveal, .reveal-left, .reveal-scale, .reveal-clip
+  // on every page. Re-runs on pathname change to catch new elements.
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            obs.unobserve(e.target); // unobserve after triggered — perf
+          }
+        }),
+      { threshold: 0.08 }
+    );
+
+    // Small delay so the new page's DOM is painted before we query
+    const timer = setTimeout(() => {
+      document.querySelectorAll(REVEAL_SELECTOR).forEach((el) => {
+        if (!el.classList.contains("visible")) obs.observe(el);
+      });
+    }, 60);
+
+    return () => {
+      clearTimeout(timer);
+      obs.disconnect();
+    };
+  }, [pathname]);
+  // ──────────────────────────────────────────────────────────────────
 
   // Close on outside click
   useEffect(() => {
