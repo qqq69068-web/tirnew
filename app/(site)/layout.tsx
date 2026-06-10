@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,11 +15,21 @@ const links = [
   { href: "/contacts", label: "Контакти" },
 ];
 
+/** Returns true if the current pathname matches this nav link */
+function isActive(href: string, pathname: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
+}
+
 export default function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isClient, setIsClient] = useState<boolean | null>(null);
   const [dark, setDark]         = useState(true);
+  /* progress bar */
+  const [progress, setProgress] = useState(0);
+  const [progVisible, setProgVisible] = useState(false);
+  const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
   /* Theme init */
@@ -47,6 +57,21 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
+  /* Page transition progress bar — fires on pathname change */
+  useEffect(() => {
+    setProgVisible(true);
+    setProgress(0);
+    /* quick ramp to 80% */
+    const t1 = setTimeout(() => setProgress(40), 50);
+    const t2 = setTimeout(() => setProgress(70), 200);
+    const t3 = setTimeout(() => setProgress(85), 500);
+    /* complete */
+    const t4 = setTimeout(() => setProgress(100), 700);
+    /* hide after bar finishes */
+    progTimer.current = setTimeout(() => setProgVisible(false), 1050);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); if (progTimer.current) clearTimeout(progTimer.current); };
+  }, [pathname]);
+
   /* Close mobile menu on route change */
   useEffect(() => { setOpen(false); }, [pathname]);
 
@@ -57,13 +82,32 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       .catch(() => setIsClient(false));
   }, [pathname]);
 
+  /* Lock body scroll when mobile menu open */
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
   const cabinetLabel     = isClient ? "Кабінет" : "Увійти";
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
     <div className="site-wrapper">
 
-      {/* ══ NAVBAR ══════════════════════════════════════════════ */}
+      {/* ══ PAGE PROGRESS BAR ═══════════════════════════════════ */}
+      <div
+        aria-hidden
+        className="page-progress"
+        style={{
+          opacity: progVisible ? 1 : 0,
+          width: `${progress}%`,
+          transition: progVisible
+            ? "width 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease"
+            : "opacity 0.3s ease 0.05s",
+        }}
+      />
+
+      {/* ══ NAVBAR ════════════════════════════════════════════ */}
       <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner container-wide">
 
@@ -78,38 +122,41 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
           {/* Desktop nav */}
           <nav className="site-nav__links hidden md:flex" aria-label="Головне меню">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`nav-link${pathname === l.href ? " active" : ""}`}
-              >
-                {l.label}
-              </Link>
-            ))}
+            {links.map((l) => {
+              const active = isActive(l.href, pathname);
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={`nav-link${active ? " active" : ""}`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {l.label}
+                  {active && <span className="nav-link__bar" aria-hidden />}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right controls */}
           <div className="site-nav__controls">
-
-            {/* Phone */}
             <a href="tel:+380664188826" className="site-nav__phone hidden md:flex">
               <Phone size={11} strokeWidth={2} aria-hidden />
               <span>+380 66 418 88 26</span>
             </a>
 
-            {/* Theme toggle */}
             <button
               onClick={toggleTheme}
               aria-label={dark ? "Світла тема" : "Темна тема"}
               className="btn-icon btn-icon--nav"
             >
-              {dark
-                ? <Sun  size={14} strokeWidth={2} aria-hidden />
-                : <Moon size={14} strokeWidth={2} aria-hidden />}
+              <span className={`theme-icon${dark ? " theme-icon--sun" : " theme-icon--moon"}`}>
+                {dark
+                  ? <Sun  size={14} strokeWidth={2} aria-hidden />
+                  : <Moon size={14} strokeWidth={2} aria-hidden />}
+              </span>
             </button>
 
-            {/* Cabinet */}
             <Link
               href="/cabinet"
               className={`site-nav__cabinet hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
@@ -118,58 +165,95 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               {cabinetLabel}
             </Link>
 
-            {/* CTA */}
             <Link href="/contacts" className="btn btn-primary btn-sm hidden md:inline-flex">
               Зв&apos;язатись
             </Link>
 
-            {/* Burger */}
+            {/* Burger — animated icon */}
             <button
-              onClick={() => setOpen(!open)}
+              onClick={() => setOpen((v) => !v)}
               className={`site-nav__burger flex md:hidden${open ? " open" : ""}`}
-              aria-label="Меню"
+              aria-label={open ? "Закрити меню" : "Відкрити меню"}
               aria-expanded={open}
+              aria-controls="mobile-menu"
             >
-              {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
+              <span className="burger-icon" aria-hidden>
+                <span className={`burger-line burger-line--top${open ? " open" : ""}`} />
+                <span className={`burger-line burger-line--mid${open ? " open" : ""}`} />
+                <span className={`burger-line burger-line--bot${open ? " open" : ""}`} />
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {open && (
-          <div className="mobile-menu mobile-menu-enter" role="navigation" aria-label="Мобільне меню">
-            <nav className="mobile-menu__nav">
-              {links.map((l) => (
+        {/* ── Mobile menu drawer (always rendered, animated via CSS) ── */}
+        <div
+          id="mobile-menu"
+          className={`mobile-menu${open ? " mobile-menu--open" : ""}`}
+          role="navigation"
+          aria-label="Мобільне меню"
+          aria-hidden={!open}
+          inert={open ? undefined : ("" as unknown as boolean)}
+        >
+          <nav className="mobile-menu__nav">
+            {links.map((l, i) => {
+              const active = isActive(l.href, pathname);
+              return (
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`mobile-nav-link${pathname === l.href ? " active" : ""}`}
+                  className={`mobile-nav-link${active ? " active" : ""}`}
+                  aria-current={active ? "page" : undefined}
+                  style={{ transitionDelay: open ? `${i * 40}ms` : "0ms" }}
                 >
-                  {l.label}
-                  {pathname === l.href && <span className="mobile-nav-link__dot" aria-hidden />}
+                  <span>{l.label}</span>
+                  {active && <span className="mobile-nav-link__dot" aria-hidden />}
                 </Link>
-              ))}
-              <Link
-                href="/cabinet"
-                className={`mobile-nav-link${isClient ? " mobile-nav-link--auth" : ""}`}
-              >
+              );
+            })}
+
+            <Link
+              href="/cabinet"
+              className={`mobile-nav-link${isClient ? " mobile-nav-link--auth" : ""}`}
+              style={{ transitionDelay: open ? `${links.length * 40}ms` : "0ms" }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
                 <User size={14} aria-hidden /> {cabinetLabelFull}
-              </Link>
-              <button onClick={toggleTheme} className="mobile-nav-link mobile-nav-link--btn">
+              </span>
+            </Link>
+
+            <button
+              onClick={toggleTheme}
+              className="mobile-nav-link mobile-nav-link--btn"
+              style={{ transitionDelay: open ? `${(links.length + 1) * 40}ms` : "0ms" }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
                 {dark ? <Sun size={14} aria-hidden /> : <Moon size={14} aria-hidden />}
                 {dark ? "Світла тема" : "Темна тема"}
-              </button>
-            </nav>
+              </span>
+            </button>
+          </nav>
 
-            <div className="mobile-menu__ctas">
-              <a href="tel:+380664188826" className="btn btn-outline" style={{ justifyContent: "center", height: 42 }}>
-                <Phone size={13} aria-hidden /> +380 66 418 88 26
-              </a>
-              <Link href="/contacts" className="btn btn-primary" style={{ justifyContent: "center", height: 42 }}>
-                Зв&apos;язатись з нами
-              </Link>
-            </div>
+          <div
+            className="mobile-menu__ctas"
+            style={{ transitionDelay: open ? `${(links.length + 2) * 40}ms` : "0ms" }}
+          >
+            <a href="tel:+380664188826" className="btn btn-outline" style={{ justifyContent: "center", height: 42 }}>
+              <Phone size={13} aria-hidden /> +380 66 418 88 26
+            </a>
+            <Link href="/contacts" className="btn btn-primary" style={{ justifyContent: "center", height: 42 }}>
+              Зв&apos;язатись з нами
+            </Link>
           </div>
+        </div>
+
+        {/* Backdrop overlay */}
+        {open && (
+          <div
+            className="mobile-menu__backdrop"
+            aria-hidden
+            onClick={() => setOpen(false)}
+          />
         )}
       </header>
 
@@ -239,10 +323,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      {/* ══ AI CHAT ══════════════════════════════════════════════ */}
+      {/* ══ AI CHAT ═══════════════════════════════════════════════ */}
       <AiChat />
 
-      {/* ══ NAV + FOOTER STYLES ═════════════════════════════════ */}
+      {/* ══ NAV + FOOTER STYLES ═══════════════════════════════════════ */}
       <style>{`
         .site-wrapper {
           display: flex;
@@ -250,7 +334,20 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           min-height: 100dvh;
         }
 
-        /* ── NAVBAR BASE ──────────────────────────────────────── */
+        /* ── PAGE PROGRESS BAR ──────────────────────────── */
+        .page-progress {
+          position: fixed;
+          top: 0; left: 0;
+          height: 2px;
+          background: var(--primary);
+          z-index: 9999;
+          pointer-events: none;
+          transform-origin: left center;
+          box-shadow: 0 0 8px rgba(185,28,28,0.5);
+          border-radius: 0 2px 2px 0;
+        }
+
+        /* ── NAVBAR BASE ────────────────────────────────────── */
         .site-nav {
           position: sticky;
           top: 0;
@@ -314,6 +411,39 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           align-items: center;
           gap: var(--space-1);
         }
+        .nav-link {
+          position: relative;
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0;
+          padding: 6px 10px;
+          border-radius: var(--radius);
+          font-family: var(--font-display);
+          font-size: var(--text-sm);
+          font-weight: 600;
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color var(--transition-fast), background var(--transition-fast);
+          overflow: visible;
+        }
+        .nav-link:hover { color: var(--text); background: var(--surface2); }
+        .nav-link.active { color: var(--text); }
+        /* Animated underline bar */
+        .nav-link__bar {
+          position: absolute;
+          bottom: -1px;
+          left: 10px;
+          right: 10px;
+          height: 2px;
+          background: var(--primary);
+          border-radius: 2px;
+          animation: navBarSlide 0.28s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes navBarSlide {
+          from { transform: scaleX(0); opacity: 0; }
+          to   { transform: scaleX(1); opacity: 1; }
+        }
 
         /* Right controls */
         .site-nav__controls {
@@ -334,7 +464,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-nav__phone:hover { color: var(--text); }
 
-        /* Theme + burger icon button */
+        /* Theme toggle */
         .btn-icon--nav {
           width: 34px;
           height: 34px;
@@ -350,11 +480,23 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             color var(--transition-fast),
             border-color var(--transition-fast);
           flex-shrink: 0;
+          overflow: hidden;
         }
         .btn-icon--nav:hover {
           background: var(--surface2);
           color: var(--text);
           border-color: var(--border-accent);
+        }
+        /* Theme icon fade/rotate transition */
+        .theme-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: themeIconIn 0.26s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes themeIconIn {
+          from { opacity: 0; transform: rotate(-45deg) scale(0.7); }
+          to   { opacity: 1; transform: rotate(0deg) scale(1); }
         }
 
         /* Cabinet button */
@@ -393,7 +535,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-color: rgba(217,119,6,0.55);
         }
 
-        /* Burger */
+        /* ── ANIMATED BURGER ─────────────────────────────────── */
         .site-nav__burger {
           width: 34px;
           height: 34px;
@@ -406,30 +548,69 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text-muted);
           transition:
             background var(--transition-fast),
-            color var(--transition-fast),
             border-color var(--transition-fast);
+          flex-shrink: 0;
         }
         .site-nav__burger.open {
           background: var(--surface2);
           border-color: var(--border-strong);
-          color: var(--text);
         }
         .site-nav__burger:hover {
           background: var(--surface2);
           color: var(--text);
         }
+        .burger-icon {
+          width: 16px;
+          height: 12px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: relative;
+        }
+        .burger-line {
+          display: block;
+          width: 100%;
+          height: 1.5px;
+          background: currentColor;
+          border-radius: 2px;
+          transition:
+            transform 0.3s cubic-bezier(0.22,1,0.36,1),
+            opacity   0.2s ease;
+          transform-origin: center center;
+        }
+        /* X state */
+        .burger-line--top.open { transform: translateY(5.25px) rotate(45deg); }
+        .burger-line--mid.open { opacity: 0; transform: scaleX(0); }
+        .burger-line--bot.open { transform: translateY(-5.25px) rotate(-45deg); }
 
-        /* ── MOBILE MENU ──────────────────────────────────── */
+        /* ── MOBILE MENU DRAWER ──────────────────────────────── */
         .mobile-menu {
+          /* start state: above-fold, invisible */
           border-top: 1px solid var(--border);
           background: var(--surface);
           padding: var(--space-3) var(--space-4) var(--space-5);
+          overflow: hidden;
+          max-height: 0;
+          opacity: 0;
+          transform: translateY(-8px);
+          pointer-events: none;
+          transition:
+            max-height 0.38s cubic-bezier(0.22,1,0.36,1),
+            opacity    0.26s ease,
+            transform  0.32s cubic-bezier(0.22,1,0.36,1);
+        }
+        .mobile-menu--open {
+          max-height: 600px;
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
         }
         .mobile-menu__nav {
           display: flex;
           flex-direction: column;
           gap: 2px;
         }
+        /* Staggered item entrance */
         .mobile-nav-link {
           display: flex;
           align-items: center;
@@ -442,7 +623,17 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           font-weight: 600;
           color: var(--text);
           text-decoration: none;
-          transition: background var(--transition-fast), color var(--transition-fast);
+          opacity: 0;
+          transform: translateX(-10px);
+          transition:
+            background  var(--transition-fast),
+            color       var(--transition-fast),
+            opacity     0.24s ease,
+            transform   0.28s cubic-bezier(0.22,1,0.36,1);
+        }
+        .mobile-menu--open .mobile-nav-link {
+          opacity: 1;
+          transform: translateX(0);
         }
         .mobile-nav-link:hover { background: var(--surface2); }
         .mobile-nav-link.active {
@@ -458,6 +649,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           text-align: left;
           color: var(--text-muted);
           justify-content: flex-start;
+          font-family: var(--font-display);
+          font-size: var(--text-sm);
+          font-weight: 600;
         }
         .mobile-nav-link__dot {
           width: 5px;
@@ -474,9 +668,32 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           display: flex;
           flex-direction: column;
           gap: var(--space-2);
+          opacity: 0;
+          transform: translateY(6px);
+          transition:
+            opacity   0.24s ease,
+            transform 0.28s cubic-bezier(0.22,1,0.36,1);
+        }
+        .mobile-menu--open .mobile-menu__ctas {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        /* Backdrop */
+        .mobile-menu__backdrop {
+          position: fixed;
+          inset: 0;
+          top: 60px;
+          background: rgba(0,0,0,0.30);
+          z-index: -1;
+          backdrop-filter: blur(2px);
+          animation: backdropIn 0.22s ease both;
+        }
+        @keyframes backdropIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
 
-        /* ── FOOTER ────────────────────────────────────────── */
+        /* ── FOOTER ──────────────────────────────────────────── */
         .site-footer {
           background: var(--bg2);
           border-top: 1px solid var(--border);
@@ -540,25 +757,19 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           transition: color var(--transition-fast);
         }
         .footer-link:hover { color: var(--text); }
-        .hover-underline {
-          position: relative;
-        }
+        .hover-underline { position: relative; }
         .hover-underline::after {
           content: '';
           position: absolute;
-          bottom: -1px;
-          left: 0;
-          width: 100%;
-          height: 1px;
+          bottom: -1px; left: 0;
+          width: 100%; height: 1px;
           background: var(--primary);
           transform: scaleX(0);
           transform-origin: left center;
-          transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+          transition: transform 0.24s cubic-bezier(0.22,1,0.36,1);
         }
         .hover-underline:hover::after { transform: scaleX(1); }
-        .site-footer__bottom {
-          padding-block: var(--space-4);
-        }
+        .site-footer__bottom { padding-block: var(--space-4); }
         .site-footer__bottom-inner {
           display: flex;
           align-items: center;
@@ -571,22 +782,41 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text-faint);
         }
 
-        /* ── RESPONSIVE ──────────────────────────────────────── */
+        /* ── RESPONSIVE ───────────────────────────────────────── */
         @media (max-width: 768px) {
           .site-footer__grid {
             grid-template-columns: 1fr 1fr;
           }
-          .site-footer__brand {
-            grid-column: span 2;
-          }
+          .site-footer__brand { grid-column: span 2; }
         }
         @media (max-width: 480px) {
-          .site-footer__grid {
-            grid-template-columns: 1fr;
+          .site-footer__grid { grid-template-columns: 1fr; }
+          .site-footer__brand { grid-column: span 1; }
+        }
+
+        /* ── REDUCED MOTION ─────────────────────────────────── */
+        @media (prefers-reduced-motion: reduce) {
+          .page-progress { transition: none !important; }
+          .mobile-menu {
+            transition:
+              max-height 0.01ms,
+              opacity    0.01ms,
+              transform  0.01ms;
           }
-          .site-footer__brand {
-            grid-column: span 1;
+          .mobile-nav-link {
+            opacity: 1;
+            transform: none;
+            transition:
+              background  var(--transition-fast),
+              color       var(--transition-fast);
           }
+          .mobile-menu__ctas {
+            opacity: 1;
+            transform: none;
+          }
+          .burger-line { transition: none; }
+          .theme-icon { animation: none; }
+          .nav-link__bar { animation: none; }
         }
       `}</style>
     </div>
