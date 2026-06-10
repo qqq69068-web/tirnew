@@ -18,7 +18,7 @@ export default function PricePage() {
         <section className="price-hero">
           <div className="price-hero__bg" aria-hidden />
           <div className="price-hero__overlay" aria-hidden />
-          <div className="price-hero__inner container-narrow">
+          <div className="price-hero__inner container">
             <p className="section-eyebrow">Вартість робіт</p>
             <h1 className="price-hero__title">Прайс на послуги</h1>
             <p className="price-hero__sub">
@@ -37,7 +37,7 @@ export default function PricePage() {
         </section>
 
         {/* ─── CONTENT ───────────────────────────────────── */}
-        <div className="price-content container-narrow">
+        <div className="price-content container">
 
           {/* Note */}
           <div className="price-note">
