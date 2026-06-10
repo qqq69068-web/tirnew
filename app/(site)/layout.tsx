@@ -7,15 +7,14 @@ import { Menu, X, Phone, User, Sun, Moon } from "lucide-react";
 import AiChat from "@/components/AiChat";
 import { TirnewLogo } from "@/components/TirnewLogo";
 
+// Gallery removed by design decision
 const links = [
-  { href: "/",         label: "Головна" },
-  { href: "/services", label: "Послуги" },
-  { href: "/price",    label: "Прайс" },
-  { href: "/gallery",  label: "Галерея" },
-  { href: "/contacts", label: "Контакти" },
+  { href: "/",           label: "Головна" },
+  { href: "/services",   label: "Послуги" },
+  { href: "/price",      label: "Прайс" },
+  { href: "/contacts",   label: "Контакти" },
 ];
 
-/** Returns true if the current pathname matches this nav link */
 function isActive(href: string, pathname: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
@@ -26,13 +25,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const [scrolled, setScrolled] = useState(false);
   const [isClient, setIsClient] = useState<boolean | null>(null);
   const [dark, setDark]         = useState(true);
-  /* progress bar */
   const [progress, setProgress] = useState(0);
   const [progVisible, setProgVisible] = useState(false);
   const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
-  /* Theme init */
+  /* ── Theme init ─────────────────────────────────────────── */
   useEffect(() => {
     const saved = localStorage.getItem("tirnew-theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -50,43 +48,119 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  /* Scroll detection */
+  /* ── Scroll detection ───────────────────────────────────── */
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  /* Page transition progress bar — fires on pathname change */
+  /* ── Page progress bar ──────────────────────────────────── */
   useEffect(() => {
     setProgVisible(true);
     setProgress(0);
-    /* quick ramp to 80% */
     const t1 = setTimeout(() => setProgress(40), 50);
     const t2 = setTimeout(() => setProgress(70), 200);
     const t3 = setTimeout(() => setProgress(85), 500);
-    /* complete */
     const t4 = setTimeout(() => setProgress(100), 700);
-    /* hide after bar finishes */
     progTimer.current = setTimeout(() => setProgVisible(false), 1050);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); if (progTimer.current) clearTimeout(progTimer.current); };
+    return () => {
+      clearTimeout(t1); clearTimeout(t2);
+      clearTimeout(t3); clearTimeout(t4);
+      if (progTimer.current) clearTimeout(progTimer.current);
+    };
   }, [pathname]);
 
-  /* Close mobile menu on route change */
+  /* ── Close mobile menu on route change ─────────────────── */
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  /* Auth check */
+  /* ── Auth check ─────────────────────────────────────────── */
   useEffect(() => {
     fetch("/api/client/me")
       .then((r) => setIsClient(r.ok))
       .catch(() => setIsClient(false));
   }, [pathname]);
 
-  /* Lock body scroll when mobile menu open */
+  /* ── Lock body scroll when mobile menu open ─────────────── */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
+
+  /* ── Custom cursor (fine pointer devices only) ───────────── */
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    if (!mq.matches) return;
+    // Respect reduced motion preference
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const dot  = document.getElementById("cursor-dot");
+    const ring = document.getElementById("cursor-ring");
+    if (!dot || !ring) return;
+
+    let dotX = 0, dotY = 0;
+    let ringX = 0, ringY = 0;
+    let raf: number;
+
+    const onMove = (e: MouseEvent) => {
+      dotX = e.clientX;
+      dotY = e.clientY;
+    };
+
+    // Ring follows with lerp for smooth trailing effect
+    const animate = () => {
+      ringX += (dotX - ringX) * 0.12;
+      ringY += (dotY - ringY) * 0.12;
+      dot.style.transform  = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
+      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+
+    const onEnter = (e: Event) => {
+      const el = e.currentTarget as HTMLElement;
+      if (el.matches('a, button, [role="button"], input, textarea, select, label')) {
+        dot.classList.add("hover");
+        ring.classList.add("hover");
+      }
+    };
+    const onLeave = () => {
+      dot.classList.remove("hover");
+      ring.classList.remove("hover");
+    };
+    const onDocLeave = () => {
+      dot.classList.add("hidden");
+      ring.classList.add("hidden");
+    };
+    const onDocEnter = () => {
+      dot.classList.remove("hidden");
+      ring.classList.remove("hidden");
+    };
+
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseleave", onDocLeave);
+    document.addEventListener("mouseenter", onDocEnter);
+
+    // Delegate hover to all interactive elements
+    const interactive = document.querySelectorAll(
+      'a, button, [role="button"], input, textarea, select, label'
+    );
+    interactive.forEach((el) => {
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mouseleave", onLeave);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseleave", onDocLeave);
+      document.removeEventListener("mouseenter", onDocEnter);
+      interactive.forEach((el) => {
+        el.removeEventListener("mouseenter", onEnter);
+        el.removeEventListener("mouseleave", onLeave);
+      });
+    };
+  }, []);
 
   const cabinetLabel     = isClient ? "Кабінет" : "Увійти";
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
@@ -94,7 +168,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="site-wrapper">
 
-      {/* ══ PAGE PROGRESS BAR ═══════════════════════════════════ */}
+      {/* ══ CUSTOM CURSOR ════════════════════════════════════ */}
+      <div id="cursor-dot"  className="cursor-dot"  aria-hidden="true" />
+      <div id="cursor-ring" className="cursor-ring" aria-hidden="true" />
+
+      {/* ══ PAGE PROGRESS BAR ════════════════════════════════ */}
       <div
         aria-hidden
         className="page-progress"
@@ -107,7 +185,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* ══ NAVBAR ════════════════════════════════════════════ */}
+      {/* ══ NAVBAR ══════════════════════════════════════════ */}
       <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner container-wide">
 
@@ -169,7 +247,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               Зв&apos;язатись
             </Link>
 
-            {/* Burger — animated icon */}
+            {/* Burger */}
             <button
               onClick={() => setOpen((v) => !v)}
               className={`site-nav__burger flex md:hidden${open ? " open" : ""}`}
@@ -186,7 +264,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* ── Mobile menu drawer (always rendered, animated via CSS) ── */}
+        {/* Mobile menu drawer */}
         <div
           id="mobile-menu"
           className={`mobile-menu${open ? " mobile-menu--open" : ""}`}
@@ -247,7 +325,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* Backdrop overlay */}
         {open && (
           <div
             className="mobile-menu__backdrop"
@@ -257,16 +334,16 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         )}
       </header>
 
-      {/* PAGE */}
+      {/* ══ PAGE CONTENT ════════════════════════════════════ */}
       <main>{children}</main>
 
-      {/* ══ FOOTER ═══════════════════════════════════════════════ */}
+      {/* ══ FOOTER ══════════════════════════════════════════ */}
       <footer className="site-footer theme-transition">
         <div className="site-footer__top">
           <div className="container-wide site-footer__grid">
 
             {/* Brand col */}
-            <div className="site-footer__brand">
+            <div className="site-footer__brand reveal">
               <Link href="/" className="site-nav__logo" style={{ marginBottom: "var(--space-4)" }}>
                 <TirnewLogo size={32} />
                 <div className="site-nav__brand">
@@ -288,20 +365,18 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             </div>
 
             {/* Nav col */}
-            <div className="site-footer__col">
+            <div className="site-footer__col reveal d-2">
               <p className="site-footer__col-title">Навігація</p>
               <div className="site-footer__col-links">
                 {links.map((l) => (
                   <Link key={l.href} href={l.href} className="footer-link hover-underline">{l.label}</Link>
                 ))}
-                <Link href="/cabinet" className="footer-link hover-underline">
-                  <User size={11} aria-hidden /> Кабінет
-                </Link>
+                <Link href="/cabinet" className="footer-link hover-underline">Кабінет</Link>
               </div>
             </div>
 
             {/* Services col */}
-            <div className="site-footer__col">
+            <div className="site-footer__col reveal d-3">
               <p className="site-footer__col-title">Послуги</p>
               <div className="site-footer__col-links">
                 {["Ремонт двигунів", "Ремонт КПП", "Гальмівна система", "Пневмосистема", "Електрика"].map((s) => (
@@ -312,7 +387,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="site-footer__bottom">
           <div className="container-wide site-footer__bottom-inner">
             <span className="site-footer__copy">
@@ -323,10 +397,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      {/* ══ AI CHAT ═══════════════════════════════════════════════ */}
+      {/* ══ AI CHAT ═════════════════════════════════════════ */}
       <AiChat />
 
-      {/* ══ NAV + FOOTER STYLES ═══════════════════════════════════════ */}
+      {/* ══ STYLES ══════════════════════════════════════════ */}
       <style>{`
         .site-wrapper {
           display: flex;
@@ -334,7 +408,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           min-height: 100dvh;
         }
 
-        /* ── PAGE PROGRESS BAR ──────────────────────────── */
+        /* ── PAGE PROGRESS BAR ─────────────────────────── */
         .page-progress {
           position: fixed;
           top: 0; left: 0;
@@ -347,7 +421,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-radius: 0 2px 2px 0;
         }
 
-        /* ── NAVBAR BASE ────────────────────────────────────── */
+        /* ── NAVBAR ────────────────────────────────────── */
         .site-nav {
           position: sticky;
           top: 0;
@@ -429,7 +503,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .nav-link:hover { color: var(--text); background: var(--surface2); }
         .nav-link.active { color: var(--text); }
-        /* Animated underline bar */
         .nav-link__bar {
           position: absolute;
           bottom: -1px;
@@ -487,7 +560,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text);
           border-color: var(--border-accent);
         }
-        /* Theme icon fade/rotate transition */
         .theme-icon {
           display: flex;
           align-items: center;
@@ -499,7 +571,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           to   { opacity: 1; transform: rotate(0deg) scale(1); }
         }
 
-        /* Cabinet button */
+        /* Cabinet */
         .site-nav__cabinet {
           height: 34px;
           padding: 0 14px;
@@ -535,7 +607,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-color: rgba(217,119,6,0.55);
         }
 
-        /* ── ANIMATED BURGER ─────────────────────────────────── */
+        /* ── BURGER ──────────────────────────────────────── */
         .site-nav__burger {
           width: 34px;
           height: 34px;
@@ -555,13 +627,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           background: var(--surface2);
           border-color: var(--border-strong);
         }
-        .site-nav__burger:hover {
-          background: var(--surface2);
-          color: var(--text);
-        }
+        .site-nav__burger:hover { background: var(--surface2); color: var(--text); }
         .burger-icon {
-          width: 16px;
-          height: 12px;
+          width: 16px; height: 12px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
@@ -569,8 +637,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .burger-line {
           display: block;
-          width: 100%;
-          height: 1.5px;
+          width: 100%; height: 1.5px;
           background: currentColor;
           border-radius: 2px;
           transition:
@@ -578,14 +645,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             opacity   0.2s ease;
           transform-origin: center center;
         }
-        /* X state */
         .burger-line--top.open { transform: translateY(5.25px) rotate(45deg); }
         .burger-line--mid.open { opacity: 0; transform: scaleX(0); }
         .burger-line--bot.open { transform: translateY(-5.25px) rotate(-45deg); }
 
-        /* ── MOBILE MENU DRAWER ──────────────────────────────── */
+        /* ── MOBILE MENU ─────────────────────────────────── */
         .mobile-menu {
-          /* start state: above-fold, invisible */
           border-top: 1px solid var(--border);
           background: var(--surface);
           padding: var(--space-3) var(--space-4) var(--space-5);
@@ -605,12 +670,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           transform: translateY(0);
           pointer-events: auto;
         }
-        .mobile-menu__nav {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        /* Staggered item entrance */
+        .mobile-menu__nav { display: flex; flex-direction: column; gap: 2px; }
         .mobile-nav-link {
           display: flex;
           align-items: center;
@@ -631,31 +691,19 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             opacity     0.24s ease,
             transform   0.28s cubic-bezier(0.22,1,0.36,1);
         }
-        .mobile-menu--open .mobile-nav-link {
-          opacity: 1;
-          transform: translateX(0);
-        }
-        .mobile-nav-link:hover { background: var(--surface2); }
-        .mobile-nav-link.active {
-          color: var(--primary);
-          background: var(--primary-subtle);
-        }
-        .mobile-nav-link--auth { color: var(--accent); }
+        .mobile-menu--open .mobile-nav-link { opacity: 1; transform: translateX(0); }
+        .mobile-nav-link:hover  { background: var(--surface2); }
+        .mobile-nav-link.active { color: var(--primary); background: var(--primary-subtle); }
+        .mobile-nav-link--auth  { color: var(--accent); }
         .mobile-nav-link--btn {
-          width: 100%;
-          background: none;
-          border: none;
-          cursor: pointer;
-          text-align: left;
-          color: var(--text-muted);
+          width: 100%; background: none; border: none; cursor: pointer;
+          text-align: left; color: var(--text-muted);
           justify-content: flex-start;
           font-family: var(--font-display);
-          font-size: var(--text-sm);
-          font-weight: 600;
+          font-size: var(--text-sm); font-weight: 600;
         }
         .mobile-nav-link__dot {
-          width: 5px;
-          height: 5px;
+          width: 5px; height: 5px;
           border-radius: 50%;
           background: var(--primary);
           display: inline-block;
@@ -665,35 +713,21 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           margin-top: var(--space-3);
           padding-top: var(--space-3);
           border-top: 1px solid var(--border);
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-2);
-          opacity: 0;
-          transform: translateY(6px);
-          transition:
-            opacity   0.24s ease,
-            transform 0.28s cubic-bezier(0.22,1,0.36,1);
+          display: flex; flex-direction: column; gap: var(--space-2);
+          opacity: 0; transform: translateY(6px);
+          transition: opacity 0.24s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1);
         }
-        .mobile-menu--open .mobile-menu__ctas {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        /* Backdrop */
+        .mobile-menu--open .mobile-menu__ctas { opacity: 1; transform: translateY(0); }
         .mobile-menu__backdrop {
-          position: fixed;
-          inset: 0;
-          top: 60px;
+          position: fixed; inset: 0; top: 60px;
           background: rgba(0,0,0,0.30);
           z-index: -1;
           backdrop-filter: blur(2px);
           animation: backdropIn 0.22s ease both;
         }
-        @keyframes backdropIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
+        @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ── FOOTER ──────────────────────────────────────────── */
+        /* ── FOOTER ──────────────────────────────────────── */
         .site-footer {
           background: var(--bg2);
           border-top: 1px solid var(--border);
@@ -718,20 +752,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           max-width: 26ch;
           margin-bottom: var(--space-4);
         }
-        .site-footer__contacts {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-1);
-        }
-        .site-footer__phone {
-          font-size: var(--text-sm);
-          font-weight: 600;
-        }
-        .site-footer__meta {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          line-height: 1.5;
-        }
+        .site-footer__contacts { display: flex; flex-direction: column; gap: var(--space-1); }
+        .site-footer__phone { font-size: var(--text-sm); font-weight: 600; }
+        .site-footer__meta { font-size: var(--text-xs); color: var(--text-faint); line-height: 1.5; }
         .site-footer__col-title {
           font-family: var(--font-display);
           font-size: 10px;
@@ -741,11 +764,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text-faint);
           margin-bottom: var(--space-4);
         }
-        .site-footer__col-links {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-2);
-        }
+        .site-footer__col-links { display: flex; flex-direction: column; gap: var(--space-2); }
         .footer-link {
           font-family: var(--font-body);
           font-size: var(--text-xs);
@@ -771,22 +790,15 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .hover-underline:hover::after { transform: scaleX(1); }
         .site-footer__bottom { padding-block: var(--space-4); }
         .site-footer__bottom-inner {
-          display: flex;
-          align-items: center;
+          display: flex; align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: var(--space-2);
+          flex-wrap: wrap; gap: var(--space-2);
         }
-        .site-footer__copy {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-        }
+        .site-footer__copy { font-size: var(--text-xs); color: var(--text-faint); }
 
-        /* ── RESPONSIVE ───────────────────────────────────────── */
+        /* ── RESPONSIVE ──────────────────────────────────── */
         @media (max-width: 768px) {
-          .site-footer__grid {
-            grid-template-columns: 1fr 1fr;
-          }
+          .site-footer__grid { grid-template-columns: 1fr 1fr; }
           .site-footer__brand { grid-column: span 2; }
         }
         @media (max-width: 480px) {
@@ -794,26 +806,18 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           .site-footer__brand { grid-column: span 1; }
         }
 
-        /* ── REDUCED MOTION ─────────────────────────────────── */
+        /* ── REDUCED MOTION ──────────────────────────────── */
         @media (prefers-reduced-motion: reduce) {
           .page-progress { transition: none !important; }
           .mobile-menu {
             transition:
-              max-height 0.01ms,
-              opacity    0.01ms,
-              transform  0.01ms;
+              max-height 0.01ms, opacity 0.01ms, transform 0.01ms;
           }
           .mobile-nav-link {
-            opacity: 1;
-            transform: none;
-            transition:
-              background  var(--transition-fast),
-              color       var(--transition-fast);
+            opacity: 1; transform: none;
+            transition: background var(--transition-fast), color var(--transition-fast);
           }
-          .mobile-menu__ctas {
-            opacity: 1;
-            transform: none;
-          }
+          .mobile-menu__ctas { opacity: 1; transform: none; }
           .burger-line { transition: none; }
           .theme-icon { animation: none; }
           .nav-link__bar { animation: none; }
