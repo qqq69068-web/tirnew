@@ -381,7 +381,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
         /* Theme toggle */
         .btn-icon--nav {
-          width: 34px; height: 34px; border-radius: var(--radius);
+          width: 27px; height: 27px; border-radius: var(--radius);
           border: 1px solid var(--border-strong); background: var(--surface);
           display: flex; align-items: center; justify-content: center;
           color: var(--text-muted); flex-shrink: 0; overflow: hidden;
@@ -399,7 +399,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
         /* Cabinet */
         .site-nav__cabinet {
-          height: 34px; padding: 0 14px; border-radius: var(--radius);
+          height: 27px; padding: 0 12px; border-radius: var(--radius);
           border: 1px solid var(--border-strong); background: var(--surface);
           color: var(--text-muted); font-family: var(--font-display);
           font-size: 13px; font-weight: 600;
@@ -412,7 +412,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
         /* Burger */
         .site-nav__burger {
-          width: 34px; height: 34px; border-radius: var(--radius);
+          width: 27px; height: 27px; border-radius: var(--radius);
           border: 1px solid var(--border); background: var(--surface);
           display: flex; align-items: center; justify-content: center;
           color: var(--text-muted); flex-shrink: 0;
