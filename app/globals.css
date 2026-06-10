@@ -291,33 +291,41 @@ a { color: inherit; text-decoration: none; }
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
 
-/* ── LAYOUT UTILITIES ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════
+   LAYOUT — BOXED / CONTAINED SYSTEM
+   Ціль: компактна ширина + узгоджені відступи на всіх сторінках.
 
-/*
-  container-narrow  — вузький контент: деталі послуги, форми, статті (max 800px)
-  container         — стандартний контент: списки, сторінки (max 1160px)
-  container-wide    — широкий: navbar, footer (max 1160px — вирівняно з container)
-*/
+   container-narrow  — вузький: форми, деталі, статті        (max 720px)
+   container         — стандарт: списки, контент, сторінки   (max 1040px)
+   container-wide    — синонім container: navbar, footer      (max 1040px)
+
+   Чому 1040px?
+   На 1280px екрані: (1280 - 1040) / 2 = 120px поля — візуально зібрано.
+   На 1440px екрані: (1440 - 1040) / 2 = 200px поля — достатньо для дихання.
+   Порівняно зі старим 1160px: контент вужчий на ~120px, щільніший.
+══════════════════════════════════════════════════════════════════ */
 
 .container-narrow {
   width: 100%;
-  max-width: 800px;
+  max-width: 720px;
   margin-inline: auto;
-  padding-inline: clamp(var(--space-4), 4vw, var(--space-10));
+  padding-inline: clamp(var(--space-4), 3vw, var(--space-8));
 }
 
 .container {
   width: 100%;
-  max-width: 1160px;
+  max-width: 1040px;
   margin-inline: auto;
-  padding-inline: clamp(var(--space-4), 4vw, var(--space-12));
+  padding-inline: clamp(var(--space-4), 3vw, var(--space-8));
 }
 
+/* container-wide = той самий container; існує для семантичної ясності
+   в navbar/footer де потрібно явно позначити "wide version" */
 .container-wide {
   width: 100%;
-  max-width: 1160px;
+  max-width: 1040px;
   margin-inline: auto;
-  padding-inline: clamp(var(--space-4), 4vw, var(--space-12));
+  padding-inline: clamp(var(--space-4), 3vw, var(--space-8));
 }
 
 /* ── SCROLL REVEAL SYSTEM ────────────────────────────────────────── */
@@ -1067,7 +1075,7 @@ select.input {
   animation: slideOutToast 0.22s cubic-bezier(0.22,1,0.36,1) both;
 }
 
-/* Status bar on toast left edge — exception: status indicator, not card decoration */
+/* Status bar on toast left edge */
 .toast-success::before,
 .toast-error::before,
 .toast-info::before,
@@ -1277,9 +1285,10 @@ select.input {
   overflow-y: auto;
 }
 
+/* admin-page тепер теж використовує 1040px для консистентності */
 .admin-page {
-  padding: var(--space-8) clamp(var(--space-5), 3vw, var(--space-10));
-  max-width: 1200px;
+  padding: var(--space-8) clamp(var(--space-5), 3vw, var(--space-8));
+  max-width: 1040px;
 }
 
 .admin-page-header {
@@ -1306,20 +1315,24 @@ select.input {
 
 .admin-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-8);
 }
 
-/* ── SECTION SPACING ─────────────────────────────────────────────── */
-.section    { padding-block: clamp(2.5rem, 6vw, 5rem); }
-.section-sm { padding-block: clamp(1.5rem, 4vw, 3rem); }
+/* ══════════════════════════════════════════════════════════════════
+   SECTION SPACING
+   Зменшені з 5rem/3rem → 4rem/2.5rem щоб секції виглядали
+   зібраніше, а не як окремі «плаваючі острови».
+══════════════════════════════════════════════════════════════════ */
+.section    { padding-block: clamp(2rem, 5vw, 4rem); }
+.section-sm { padding-block: clamp(1.25rem, 3vw, 2.5rem); }
 
 /* ── PAGE HERO ───────────────────────────────────────────────────── */
 .page-hero {
   position: relative;
   overflow: hidden;
-  padding: clamp(2.5rem, 5vw, 4rem) 0;
+  padding: clamp(2rem, 4vw, 3.5rem) 0;
   border-bottom: 1px solid var(--border);
 }
 .page-hero-bg {
