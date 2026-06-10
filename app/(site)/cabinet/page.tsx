@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Suspense } from "react";
-import { LogOut, Clock, CheckCircle2, Wrench, Search, ChevronRight, User, ReceiptText, Timer, Mail, Package } from "lucide-react";
+import {
+  LogOut, Clock, CheckCircle2, Wrench, Search, User,
+  ReceiptText, Timer, Mail, Package, ChevronRight, ArrowRight,
+} from "lucide-react";
 
+/* ─── Types (unchanged) ─── */
 interface Booking {
   id: string; service: string | null; carBrand: string | null; carModel: string | null;
   progress: string; price: number | null; partsCost: number | null;
@@ -11,36 +15,45 @@ interface Booking {
 }
 interface Client { email: string; name: string | null; phone: string | null; bookings: Booking[]; }
 
+/* ─── Constants (unchanged) ─── */
 const PROGRESS_STEPS = [
-  { key: "received",    label: "Прийнято" },
-  { key: "diagnostics", label: "Діагностика" },
-  { key: "in_progress", label: "В роботі" },
-  { key: "done",        label: "Готово" },
+  { key: "received",    label: "Прийнято",    icon: <Clock    size={12} /> },
+  { key: "diagnostics", label: "Діагностика", icon: <Search   size={12} /> },
+  { key: "in_progress", label: "В роботі",    icon: <Wrench   size={12} /> },
+  { key: "done",        label: "Готово",      icon: <CheckCircle2 size={12} /> },
 ];
 
-const PROGRESS_ICONS: Record<string, React.ReactNode> = {
-  received: <Clock size={13} />, diagnostics: <Search size={13} />,
-  in_progress: <Wrench size={13} />, done: <CheckCircle2 size={13} />,
-};
+/* ─── Animated counter hook ─── */
+function useCountUp(target: number, duration = 900) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setValue(0); return; }
+    let start: number | null = null;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setValue(Math.round(ease * target));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration]);
+  return value;
+}
 
-function ProgressBar({ current }: { current: string }) {
+/* ─── ProgressTrack ─── */
+function ProgressTrack({ current }: { current: string }) {
   const idx = PROGRESS_STEPS.findIndex((s) => s.key === current);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 14, flexWrap: "wrap" }}>
+    <div className="cb-progress-track">
       {PROGRESS_STEPS.map((step, i) => (
-        <div key={step.key} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <div style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "4px 10px", borderRadius: 99, fontSize: 12, fontWeight: 500,
-            background: i <= idx ? "var(--accent)" : "var(--surface2)",
-            color: i <= idx ? "#fff" : "var(--text-faint)",
-            border: "1px solid " + (i <= idx ? "var(--accent)" : "var(--border)"),
-          }}>
-            {PROGRESS_ICONS[step.key]}
+        <div key={step.key} className="cb-progress-item">
+          <div className={`cb-progress-step ${i < idx ? "cb-progress-step--done" : i === idx ? "cb-progress-step--active" : "cb-progress-step--future"}`}>
+            {i < idx ? <CheckCircle2 size={11} /> : step.icon}
             <span>{step.label}</span>
           </div>
           {i < PROGRESS_STEPS.length - 1 && (
-            <ChevronRight size={11} style={{ color: i < idx ? "var(--accent)" : "var(--text-faint)" }} />
+            <ChevronRight size={10} className={`cb-progress-arrow ${i < idx ? "cb-progress-arrow--done" : ""}`} />
           )}
         </div>
       ))}
@@ -48,68 +61,143 @@ function ProgressBar({ current }: { current: string }) {
   );
 }
 
+/* ─── StatsBar ─── */
 function StatsBar({ bookings }: { bookings: Booking[] }) {
-  const total = bookings.length;
-  const totalPrice = bookings.reduce((s, b) => s + (b.price || 0) + (b.partsCost || 0), 0);
-  const done = bookings.filter((b) => b.progress === "done").length;
+  const total    = bookings.length;
+  const done     = bookings.filter((b) => b.progress === "done").length;
+  const totalPrc = bookings.reduce((s, b) => s + (b.price || 0) + (b.partsCost || 0), 0);
+  const cTotal   = useCountUp(total);
+  const cDone    = useCountUp(done);
+  const cPrice   = useCountUp(totalPrc, 1200);
+
+  const stats = [
+    { icon: <ReceiptText size={16} />, val: cTotal, label: "Замовлень",  suffix: "" },
+    { icon: <CheckCircle2 size={16} />, val: cDone,  label: "Виконано",  suffix: "" },
+    { icon: <Timer size={16} />, val: totalPrc > 0 ? cPrice : null, label: "Витрачено", suffix: " ₴" },
+  ];
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 24 }}>
-      {[
-        { icon: <ReceiptText size={18} style={{ color: "var(--accent)" }} />, val: total, label: "Замовлень" },
-        { icon: <CheckCircle2 size={18} style={{ color: "var(--accent)" }} />, val: done, label: "Виконано" },
-        { icon: <Timer size={18} style={{ color: "var(--accent)" }} />, val: totalPrice > 0 ? `${totalPrice.toLocaleString()} ₴` : "—", label: "Витрачено" },
-      ].map(({ icon, val, label }) => (
-        <div key={label} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>{icon}</div>
-          <p style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>{val}</p>
-          <p style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 2 }}>{label}</p>
+    <div className="cb-stats">
+      {stats.map(({ icon, val, label, suffix }) => (
+        <div key={label} className="cb-stat-card">
+          <div className="cb-stat-icon">{icon}</div>
+          <p className="cb-stat-value">
+            {val === null ? "—" : `${val.toLocaleString("uk-UA")}${suffix}`}
+          </p>
+          <p className="cb-stat-label">{label}</p>
         </div>
       ))}
     </div>
   );
 }
 
-function BookingCard({ b }: { b: Booking }) {
-  const totalCost = (b.price || 0) + (b.partsCost || 0);
+/* ─── CostPill ─── */
+function CostPill({ icon, label, amount }: { icon: React.ReactNode; label: string; amount: number }) {
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px 18px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <p style={{ fontWeight: 600, color: "var(--text)", fontSize: 14 }}>
-            {b.carBrand || b.carModel ? `${b.carBrand || ""} ${b.carModel || ""}`.trim() : "Авто не вказано"}
+    <span className="cb-cost-pill">
+      {icon}
+      {label}: {amount.toLocaleString("uk-UA")} ₴
+    </span>
+  );
+}
+
+/* ─── BookingCard ─── */
+function BookingCard({ b, index }: { b: Booking; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(16px)";
+    const t = setTimeout(() => {
+      el.style.transition = "opacity 0.45s ease, transform 0.45s ease";
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    }, index * 90 + 60);
+    return () => clearTimeout(t);
+  }, [index]);
+
+  const totalCost = (b.price || 0) + (b.partsCost || 0);
+
+  return (
+    <div ref={ref} className="cb-card">
+      {/* Header row */}
+      <div className="cb-card-header">
+        <div className="cb-card-header-left">
+          <p className="cb-card-car">
+            {b.carBrand || b.carModel
+              ? `${b.carBrand || ""} ${b.carModel || ""}`.trim()
+              : "Авто не вказано"}
           </p>
-          <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>{b.service || "Послуга"}</p>
+          <p className="cb-card-service">{b.service || "Послуга"}</p>
         </div>
-        <div style={{ textAlign: "right" }}>
+        <div className="cb-card-header-right">
           {totalCost > 0 ? (
-            <p style={{ fontWeight: 700, color: "var(--accent)", fontSize: 16 }}>{totalCost.toLocaleString()} ₴</p>
+            <p className="cb-card-price">{totalCost.toLocaleString("uk-UA")} ₴</p>
           ) : (
-            <p style={{ fontSize: 12, color: "var(--text-faint)" }}>Ціна уточнюється</p>
+            <p className="cb-card-price-tbd">Ціна уточнюється</p>
           )}
-          <p style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>{new Date(b.createdAt).toLocaleDateString("uk-UA")}</p>
+          <p className="cb-card-date">
+            {new Date(b.createdAt).toLocaleDateString("uk-UA", { day: "2-digit", month: "short", year: "numeric" })}
+          </p>
         </div>
       </div>
+
+      {/* Cost breakdown */}
       {(b.price || b.partsCost) && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
-          {b.price ? <span style={{ fontSize: 12, color: "var(--text-muted)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 99, padding: "3px 10px", display: "flex", alignItems: "center", gap: 4 }}><Wrench size={10} /> Робота: {b.price.toLocaleString()} ₴</span> : null}
-          {b.partsCost ? <span style={{ fontSize: 12, color: "var(--text-muted)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 99, padding: "3px 10px", display: "flex", alignItems: "center", gap: 4 }}><Package size={10} /> Деталі: {b.partsCost.toLocaleString()} ₴</span> : null}
+        <div className="cb-cost-row">
+          {b.price    && <CostPill icon={<Wrench  size={10} />} label="Робота"  amount={b.price} />}
+          {b.partsCost && <CostPill icon={<Package size={10} />} label="Деталі" amount={b.partsCost} />}
         </div>
       )}
+
+      {/* Work items */}
       {b.workItems && b.workItems.length > 0 && (
-        <div style={{ marginTop: 12 }}>
-          <p style={{ fontSize: 11, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Виконані роботи</p>
+        <div className="cb-work-items">
+          <p className="cb-section-eyebrow">Виконані роботи</p>
           {b.workItems.map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>
-              <span style={{ color: "var(--accent)", flexShrink: 0 }}>✓</span> {item}
+            <div key={i} className="cb-work-item">
+              <span className="cb-work-check">✓</span>
+              {item}
             </div>
           ))}
         </div>
       )}
-      <ProgressBar current={b.progress} />
+
+      {/* Progress */}
+      <ProgressTrack current={b.progress} />
     </div>
   );
 }
 
+/* ─── Skeleton ─── */
+function CabinetSkeleton() {
+  return (
+    <div className="cb-skeleton-wrap">
+      <div className="cb-stats">
+        {[1, 2, 3].map((n) => (
+          <div key={n} className="cb-stat-card">
+            <div className="skeleton cb-sk-icon" />
+            <div className="skeleton cb-sk-val" />
+            <div className="skeleton cb-sk-lbl" />
+          </div>
+        ))}
+      </div>
+      {[1, 2].map((n) => (
+        <div key={n} className="cb-card" style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+            <div><div className="skeleton" style={{ height: 15, width: 140, borderRadius: 6, marginBottom: 8 }} /><div className="skeleton" style={{ height: 12, width: 100, borderRadius: 6 }} /></div>
+            <div className="skeleton" style={{ height: 20, width: 70, borderRadius: 6 }} />
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+            {[1, 2, 3, 4].map((k) => <div key={k} className="skeleton" style={{ height: 24, flex: 1, borderRadius: 99 }} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── AuthForm ─── */
 function AuthForm() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -117,53 +205,69 @@ function AuthForm() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
-    await fetch("/api/client/send-magic-link", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+    await fetch("/api/client/send-magic-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
     setLoading(false); setSent(true);
   };
 
   if (sent) return (
-    <div style={{ maxWidth: 400, margin: "0 auto", padding: "60px 16px", textAlign: "center" }}>
-      <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(15,118,110,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-        <Mail size={30} style={{ color: "var(--accent)" }} />
+    <div className="cb-auth-wrap cb-auth-sent">
+      <div className="cb-auth-icon-wrap">
+        <Mail size={26} style={{ color: "var(--accent)" }} />
       </div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Перевірте пошту</h2>
-      <p style={{ fontSize: 14, color: "var(--text-muted)" }}>Надіслали посилання для входу на <strong style={{ color: "var(--text)" }}>{email}</strong>. Воно діє 30 хвилин.</p>
-      <button onClick={() => { setSent(false); setEmail(""); }} style={{ marginTop: 20, fontSize: 13, color: "var(--accent)", background: "none", border: "none", cursor: "pointer" }}>← Ввести інший email</button>
+      <h2 className="cb-auth-title">Перевірте пошту</h2>
+      <p className="cb-auth-sub">
+        Надіслали посилання для входу на{" "}
+        <strong style={{ color: "var(--text)" }}>{email}</strong>. Воно діє 30 хвилин.
+      </p>
+      <button className="cb-auth-back" onClick={() => { setSent(false); setEmail(""); }}>
+        ← Ввести інший email
+      </button>
     </div>
   );
 
   return (
-    <div style={{ maxWidth: 360, margin: "0 auto", padding: "0 16px" }}>
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <div style={{ width: 56, height: 56, borderRadius: 14, background: "rgba(15,118,110,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-          <User size={24} style={{ color: "var(--accent)" }} />
-        </div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>Увійти / зареєструватись</h2>
-        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Введіть email — надішлемо посилання. Без пароля.</p>
+    <div className="cb-auth-wrap">
+      <div className="cb-auth-icon-wrap">
+        <User size={22} style={{ color: "var(--accent)" }} />
       </div>
-      <form onSubmit={submit} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "24px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
-        <div>
-          <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6 }}>Email <span style={{ color: "var(--accent)" }}>*</span></label>
-          <div style={{ position: "relative" }}>
-            <Mail size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-faint)" }} />
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required
-              style={{ width: "100%", borderRadius: 10, padding: "10px 12px 10px 36px", fontSize: 13, color: "var(--text)", background: "var(--surface2)", border: "1px solid var(--border)", outline: "none" }}
-              onFocus={e => e.currentTarget.style.borderColor = "var(--accent)"}
-              onBlur={e => e.currentTarget.style.borderColor = "var(--border)"}
+      <h2 className="cb-auth-title">Увійти / зареєструватись</h2>
+      <p className="cb-auth-sub">Введіть email — надішлемо посилання для входу. Без пароля.</p>
+
+      <form onSubmit={submit} className="cb-auth-form">
+        <div className="cb-field">
+          <label className="cb-label">
+            Email <span style={{ color: "var(--accent)" }}>*</span>
+          </label>
+          <div className="cb-input-wrap">
+            <Mail size={14} className="cb-input-icon" />
+            <input
+              type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com" required className="cb-input"
+              onFocus={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+              onBlur={(e)  => (e.currentTarget.style.borderColor = "var(--border)")}
             />
           </div>
         </div>
-        <button type="submit" disabled={loading} style={{ background: "var(--accent)", color: "#fff", fontWeight: 600, fontSize: 13, padding: "12px", borderRadius: 10, border: "none", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.65 : 1 }}>
-          {loading ? "Надсилаємо..." : "Отримати посилання"}
+        <button type="submit" disabled={loading} className={`cb-submit-btn ${loading ? "cb-submit-btn--loading" : ""}`}>
+          {loading ? (
+            <span className="cb-spinner" />
+          ) : (
+            <><span>Отримати посилання</span><ArrowRight size={15} /></>
+          )}
         </button>
       </form>
-      <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 14 }}>Акаунт створюється автоматично при першому вході.</p>
+      <p className="cb-auth-hint">Акаунт створюється автоматично при першому вході.</p>
     </div>
   );
 }
 
+/* ─── Main cabinet ─── */
 function CabinetContent() {
-  const [client, setClient] = useState<Client | null>(null);
+  const [client, setClient]   = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchClient = useCallback(async () => {
@@ -181,60 +285,268 @@ function CabinetContent() {
     setClient(null);
   };
 
-  if (loading) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-      <div style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid var(--accent)", borderTopColor: "transparent", animation: "spin 0.7s linear infinite" }} />
-    </div>
-  );
-
-  if (!client) return <AuthForm />;
+  if (loading) return <CabinetSkeleton />;
+  if (!client)  return <AuthForm />;
 
   return (
-    <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 16px 40px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+    <div className="cb-content">
+      {/* Header */}
+      <div className="cb-user-header">
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>
+          <h1 className="cb-user-name">
             {client.name ? `Вітаємо, ${client.name}!` : "Особистий кабінет"}
           </h1>
-          <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>{client.email}</p>
+          <p className="cb-user-email">{client.email}</p>
         </div>
-        <button onClick={logout} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>
-          <LogOut size={15} /> Вийти
+        <button onClick={logout} className="cb-logout-btn">
+          <LogOut size={14} /> Вийти
         </button>
       </div>
+
+      {/* Stats */}
       {client.bookings.length > 0 && <StatsBar bookings={client.bookings} />}
+
+      {/* Bookings */}
       {client.bookings.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-faint)" }}>
-          <Wrench size={36} style={{ margin: "0 auto 12px", opacity: 0.3 }} />
-          <p>У вас ще немає замовлень</p>
-          <a href="/services" style={{ marginTop: 12, display: "inline-block", fontSize: 13, color: "var(--accent)", textDecoration: "none" }}>Переглянути послуги →</a>
+        <div className="cb-empty">
+          <Wrench size={34} className="cb-empty-icon" />
+          <p className="cb-empty-text">У вас ще немає замовлень</p>
+          <a href="/services" className="cb-empty-link">
+            Переглянути послуги <ArrowRight size={13} style={{ display: "inline" }} />
+          </a>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <h2 style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-faint)", marginBottom: 4 }}>Історія замовлень</h2>
-          {client.bookings.map((b) => <BookingCard key={b.id} b={b} />)}
+        <div>
+          <p className="cb-section-eyebrow" style={{ marginBottom: 12 }}>Історія замовлень</p>
+          <div className="cb-cards-list">
+            {client.bookings.map((b, i) => <BookingCard key={b.id} b={b} index={i} />)}
+          </div>
         </div>
       )}
     </div>
   );
 }
 
+/* ─── Page ─── */
 export default function CabinetPage() {
   return (
-    <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-      <section style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "48px 16px", textAlign: "center" }}>
-        <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--accent)", marginBottom: 8 }}>Клієнтам</p>
-        <h1 style={{ fontSize: "clamp(1.8rem,4vw,2.8rem)", fontWeight: 800, color: "var(--text)" }}>Особистий кабінет</h1>
-      </section>
-      <section style={{ padding: "28px 0" }}>
-        <Suspense fallback={
-          <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid var(--accent)", borderTopColor: "transparent", animation: "spin 0.7s linear infinite" }} />
-          </div>
-        }>
-          <CabinetContent />
-        </Suspense>
-      </section>
-    </main>
+    <>
+      <style>{`
+        /* ── Layout ── */
+        .cb-page-hero {
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+          padding: 52px 16px 40px;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+        .cb-page-hero::before {
+          content: "";
+          position: absolute; inset: 0;
+          background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(var(--accent-rgb, 185,28,28), 0.07) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .cb-eyebrow {
+          font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+          text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+        }
+        .cb-page-title {
+          font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 800;
+          color: var(--text); line-height: 1.15;
+        }
+        .cb-page-section { padding: 32px 0 64px; }
+        .cb-content { max-width: 680px; margin: 0 auto; padding: 24px 16px 40px; }
+        .cb-skeleton-wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
+
+        /* ── User header ── */
+        .cb-user-header {
+          display: flex; justify-content: space-between; align-items: flex-start;
+          margin-bottom: 24px;
+        }
+        .cb-user-name { font-size: 18px; font-weight: 700; color: var(--text); }
+        .cb-user-email { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+        .cb-logout-btn {
+          display: flex; align-items: center; gap: 6px;
+          font-size: 13px; color: var(--text-muted); background: none; border: none;
+          cursor: pointer; padding: 6px 10px; border-radius: 8px;
+          transition: background 0.18s, color 0.18s;
+        }
+        .cb-logout-btn:hover { background: var(--surface2); color: var(--text); }
+
+        /* ── Stats ── */
+        .cb-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 28px; }
+        .cb-stat-card {
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 12px; padding: 16px 12px; text-align: center;
+          transition: box-shadow 0.22s, transform 0.22s;
+        }
+        .cb-stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .cb-stat-icon { display: flex; justify-content: center; color: var(--accent); margin-bottom: 8px; }
+        .cb-stat-value { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+        .cb-stat-label { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+
+        /* ── Skeleton cells ── */
+        .cb-sk-icon { width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 8px; }
+        .cb-sk-val  { height: 22px; width: 50%; border-radius: 6px; margin: 0 auto 6px; }
+        .cb-sk-lbl  { height: 11px; width: 60%; border-radius: 6px; margin: 0 auto; }
+
+        /* ── Card ── */
+        .cb-card {
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 14px; padding: 18px 20px;
+          transition: box-shadow 0.22s, transform 0.22s;
+        }
+        .cb-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); transform: translateY(-2px); }
+        .cb-cards-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .cb-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+        .cb-card-header-right { text-align: right; flex-shrink: 0; margin-left: 12px; }
+        .cb-card-car  { font-size: 14px; font-weight: 700; color: var(--text); }
+        .cb-card-service { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+        .cb-card-price { font-size: 17px; font-weight: 800; color: var(--accent); }
+        .cb-card-price-tbd { font-size: 12px; color: var(--text-faint); }
+        .cb-card-date { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
+
+        /* ── Cost pills ── */
+        .cb-cost-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+        .cb-cost-pill {
+          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 12px; color: var(--text-muted);
+          background: var(--surface2); border: 1px solid var(--border);
+          border-radius: 99px; padding: 3px 10px;
+        }
+
+        /* ── Work items ── */
+        .cb-work-items { margin-top: 14px; }
+        .cb-work-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+        .cb-work-check { color: var(--accent); flex-shrink: 0; }
+
+        /* ── Progress track ── */
+        .cb-progress-track { display: flex; align-items: center; gap: 4px; margin-top: 16px; flex-wrap: wrap; }
+        .cb-progress-item  { display: flex; align-items: center; gap: 4px; }
+        .cb-progress-step {
+          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 11px; font-weight: 600; padding: 4px 10px;
+          border-radius: 99px; border: 1px solid transparent;
+          transition: background 0.2s, color 0.2s;
+        }
+        .cb-progress-step--future {
+          background: var(--surface2); color: var(--text-faint);
+          border-color: var(--border);
+        }
+        .cb-progress-step--active {
+          background: rgba(var(--accent-rgb, 185,28,28), 0.12);
+          color: var(--accent); border-color: rgba(var(--accent-rgb, 185,28,28), 0.3);
+        }
+        .cb-progress-step--done {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .cb-progress-arrow { color: var(--text-faint); flex-shrink: 0; }
+        .cb-progress-arrow--done { color: var(--accent); }
+
+        /* ── Section eyebrow ── */
+        .cb-section-eyebrow {
+          font-size: 10px; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.12em; color: var(--text-faint);
+        }
+
+        /* ── Empty state ── */
+        .cb-empty { text-align: center; padding: 56px 0; color: var(--text-faint); }
+        .cb-empty-icon { margin: 0 auto 14px; opacity: 0.25; }
+        .cb-empty-text { font-size: 14px; color: var(--text-muted); margin-bottom: 14px; }
+        .cb-empty-link {
+          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 13px; font-weight: 600; color: var(--accent);
+          text-decoration: none; border-bottom: 1px solid rgba(var(--accent-rgb,185,28,28),0.3);
+          padding-bottom: 1px; transition: border-color 0.18s;
+        }
+        .cb-empty-link:hover { border-color: var(--accent); }
+
+        /* ── Auth form ── */
+        .cb-auth-wrap {
+          max-width: 360px; margin: 0 auto; padding: 0 16px;
+          display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+        .cb-auth-sent { padding-top: 24px; }
+        .cb-auth-icon-wrap {
+          width: 56px; height: 56px; border-radius: 14px;
+          background: rgba(var(--accent-rgb, 185,28,28), 0.09);
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 14px;
+        }
+        .cb-auth-title { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+        .cb-auth-sub   { font-size: 13px; color: var(--text-muted); max-width: 30ch; line-height: 1.55; }
+        .cb-auth-back  {
+          margin-top: 18px; font-size: 13px; color: var(--accent);
+          background: none; border: none; cursor: pointer;
+          text-decoration: underline; text-underline-offset: 3px;
+        }
+        .cb-auth-form  {
+          width: 100%; background: var(--surface); border: 1px solid var(--border);
+          border-radius: 14px; padding: 24px 20px;
+          display: flex; flex-direction: column; gap: 14px; margin-top: 22px;
+        }
+        .cb-auth-hint { font-size: 11px; color: var(--text-faint); margin-top: 12px; }
+
+        /* ── Field / input ── */
+        .cb-field { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+        .cb-label  { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+        .cb-input-wrap { position: relative; }
+        .cb-input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-faint); }
+        .cb-input {
+          width: 100%; border-radius: 10px; padding: 10px 12px 10px 36px;
+          font-size: 13px; color: var(--text); background: var(--surface2);
+          border: 1px solid var(--border); outline: none;
+          transition: border-color 0.18s;
+        }
+
+        /* ── Submit button ── */
+        .cb-submit-btn {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          background: var(--accent); color: #fff; font-weight: 700; font-size: 13px;
+          padding: 12px; border-radius: 10px; border: none; cursor: pointer;
+          transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .cb-submit-btn:hover:not(:disabled) {
+          opacity: 0.88; transform: translateY(-1px);
+          box-shadow: 0 4px 14px rgba(var(--accent-rgb, 185,28,28), 0.35);
+        }
+        .cb-submit-btn:active:not(:disabled) { transform: translateY(0); }
+        .cb-submit-btn--loading { opacity: 0.65; cursor: not-allowed; }
+
+        /* ── Spinner ── */
+        .cb-spinner {
+          display: inline-block; width: 16px; height: 16px; border-radius: 50%;
+          border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff;
+          animation: spin 0.65s linear infinite;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 480px) {
+          .cb-stats { grid-template-columns: repeat(3,1fr); gap: 6px; }
+          .cb-stat-value { font-size: 18px; }
+          .cb-card { padding: 14px 14px; }
+          .cb-progress-track { gap: 2px; }
+          .cb-progress-step  { font-size: 10px; padding: 3px 7px; }
+          .cb-progress-arrow { display: none; }
+        }
+      `}</style>
+
+      <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
+        {/* Hero */}
+        <section className="cb-page-hero">
+          <p className="cb-eyebrow">Клієнтам</p>
+          <h1 className="cb-page-title">Особистий кабінет</h1>
+        </section>
+
+        {/* Content */}
+        <section className="cb-page-section">
+          <Suspense fallback={<CabinetSkeleton />}>
+            <CabinetContent />
+          </Suspense>
+        </section>
+      </main>
+    </>
   );
 }
