@@ -63,9 +63,9 @@ export default function ServicesPage() {
               <Wrench size={10} aria-hidden />
               Що ми робимо
             </span>
-            <h1 className="services-hero__title">Catalog послуг</h1>
+            <h1 className="services-hero__title">Каталог послуг</h1>
             <p className="services-hero__sub">
-              Повний цикл ремонту та обслуговування вантажного транспорту, причіпної техніки та легкових автомобілів.
+              Повний цикл ремонту та обслуговування вантажного транспорту, причіпної техніки та легкових автомобілів.
             </p>
             {/* stat strip */}
             <div className="services-hero__stats">
