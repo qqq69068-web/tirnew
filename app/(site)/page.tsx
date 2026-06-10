@@ -3,38 +3,64 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { services } from "@/lib/services";
-import { Phone, ArrowRight, ChevronRight } from "lucide-react";
+import { Phone, ArrowRight, ChevronRight, ChevronDown, ClipboardList, Wrench, CheckCircle, Headphones } from "lucide-react";
 
 const categories = Array.from(new Set(services.map((s) => s.category)));
 
 const stats = [
-  { value: "20+",                label: "Років досвіду" },
-  { value: services.length + "+", label: "Видів послуг" },
-  { value: "5 000+",             label: "Виконаних ремонтів" },
-  { value: "24/7",               label: "Підтримка" },
+  { value: 20,      suffix: "+", label: "Років досвіду" },
+  { value: services.length, suffix: "+", label: "Видів послуг" },
+  { value: 5000,    suffix: "+", label: "Ремонтів" },
+  { value: 24,      suffix: "/7", label: "Підтримка" },
 ];
 
-/* Advantages — rendered as engineering-style numbered strip, NOT icon-in-circle */
 const advantages = [
   {
-    tag:   "01",
+    tag: "01",
     title: "Власний склад запчастин",
-    desc:  "Великий асортимент оригінальних і аналогових деталей — мінімальний простій техніки.",
+    desc: "Великий асортимент оригінальних і аналогових деталей — мінімальний простій техніки.",
   },
   {
-    tag:   "02",
+    tag: "02",
     title: "Швидка діагностика",
-    desc:  "AutoCom, VOCOM, WABCO — точно виявляємо несправність за лічені хвилини.",
+    desc: "AutoCom, VOCOM, WABCO — точно виявляємо несправність за лічені хвилини.",
   },
   {
-    tag:   "03",
+    tag: "03",
     title: "Оперативний ремонт",
-    desc:  "Досвідчені майстри та налагоджені процеси — мінімальний час простою.",
+    desc: "Досвідчені майстри та налагоджені процеси — мінімальний час простою.",
   },
   {
-    tag:   "04",
+    tag: "04",
     title: "Гарантія якості",
-    desc:  "Гарантуємо якість усіх виконаних робіт і встановлених запчастин.",
+    desc: "Гарантуємо якість усіх виконаних робіт і встановлених запчастин.",
+  },
+];
+
+const processSteps = [
+  {
+    num: "01",
+    icon: Headphones,
+    title: "Звернення",
+    desc: "Зателефонуйте або залиште заявку онлайн. Майстер передзвонить і запише на зручний час.",
+  },
+  {
+    num: "02",
+    icon: ClipboardList,
+    title: "Діагностика",
+    desc: "Професійне обладнання AutoCom / VOCOM. Подаємо чіткий перелік робіт і вартість.",
+  },
+  {
+    num: "03",
+    icon: Wrench,
+    title: "Ремонт",
+    desc: "Виконуємо роботи з власного складу запчастин. Мінімальний час простою.",
+  },
+  {
+    num: "04",
+    icon: CheckCircle,
+    title: "Гарантія",
+    desc: "Видаємо авто з гарантією на виконані роботи і запчастини. Післяпродажний супровід.",
   },
 ];
 
@@ -47,12 +73,52 @@ function useReveal() {
     if (!el) return;
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("visible")),
-      { threshold: 0.10 }
+      { threshold: 0.08 }
     );
     el.querySelectorAll(".reveal").forEach((n) => obs.observe(n));
     return () => obs.disconnect();
   }, []);
   return ref;
+}
+
+/* Animated counter hook */
+function useCounter(target: number, duration = 1200) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        obs.disconnect();
+        const start = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - p, 3); /* easeOutCubic */
+          el.textContent = String(Math.round(ease * target));
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = String(target);
+        };
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [target, duration]);
+  return ref;
+}
+
+function StatItem({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const numRef = useCounter(value, 1400);
+  return (
+    <div className="hp-stats__inner">
+      <span className="hp-stats__value">
+        <span ref={numRef}>{value}</span>{suffix}
+      </span>
+      <span className="hp-stats__label">{label}</span>
+    </div>
+  );
 }
 
 export default function HomePage() {
@@ -61,7 +127,7 @@ export default function HomePage() {
   return (
     <main ref={ref} className="hp-root">
 
-      {/* ═══ HERO ══════════════════════════════════════════════════ */}
+      {/* ╔═══ HERO ══════════════════════════════════════════════╗ */}
       <section className="hp-hero">
         <div className="hp-hero__bg">
           <img
@@ -97,30 +163,34 @@ export default function HomePage() {
 
           <div className="fade-in hp-hero__ctas anim-d3">
             <Link href="/contacts" className="btn btn-primary btn-lg">
-              Зв&apos;язатись з нами <ChevronRight size={16} aria-hidden />
+              Зв&apos;язатись <ChevronRight size={16} aria-hidden />
             </Link>
             <Link href="/services" className="btn btn-outline btn-lg">
-              Переглянути послуги
+              Послуги
             </Link>
           </div>
 
+          {/* Animated stats */}
           <div className="fade-in hp-stats anim-d4">
             {stats.map((s, i) => (
               <div key={s.label} className="hp-stats__item">
                 {i > 0 && <div className="hp-stats__divider" aria-hidden />}
-                <div className="hp-stats__inner">
-                  <span className="hp-stats__value">{s.value}</span>
-                  <span className="hp-stats__label">{s.label}</span>
-                </div>
+                <StatItem value={s.value} suffix={s.suffix} label={s.label} />
               </div>
             ))}
           </div>
         </div>
 
+        {/* Scroll indicator */}
+        <div className="hp-hero__scroll" aria-hidden>
+          <span className="hp-hero__scroll-label">Горнути вниз</span>
+          <ChevronDown size={14} className="hp-hero__scroll-icon" />
+        </div>
+
         <div className="hp-hero__bottom-fade" aria-hidden />
       </section>
 
-      {/* ═══ ADVANTAGES STRIP ══════════════════════════════════════ */}
+      {/* ╔═══ ADVANTAGES ═══════════════════════════════════════╗ */}
       <section className="section-sm">
         <div className="container">
           <div className="reveal hp-adv">
@@ -137,7 +207,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ SERVICES PREVIEW ══════════════════════════════════════ */}
+      {/* ╔═══ SERVICES PREVIEW ═══════════════════════════════╗ */}
       <section className="section">
         <div className="container">
           <div className="reveal hp-section-head">
@@ -158,6 +228,19 @@ export default function HomePage() {
                 href={`/services/${s.slug}`}
                 className={`hp-svc-card reveal d-${i + 1}`}
               >
+                {/* Card image */}
+                {s.image && (
+                  <div className="hp-svc-card__img">
+                    <img
+                      src={s.image}
+                      alt={s.title}
+                      width={480}
+                      height={180}
+                      loading="lazy"
+                    />
+                    <div className="hp-svc-card__img-overlay" aria-hidden />
+                  </div>
+                )}
                 <div className="hp-svc-card__line" aria-hidden />
                 <div className="hp-svc-card__body">
                   <p className="hp-svc-card__title">{s.title}</p>
@@ -175,7 +258,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ CATEGORIES ════════════════════════════════════════════ */}
+      {/* ╔═══ PROCESS ═════════════════════════════════════════╗ */}
+      <section className="section hp-process-section">
+        <div className="container">
+          <div className="reveal hp-section-head">
+            <div>
+              <p className="section-eyebrow">Як це працює</p>
+              <h2 className="hp-section-title">Процес роботи</h2>
+            </div>
+          </div>
+
+          <div className="hp-process">
+            {processSteps.map((step, i) => (
+              <div key={step.num} className={`hp-process__step reveal d-${i + 1}`}>
+                {/* Connector line */}
+                {i < processSteps.length - 1 && (
+                  <div className="hp-process__connector" aria-hidden />
+                )}
+                <div className="hp-process__num">{step.num}</div>
+                <div className="hp-process__icon" aria-hidden>
+                  <step.icon size={18} strokeWidth={1.75} />
+                </div>
+                <h3 className="hp-process__title">{step.title}</h3>
+                <p className="hp-process__desc">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ╔═══ CATEGORIES ═══════════════════════════════════════╗ */}
       <section className="section-sm">
         <div className="container">
           <div className="reveal hp-cats">
@@ -191,7 +303,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ CTA BANNER ════════════════════════════════════════════ */}
+      {/* ╔═══ CTA BANNER ════════════════════════════════════════╗ */}
       <section className="section">
         <div className="container">
           <div className="reveal hp-cta">
@@ -215,14 +327,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ PAGE STYLES ═══════════════════════════════════════════ */}
+      {/* ╔═══ PAGE STYLES ════════════════════════════════════════╗ */}
       <style>{`
         .hp-root {
           background: var(--bg);
           color: var(--text);
         }
 
-        /* ── HERO ──────────────────────────────────────────────── */
+        /* ── HERO ───────────────────────────────────────── */
         .hp-hero {
           position: relative;
           overflow: hidden;
@@ -230,29 +342,22 @@ export default function HomePage() {
           display: flex;
           flex-direction: column;
         }
-        .hp-hero__bg {
-          position: absolute;
-          inset: 0;
-        }
+        .hp-hero__bg { position: absolute; inset: 0; }
         .hp-hero__img {
-          width: 100%;
-          height: 100%;
+          width: 100%; height: 100%;
           object-fit: cover;
           filter: brightness(0.42) saturate(0.55);
         }
         .hp-hero__overlay {
-          position: absolute;
-          inset: 0;
+          position: absolute; inset: 0;
           background: var(--hero-overlay);
         }
         .hp-hero__radial {
-          position: absolute;
-          inset: 0;
+          position: absolute; inset: 0;
           background: radial-gradient(ellipse 55% 55% at 8% 65%, rgba(185,28,28,0.18) 0%, transparent 68%);
         }
         .hp-hero__grid {
-          position: absolute;
-          inset: 0;
+          position: absolute; inset: 0;
           background-image:
             linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
@@ -305,6 +410,34 @@ export default function HomePage() {
           gap: var(--space-3);
         }
 
+        /* Scroll indicator */
+        .hp-hero__scroll {
+          position: absolute;
+          bottom: var(--space-8);
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-1);
+          animation: scrollBounce 2.4s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .hp-hero__scroll-label {
+          font-size: 9px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.35);
+        }
+        .hp-hero__scroll-icon {
+          color: rgba(255,255,255,0.35);
+        }
+        @keyframes scrollBounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+          50%       { transform: translateX(-50%) translateY(6px); opacity: 1; }
+        }
+
         /* Stats */
         .hp-stats {
           margin-top: clamp(var(--space-10), 5vw, var(--space-16));
@@ -346,7 +479,7 @@ export default function HomePage() {
           letter-spacing: 0.04em;
         }
 
-        /* ── ADVANTAGES ────────────────────────────────────────── */
+        /* ── ADVANTAGES ─────────────────────────────────── */
         .hp-adv {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -390,8 +523,8 @@ export default function HomePage() {
           font-size: var(--text-base);
           font-weight: 700;
           color: var(--text);
-          max-width: none;
           line-height: 1.3;
+          max-width: none;
         }
         .hp-adv__desc {
           font-size: var(--text-sm);
@@ -400,7 +533,7 @@ export default function HomePage() {
           max-width: 30ch;
         }
 
-        /* ── SERVICES ──────────────────────────────────────────── */
+        /* ── SERVICES ────────────────────────────────────── */
         .hp-section-head {
           display: flex;
           align-items: flex-end;
@@ -435,6 +568,7 @@ export default function HomePage() {
           transition: gap var(--transition-base), color var(--transition-fast);
         }
         .hp-all-link:hover { gap: var(--space-3); }
+
         .hp-services {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -460,6 +594,25 @@ export default function HomePage() {
           box-shadow: var(--shadow-card-hover);
           border-color: var(--border-accent);
         }
+        /* Image */
+        .hp-svc-card__img {
+          position: relative;
+          height: 160px;
+          overflow: hidden;
+        }
+        .hp-svc-card__img img {
+          width: 100%; height: 100%;
+          object-fit: cover;
+          transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+        }
+        .hp-svc-card:hover .hp-svc-card__img img {
+          transform: scale(1.06);
+        }
+        .hp-svc-card__img-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, var(--surface) 0%, transparent 55%);
+        }
         .hp-svc-card__line {
           height: 2px;
           background: var(--primary);
@@ -470,7 +623,7 @@ export default function HomePage() {
         .hp-svc-card:hover .hp-svc-card__line { transform: scaleX(1); }
         .hp-svc-card__body {
           flex: 1;
-          padding: var(--space-5) var(--space-5) 0;
+          padding: var(--space-4) var(--space-5) 0;
         }
         .hp-svc-card__title {
           font-family: var(--font-display);
@@ -478,8 +631,8 @@ export default function HomePage() {
           font-weight: 700;
           color: var(--text);
           margin-bottom: var(--space-2);
-          max-width: none;
           line-height: 1.3;
+          max-width: none;
         }
         .hp-svc-card__desc {
           font-size: var(--text-sm);
@@ -513,7 +666,81 @@ export default function HomePage() {
           color: var(--primary);
         }
 
-        /* ── CATEGORIES ────────────────────────────────────────── */
+        /* ── PROCESS ──────────────────────────────────────── */
+        .hp-process-section {
+          background: var(--surface);
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+        }
+        .hp-process {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1px;
+          background: var(--border);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          overflow: hidden;
+          margin-top: var(--space-6);
+        }
+        .hp-process__step {
+          position: relative;
+          background: var(--surface);
+          padding: var(--space-6) var(--space-5);
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-3);
+          transition: background var(--transition-fast);
+        }
+        .hp-process__step:hover { background: var(--surface2); }
+        /* Horizontal connector */
+        .hp-process__connector {
+          position: absolute;
+          top: calc(var(--space-6) + 18px);
+          right: -1px;
+          width: 1px;
+          height: 36px;
+          background: var(--border);
+          z-index: 1;
+          display: none; /* hidden — gap lines handle separation */
+        }
+        .hp-process__num {
+          font-family: var(--font-display);
+          font-size: var(--text-xs);
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          color: var(--primary);
+        }
+        .hp-process__icon {
+          width: 40px;
+          height: 40px;
+          border-radius: var(--radius);
+          background: var(--primary-subtle);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--primary);
+          flex-shrink: 0;
+          transition: background var(--transition-fast), transform var(--transition-spring);
+        }
+        .hp-process__step:hover .hp-process__icon {
+          background: rgba(185,28,28,0.10);
+          transform: scale(1.06);
+        }
+        .hp-process__title {
+          font-family: var(--font-display);
+          font-size: var(--text-base);
+          font-weight: 700;
+          color: var(--text);
+          line-height: 1.2;
+        }
+        .hp-process__desc {
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          line-height: 1.6;
+          max-width: 28ch;
+        }
+
+        /* ── CATEGORIES ──────────────────────────────────── */
         .hp-cats {
           background: var(--surface2);
           border: 1px solid var(--border);
@@ -557,7 +784,7 @@ export default function HomePage() {
           transform: translateY(-2px);
         }
 
-        /* ── CTA BANNER ────────────────────────────────────────── */
+        /* ── CTA BANNER ───────────────────────────────────── */
         .hp-cta {
           position: relative;
           background: var(--surface);
@@ -579,12 +806,7 @@ export default function HomePage() {
           background: radial-gradient(circle, rgba(185,28,28,0.10) 0%, transparent 70%);
           pointer-events: none;
         }
-        .hp-cta__content {
-          position: relative;
-          z-index: 1;
-          flex: 1;
-          min-width: 220px;
-        }
+        .hp-cta__content { position: relative; z-index: 1; flex: 1; min-width: 220px; }
         .hp-cta__title {
           font-family: var(--font-display);
           font-size: var(--text-xl);
@@ -601,24 +823,40 @@ export default function HomePage() {
           line-height: 1.6;
         }
         .hp-cta__actions {
-          position: relative;
-          z-index: 1;
+          position: relative; z-index: 1;
           display: flex;
           gap: var(--space-3);
           flex-wrap: wrap;
           flex-shrink: 0;
         }
 
-        /* ── RESPONSIVE ────────────────────────────────────────── */
+        /* ── RESPONSIVE ───────────────────────────────────── */
+        @media (max-width: 900px) {
+          .hp-process {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
         @media (max-width: 640px) {
           .hp-hero__ctas { flex-direction: column; }
           .hp-hero__ctas .btn { width: 100%; justify-content: center; }
+          .hp-hero__scroll { display: none; }
           .hp-stats { gap: var(--space-4); }
           .hp-stats__value { font-size: var(--text-xl); }
           .hp-section-head { flex-direction: column; align-items: flex-start; }
           .hp-cta { flex-direction: column; }
           .hp-cta__actions { width: 100%; }
           .hp-cta__actions .btn { flex: 1; justify-content: center; }
+          .hp-process { grid-template-columns: 1fr; }
+          .hp-svc-card__img { height: 120px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hp-hero__scroll { animation: none; }
+          .hp-svc-card:hover { transform: none; }
+          .hp-svc-card__img img { transition: none; }
+          .hp-process__icon { transition: none; }
+          .hp-cat-tag:hover { transform: none; }
+          .hp-adv__item:hover::after { transform: scaleX(1); }
         }
       `}</style>
     </main>
