@@ -57,7 +57,9 @@ export default function ServicesPage() {
             style={{ backgroundImage: "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80)" }}
             aria-hidden
           />
+          {/* z-index: 1 — overlay sits above bg but below content */}
           <div className="services-hero__overlay" aria-hidden />
+          {/* z-index: 2 — content always on top */}
           <div className="container services-hero__content fade-in">
             <span className="section-eyebrow">
               <Wrench size={10} aria-hidden />
@@ -203,15 +205,20 @@ export default function ServicesPage() {
           background-size: cover;
           background-position: center 40%;
           opacity: 0.09;
+          z-index: 0;
           transition: opacity var(--transition-base);
         }
+        /* FIX: overlay z-index:1 — sits above bg, below content */
         .services-hero__overlay {
           position: absolute;
           inset: 0;
           background: var(--hero-overlay);
+          z-index: 1;
         }
+        /* FIX: content z-index:2 — always above overlay */
         .services-hero__content {
           position: relative;
+          z-index: 2;
           text-align: center;
         }
         .services-hero__title {
@@ -367,6 +374,7 @@ export default function ServicesPage() {
           border-radius: var(--radius);
           padding: var(--space-3) var(--space-4);
           text-decoration: none;
+          color: var(--text);
           transition:
             background var(--transition-fast),
             border-color var(--transition-fast),
