@@ -91,38 +91,35 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* ── KPI Stats ── */}
-      <div className="admin-stats-grid">
+      <div className="dash-stats-grid">
         {stats.map((s, i) => (
           <Link
             key={s.label}
             href={s.href}
-            className="card-stat"
+            className="dash-stat-card"
             style={{ animationDelay: `${i * 0.07}s` }}
           >
-            <div className="card-stat__header">
-              <span className="card-stat__icon text-faint">{s.icon}</span>
+            <div className="dash-stat-card__header">
+              <span className="dash-stat-card__icon">{s.icon}</span>
               {s.badge !== null && s.badge > 0 && (
-                <span className="status status-new card-stat__badge">
+                <span className="status status-new dash-stat-card__badge">
                   +{s.badge} {s.badgeLabel}
                 </span>
               )}
             </div>
-            <p
-              className="stat-number"
-              data-counter={s.value}
-            >
+            <p className="dash-stat-card__value" data-counter={s.value}>
               {s.value}
             </p>
-            <p className="stat-label">{s.label}</p>
+            <p className="dash-stat-card__label">{s.label}</p>
           </Link>
         ))}
       </div>
 
       {/* ── Recent Bookings ── */}
       <div>
-        <div className="admin-section-header">
-          <h2 className="admin-section-title">Останні замовлення</h2>
-          <Link href="/admin/bookings" className="btn btn-ghost btn-sm text-muted">
+        <div className="dash-section-header">
+          <h2 className="dash-section-title">Останні замовлення</h2>
+          <Link href="/admin/bookings" className="btn btn-ghost btn-sm">
             Всі
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polyline points="9 18 15 12 9 6"/>
@@ -150,7 +147,7 @@ export default async function AdminDashboardPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  {["Ім’я", "Телефон", "Послуга", "Статус", "Дата"].map((h) => (
+                  {["Ім'я", "Телефон", "Послуга", "Статус", "Дата"].map((h) => (
                     <th key={h}>{h}</th>
                   ))}
                 </tr>
@@ -178,57 +175,101 @@ export default async function AdminDashboardPage() {
         )}
       </div>
 
-      {/* ── Animated counters + scoped styles ── */}
       <style>{`
-        .card-stat__header {
+        /* ── Stats grid ── */
+        .dash-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: var(--space-4);
+          margin-bottom: var(--space-6);
+        }
+        @media (max-width: 640px) {
+          .dash-stats-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Stat card ── */
+        .dash-stat-card {
+          display: block;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: var(--space-5);
+          text-decoration: none;
+          transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-spring);
+          animation: fadeIn 0.4s ease both;
+        }
+        .dash-stat-card:hover {
+          border-color: var(--border-accent);
+          box-shadow: var(--shadow-md);
+          transform: translateY(-2px);
+        }
+        .dash-stat-card__header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           margin-bottom: var(--space-4);
         }
-        .card-stat__icon {
+        .dash-stat-card__icon {
           display: flex;
           align-items: center;
           color: var(--text-faint);
           transition: color var(--transition-base);
         }
-        .card-stat:hover .card-stat__icon {
+        .dash-stat-card:hover .dash-stat-card__icon {
           color: var(--primary);
         }
-        .card-stat__badge {
+        .dash-stat-card__badge {
           font-size: 10px !important;
         }
-        .card-stat .stat-number {
+        .dash-stat-card__value {
+          font-family: var(--font-display);
+          font-size: clamp(2rem, 5vw, 2.75rem);
+          font-weight: 800;
+          color: var(--text);
+          line-height: 1;
+          letter-spacing: -0.03em;
+          margin-bottom: var(--space-1);
           transition: color var(--transition-base);
         }
-        .card-stat:hover .stat-number {
+        .dash-stat-card:hover .dash-stat-card__value {
           color: var(--primary);
         }
-        .admin-section-header {
+        .dash-stat-card__label {
+          font-size: var(--text-xs);
+          font-weight: 600;
+          color: var(--text-faint);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        /* ── Section header ── */
+        .dash-section-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           margin-bottom: var(--space-4);
         }
-        .admin-section-title {
+        .dash-section-title {
           font-family: var(--font-display);
           font-size: var(--text-lg);
           font-weight: 700;
           color: var(--text);
         }
-        .cell-name {
-          font-weight: 600;
-          color: var(--text);
-        }
-        .cell-service {
-          max-width: 180px;
-        }
-        /* Animated counter keyframes */
+
+        /* ── Table cells ── */
+        .cell-name   { font-weight: 600; color: var(--text); }
+        .cell-muted  { color: var(--text-muted); }
+        .cell-faint  { color: var(--text-faint); }
+        .cell-service { max-width: 180px; }
+        .tabular  { font-variant-numeric: tabular-nums; }
+        .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* ── Counter animation ── */
         @keyframes countUp {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .stat-number[data-counter] {
+        .dash-stat-card__value[data-counter] {
           animation: countUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
         }
       `}</style>
@@ -240,12 +281,11 @@ export default async function AdminDashboardPage() {
             if (isNaN(target) || target === 0) return;
             var duration = 700;
             var start = null;
-            var startVal = 0;
             function ease(t) { return 1 - Math.pow(1 - t, 3); }
             function step(ts) {
               if (!start) start = ts;
               var progress = Math.min((ts - start) / duration, 1);
-              el.textContent = Math.round(startVal + ease(progress) * (target - startVal));
+              el.textContent = Math.round(ease(progress) * target);
               if (progress < 1) requestAnimationFrame(step);
               else el.textContent = target;
             }
@@ -254,10 +294,7 @@ export default async function AdminDashboardPage() {
           document.querySelectorAll('[data-counter]').forEach(function(el) {
             var obs = new IntersectionObserver(function(entries) {
               entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                  animateCounter(el);
-                  obs.unobserve(el);
-                }
+                if (entry.isIntersecting) { animateCounter(el); obs.unobserve(el); }
               });
             }, { threshold: 0.3 });
             obs.observe(el);

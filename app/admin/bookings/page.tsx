@@ -110,7 +110,7 @@ export default function AdminBookingsPage() {
             <h1 className="admin-page-title">Замовлення</h1>
           </div>
         </div>
-        <div className="bk-skeleton-list">
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           {[1,2,3,4].map(i => (
             <div key={i} className="skeleton" style={{ height: 68, borderRadius: "var(--radius-lg)" }} />
           ))}
@@ -122,7 +122,6 @@ export default function AdminBookingsPage() {
   return (
     <div className="admin-page fade-in">
 
-      {/* ── Header ── */}
       <div className="admin-page-header">
         <div>
           <p className="section-eyebrow">Керування</p>
@@ -131,7 +130,6 @@ export default function AdminBookingsPage() {
         </div>
       </div>
 
-      {/* ── Empty state ── */}
       {bookings.length === 0 && (
         <div className="card-flat">
           <div className="empty-state">
@@ -149,7 +147,6 @@ export default function AdminBookingsPage() {
         </div>
       )}
 
-      {/* ── Bookings accordion list ── */}
       <div className="bk-list">
         {bookings.map((b) => {
           const edit = edits[b.id] || {};
@@ -167,7 +164,6 @@ export default function AdminBookingsPage() {
           return (
             <div key={b.id} className={`bk-card${isOpen ? " bk-card--open" : ""}`}>
 
-              {/* ── Summary row ── */}
               <button
                 onClick={() => setExpanded(isOpen ? null : b.id)}
                 className="bk-card__summary"
@@ -183,7 +179,6 @@ export default function AdminBookingsPage() {
                     <p className="bk-card__service">{getServiceLabel(b.service)}</p>
                   </div>
                 </div>
-
                 <div className="bk-card__meta">
                   {b.scheduledAt && (
                     <span className="bk-card__scheduled">
@@ -204,25 +199,22 @@ export default function AdminBookingsPage() {
                 </div>
               </button>
 
-              {/* ── Expanded edit panel ── */}
               {isOpen && (
                 <div className="bk-card__body">
 
-                  {/* Message from client */}
                   {b.message && (
                     <div className="bk-message">
                       <p>{b.message}</p>
                     </div>
                   )}
 
-                  {/* Fields grid */}
                   <div className="bk-fields">
                     <div className="form-group">
                       <label className="form-label">Статус прогресу</label>
                       <select
                         value={currentProgress}
                         onChange={(e) => setEdit(b.id, "progress", e.target.value)}
-                        className="input bk-input"
+                        className="bk-field-input"
                       >
                         {PROGRESS_OPTIONS.map((p) => (
                           <option key={p.value} value={p.value}>{p.label}</option>
@@ -239,7 +231,7 @@ export default function AdminBookingsPage() {
                         type="datetime-local"
                         value={scheduledValue}
                         onChange={(e) => setEdit(b.id, "scheduledAt", e.target.value)}
-                        className="input bk-input"
+                        className="bk-field-input"
                       />
                     </div>
 
@@ -250,7 +242,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.price || ""}
                         onChange={(e) => setEdit(b.id, "price", e.target.value)}
                         placeholder="0"
-                        className="input bk-input"
+                        className="bk-field-input"
                       />
                     </div>
 
@@ -264,7 +256,7 @@ export default function AdminBookingsPage() {
                         defaultValue={b.partsCost || ""}
                         onChange={(e) => setEdit(b.id, "partsCost", e.target.value)}
                         placeholder="0"
-                        className="input bk-input"
+                        className="bk-field-input"
                       />
                     </div>
 
@@ -278,12 +270,11 @@ export default function AdminBookingsPage() {
                         defaultValue={b.clientEmail || ""}
                         onChange={(e) => setEdit(b.id, "clientEmail", e.target.value)}
                         placeholder="client@email.com"
-                        className="input bk-input"
+                        className="bk-field-input"
                       />
                     </div>
                   </div>
 
-                  {/* Work items */}
                   <div className="form-group">
                     <label className="form-label">
                       <Wrench size={12} aria-hidden="true" style={{ display:"inline", marginRight:4, verticalAlign:"middle" }} />
@@ -314,7 +305,7 @@ export default function AdminBookingsPage() {
                         onChange={(e) => setNewWorkItem((prev) => ({ ...prev, [b.id]: e.target.value }))}
                         onKeyDown={(e) => e.key === "Enter" && addWorkItem(b.id)}
                         placeholder="Наприклад: Заміна масла..."
-                        className="input bk-input"
+                        className="bk-field-input"
                       />
                       <button
                         onClick={() => addWorkItem(b.id)}
@@ -327,7 +318,6 @@ export default function AdminBookingsPage() {
                     </div>
                   </div>
 
-                  {/* Total cost */}
                   {totalCost > 0 && (
                     <div className="bk-total">
                       <span className="bk-total__label">Загальна сума</span>
@@ -335,7 +325,6 @@ export default function AdminBookingsPage() {
                     </div>
                   )}
 
-                  {/* Actions */}
                   <div className="bk-actions">
                     <button
                       onClick={() => save(b.id)}
@@ -373,23 +362,10 @@ export default function AdminBookingsPage() {
         })}
       </div>
 
-      {/* ── Scoped styles ── */}
       <style>{`
-        /* Skeleton loading */
-        .bk-skeleton-list {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-3);
-        }
+        .bk-list { display:flex; flex-direction:column; gap:var(--space-3); }
 
-        /* Booking list */
-        .bk-list {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-3);
-        }
-
-        /* Booking card */
+        /* Card */
         .bk-card {
           background: var(--surface);
           border: 1px solid var(--border);
@@ -397,106 +373,30 @@ export default function AdminBookingsPage() {
           overflow: hidden;
           transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
-        .bk-card--open {
-          border-color: var(--border-accent);
-          box-shadow: var(--shadow-sm);
-        }
-        .bk-card:hover:not(.bk-card--open) {
-          border-color: var(--border-strong);
-        }
+        .bk-card--open { border-color: var(--border-accent); box-shadow: var(--shadow-sm); }
+        .bk-card:hover:not(.bk-card--open) { border-color: var(--border-strong); }
 
-        /* Summary row (collapsed header) */
+        /* Summary row */
         .bk-card__summary {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: var(--space-4);
-          padding: var(--space-4) var(--space-5);
-          background: none;
-          border: none;
-          cursor: pointer;
-          text-align: left;
-          transition: background var(--transition-fast);
+          width:100%; display:flex; align-items:center; justify-content:space-between;
+          gap:var(--space-4); padding:var(--space-4) var(--space-5);
+          background:none; border:none; cursor:pointer; text-align:left;
+          transition:background var(--transition-fast);
         }
-        .bk-card__summary:hover {
-          background: var(--surface2);
-        }
-
-        .bk-card__info {
-          display: flex;
-          align-items: center;
-          gap: var(--space-5);
-          min-width: 0;
-          flex: 1;
-        }
-        .bk-card__client {
-          flex-shrink: 0;
-        }
-        .bk-card__name {
-          font-size: var(--text-sm);
-          font-weight: 600;
-          color: var(--text);
-          line-height: 1.3;
-        }
-        .bk-card__phone {
-          font-size: var(--text-xs);
-          color: var(--text-muted);
-          font-variant-numeric: tabular-nums;
-          margin-top: 2px;
-        }
-        .bk-card__car {
-          display: none;
-          min-width: 0;
-        }
-        @media (min-width: 640px) {
-          .bk-card__car { display: block; }
-        }
-        .bk-card__car-model {
-          font-size: var(--text-sm);
-          color: var(--text-muted);
-          line-height: 1.3;
-        }
-        .bk-card__service {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          margin-top: 2px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 200px;
-        }
-
-        .bk-card__meta {
-          display: flex;
-          align-items: center;
-          gap: var(--space-3);
-          flex-shrink: 0;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-        }
-        .bk-card__scheduled {
-          display: none;
-          align-items: center;
-          gap: 4px;
-          font-size: var(--text-xs);
-          color: var(--text-muted);
-          font-variant-numeric: tabular-nums;
-        }
-        @media (min-width: 640px) {
-          .bk-card__scheduled { display: flex; }
-        }
-        .bk-card__price {
-          font-size: var(--text-sm);
-          font-weight: 700;
-          color: var(--accent);
-          font-variant-numeric: tabular-nums;
-        }
-        .bk-card__chevron {
-          color: var(--text-faint);
-          transition: transform var(--transition-fast);
-          flex-shrink: 0;
-        }
+        .bk-card__summary:hover { background:var(--surface2); }
+        .bk-card__info { display:flex; align-items:center; gap:var(--space-5); min-width:0; flex:1; }
+        .bk-card__client { flex-shrink:0; }
+        .bk-card__name { font-size:var(--text-sm); font-weight:600; color:var(--text); line-height:1.3; }
+        .bk-card__phone { font-size:var(--text-xs); color:var(--text-muted); margin-top:2px; }
+        .bk-card__car { display:none; min-width:0; }
+        @media (min-width:640px) { .bk-card__car { display:block; } }
+        .bk-card__car-model { font-size:var(--text-sm); color:var(--text-muted); line-height:1.3; }
+        .bk-card__service { font-size:var(--text-xs); color:var(--text-faint); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px; }
+        .bk-card__meta { display:flex; align-items:center; gap:var(--space-3); flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; }
+        .bk-card__scheduled { display:none; align-items:center; gap:4px; font-size:var(--text-xs); color:var(--text-muted); }
+        @media (min-width:640px) { .bk-card__scheduled { display:flex; } }
+        .bk-card__price { font-size:var(--text-sm); font-weight:700; color:var(--accent); }
+        .bk-card__chevron { color:var(--text-faint); transition:transform var(--transition-fast); flex-shrink:0; }
 
         /* Expanded body */
         .bk-card__body {
@@ -506,185 +406,96 @@ export default function AdminBookingsPage() {
           flex-direction: column;
           gap: var(--space-5);
           animation: fadeIn 0.18s ease both;
-          background: var(--surface2);
         }
 
-        /* Client message */
-        .bk-message {
-          background: var(--surface2);
-          border: 1px solid var(--border);
-          border-radius: var(--radius);
-          padding: var(--space-3) var(--space-4);
-        }
-        .bk-message p {
+        /* ── Custom field input — повністю замінює .input для цієї сторінки ── */
+        .bk-field-input {
+          display: block;
+          width: 100%;
+          padding: 0 var(--space-3);
+          height: 40px;
+          font-family: var(--font-body);
           font-size: var(--text-sm);
-          color: var(--text-muted);
-          line-height: 1.6;
-          max-width: none;
-        }
-
-        /* Fields grid */
-        .bk-fields {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: var(--space-4);
-        }
-        @media (min-width: 540px) {
-          .bk-fields { grid-template-columns: 1fr 1fr; }
-        }
-        .bk-fields__full {
-          grid-column: 1 / -1;
-        }
-
-        /* ── Force correct colors on all inputs inside expanded panel ── */
-        .bk-input,
-        .bk-card__body .input {
-          background: var(--surface) !important;
-          color: var(--text) !important;
-          border-color: var(--border-strong) !important;
-        }
-        .bk-input:focus,
-        .bk-card__body .input:focus {
-          border-color: var(--primary) !important;
-          box-shadow: 0 0 0 3px var(--primary-glow) !important;
+          font-weight: 400;
+          line-height: 1;
+          border-radius: var(--radius);
+          border: 1.5px solid rgba(255,255,255,0.14);
+          background: rgba(255,255,255,0.06);
+          color: #edeae6;
           outline: none;
+          transition: border-color 150ms ease, box-shadow 150ms ease;
+          -webkit-appearance: none;
+          appearance: none;
         }
-        .bk-input::placeholder,
-        .bk-card__body .input::placeholder {
-          color: var(--text-faint) !important;
+        .bk-field-input::placeholder { color: rgba(237,234,230,0.35); }
+        .bk-field-input:focus {
+          border-color: rgba(239,68,68,0.6);
+          box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
         }
-        /* Fix native select dropdown option colors */
-        .bk-input option,
-        .bk-card__body .input option {
-          background: var(--surface);
-          color: var(--text);
+        /* select arrow */
+        select.bk-field-input {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          padding-right: 36px;
+          cursor: pointer;
         }
-        /* Fix datetime-local calendar icon color in dark mode */
-        .bk-input::-webkit-calendar-picker-indicator {
-          filter: var(--calendar-icon-filter, none);
+        select.bk-field-input option {
+          background: #1c1b19;
+          color: #edeae6;
+        }
+        /* datetime calendar icon */
+        input[type="datetime-local"].bk-field-input::-webkit-calendar-picker-indicator {
+          filter: invert(0.7);
           opacity: 0.6;
           cursor: pointer;
         }
-        [data-theme="dark"] .bk-input::-webkit-calendar-picker-indicator {
-          filter: invert(1);
-          opacity: 0.5;
-        }
-        /* form-label inside body */
+        /* number spinner hide */
+        input[type="number"].bk-field-input::-webkit-inner-spin-button,
+        input[type="number"].bk-field-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+        /* Labels */
         .bk-card__body .form-label {
-          color: var(--text-muted);
-        }
-
-        /* Work items list */
-        .bk-worklist {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-1);
-          margin-bottom: var(--space-2);
-          min-height: 24px;
-        }
-        .bk-worklist__empty {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          font-style: italic;
-          padding: var(--space-2) 0;
-        }
-        .bk-worklist__item {
-          display: flex;
-          align-items: center;
-          gap: var(--space-2);
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius);
-          padding: var(--space-2) var(--space-3);
-          animation: fadeIn 0.2s ease both;
-        }
-        .bk-worklist__num {
-          font-size: var(--text-xs);
-          font-weight: 700;
-          color: var(--accent);
-          flex-shrink: 0;
-          width: 18px;
-          font-variant-numeric: tabular-nums;
-        }
-        .bk-worklist__text {
-          font-size: var(--text-sm);
-          color: var(--text);
-          flex: 1;
-        }
-        .bk-worklist__remove {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 22px;
-          height: 22px;
-          border-radius: var(--radius);
-          color: var(--text-faint);
-          transition: color var(--transition-fast), background var(--transition-fast);
-          flex-shrink: 0;
-        }
-        .bk-worklist__remove:hover {
-          color: var(--primary);
-          background: var(--primary-subtle);
-        }
-
-        /* Add work row */
-        .bk-addwork {
-          display: flex;
-          gap: var(--space-2);
-          align-items: center;
-        }
-        .bk-addwork .input {
-          flex: 1;
-        }
-
-        /* Total cost row */
-        .bk-total {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: var(--accent-subtle);
-          border: 1px solid var(--accent-border);
-          border-radius: var(--radius);
-          padding: var(--space-3) var(--space-4);
-        }
-        .bk-total__label {
+          display: block;
           font-size: var(--text-xs);
           font-weight: 600;
-          color: var(--accent);
+          color: var(--text-muted);
           letter-spacing: 0.04em;
           text-transform: uppercase;
-        }
-        .bk-total__value {
-          font-size: var(--text-sm);
-          font-weight: 700;
-          color: var(--accent);
-          font-variant-numeric: tabular-nums;
+          margin-bottom: var(--space-2);
         }
 
-        /* Actions row */
-        .bk-actions {
-          display: flex;
-          align-items: center;
-          gap: var(--space-3);
-          flex-wrap: wrap;
-        }
-        .bk-actions__date {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          margin-left: auto;
-          font-variant-numeric: tabular-nums;
-        }
+        /* Fields grid */
+        .bk-fields { display:grid; grid-template-columns:1fr; gap:var(--space-4); }
+        @media (min-width:540px) { .bk-fields { grid-template-columns:1fr 1fr; } }
+        .bk-fields__full { grid-column:1 / -1; }
 
-        /* Saved confirmation */
-        .bk-saved-msg {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          font-size: var(--text-xs);
-          font-weight: 600;
-          color: var(--status-done-text);
-          animation: fadeIn 0.2s ease both;
-        }
+        /* Client message */
+        .bk-message { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); }
+        .bk-message p { font-size:var(--text-sm); color:var(--text-muted); line-height:1.6; max-width:none; }
+
+        /* Work items */
+        .bk-worklist { display:flex; flex-direction:column; gap:var(--space-1); margin-bottom:var(--space-2); min-height:24px; }
+        .bk-worklist__empty { font-size:var(--text-xs); color:var(--text-faint); font-style:italic; padding:var(--space-2) 0; }
+        .bk-worklist__item { display:flex; align-items:center; gap:var(--space-2); background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-2) var(--space-3); animation:fadeIn 0.2s ease both; }
+        .bk-worklist__num { font-size:var(--text-xs); font-weight:700; color:var(--accent); flex-shrink:0; width:18px; }
+        .bk-worklist__text { font-size:var(--text-sm); color:var(--text); flex:1; }
+        .bk-worklist__remove { display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:var(--radius); color:var(--text-faint); transition:color var(--transition-fast),background var(--transition-fast); flex-shrink:0; }
+        .bk-worklist__remove:hover { color:var(--primary); background:var(--primary-subtle); }
+
+        /* Add work */
+        .bk-addwork { display:flex; gap:var(--space-2); align-items:center; }
+        .bk-addwork .bk-field-input { flex:1; }
+
+        /* Total */
+        .bk-total { display:flex; align-items:center; justify-content:space-between; background:var(--accent-subtle); border:1px solid var(--accent-border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); }
+        .bk-total__label { font-size:var(--text-xs); font-weight:600; color:var(--accent); letter-spacing:0.04em; text-transform:uppercase; }
+        .bk-total__value { font-size:var(--text-sm); font-weight:700; color:var(--accent); }
+
+        /* Actions */
+        .bk-actions { display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap; }
+        .bk-actions__date { font-size:var(--text-xs); color:var(--text-faint); margin-left:auto; }
+        .bk-saved-msg { display:inline-flex; align-items:center; gap:5px; font-size:var(--text-xs); font-weight:600; color:var(--status-done-text); animation:fadeIn 0.2s ease both; }
       `}</style>
     </div>
   );
