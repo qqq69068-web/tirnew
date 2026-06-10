@@ -108,11 +108,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
       {/* ══ NAVBAR ═════════════════════════════════════════════════════════════════ */}
       <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
-        <div className="site-nav__inner container-wide">
+        {/* full-width inner — no container cap, just edge padding */}
+        <div className="site-nav__inner">
 
           {/* Logo */}
           <Link href="/" className="site-nav__logo">
-            <TirnewLogo size={36} />
+            <TirnewLogo size={38} />
             <div className="site-nav__brand">
               <span className="site-nav__brand-name">Tirnew</span>
               <span className="site-nav__brand-sub">Truck Service</span>
@@ -256,13 +257,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* ══ PAGE CONTENT ══════════════════════════════════════════════════════════════ */}
-      {/* id=main-content targets the skip link from root layout */}
       <main id="main-content" style={{ flex: 1 }}>{children}</main>
 
       {/* ══ FOOTER ═════════════════════════════════════════════════════════════════ */}
       <footer className="site-footer theme-transition">
         <div className="site-footer__top">
-          <div className="container-wide site-footer__grid">
+          <div className="site-footer__grid site-footer__full-width">
 
             {/* Brand col */}
             <div className="site-footer__brand reveal">
@@ -309,8 +309,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
+        {/* Bottom bar — full-width, logo-left / diploma-right */}
         <div className="site-footer__bottom">
-          <div className="container-wide site-footer__bottom-inner">
+          <div className="site-footer__bottom-inner site-footer__full-width">
             <span className="site-footer__copy">
               &copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.
             </span>
@@ -343,6 +344,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-radius: 0 2px 2px 0;
         }
 
+        /* ── FULL-WIDTH HELPER ───────────────────────────── */
+        /* stretches content edge-to-edge with comfortable side padding */
+        .site-footer__full-width,
+        .site-nav__inner {
+          width: 100%;
+          padding-inline: clamp(var(--space-5), 4vw, var(--space-16));
+        }
+
         /* ── NAVBAR ────────────────────────────────────────── */
         .site-nav {
           position: sticky;
@@ -363,8 +372,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           box-shadow: var(--shadow-md);
         }
         .site-nav__inner {
-          /* 60→64px: більш преміум відчуття, зберігає вирівнювання лого та елементів */
-          height: 64px;
+          height: 68px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -389,7 +397,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-nav__brand-name {
           font-family: var(--font-display);
-          font-size: 15px;
+          font-size: 18px;
           font-weight: 900;
           letter-spacing: 0.05em;
           text-transform: uppercase;
@@ -414,7 +422,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           flex-direction: column;
           align-items: center;
           gap: 0;
-          padding: 6px 10px;
+          padding: 6px 12px;
           border-radius: var(--radius);
           font-family: var(--font-display);
           font-size: var(--text-sm);
@@ -429,8 +437,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         .nav-link__bar {
           position: absolute;
           bottom: -1px;
-          left: 10px;
-          right: 10px;
+          left: 12px;
+          right: 12px;
           height: 2px;
           background: var(--primary);
           border-radius: 2px;
@@ -519,7 +527,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text);
           border-color: var(--border-strong);
         }
-        /* Auth state: amber/teal accent — uses --accent (teal) tokens */
         .site-nav__cabinet--auth {
           border-color: var(--accent-border);
           background: var(--accent-subtle);
@@ -643,7 +650,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .mobile-menu--open .mobile-menu__ctas { opacity: 1; transform: translateY(0); }
         .mobile-menu__backdrop {
-          position: fixed; inset: 0; top: 64px;
+          position: fixed; inset: 0; top: 68px;
           background: rgba(0,0,0,0.30);
           z-index: -1;
           backdrop-filter: blur(2px);
@@ -678,7 +685,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-footer__contacts { display: flex; flex-direction: column; gap: var(--space-1); }
 
-        /* телефон у футері — завжди видимий */
         .site-footer__phone {
           font-size: var(--text-sm);
           font-weight: 600;
@@ -686,7 +692,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-footer__phone:hover { color: var(--primary) !important; }
 
-        /* адреса та години — завжди читабельні */
         .site-footer__meta {
           font-size: var(--text-xs);
           color: var(--text-muted);
@@ -694,7 +699,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           opacity: 1;
         }
 
-        /* заголовки колонок — чітко видно */
         .site-footer__col-title {
           font-family: var(--font-display);
           font-size: 10px;
@@ -707,7 +711,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-footer__col-links { display: flex; flex-direction: column; gap: var(--space-2); }
 
-        /* посилання у футері — завжди видимі, не лише при hover */
         .footer-link {
           font-family: var(--font-body);
           font-size: var(--text-xs);
@@ -721,7 +724,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .footer-link:hover { color: var(--text); }
 
-        /* підкреслення при hover */
         .hover-underline { position: relative; }
         .hover-underline::after {
           content: '';
@@ -735,12 +737,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .hover-underline:hover::after { transform: scaleX(1); }
 
-        /* нижня смужка копірайт */
+        /* ── FOOTER BOTTOM — edge-to-edge ─────────────────── */
         .site-footer__bottom { padding-block: var(--space-4); }
         .site-footer__bottom-inner {
-          display: flex; align-items: center;
+          display: flex;
+          align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap; gap: var(--space-2);
+          flex-wrap: wrap;
+          gap: var(--space-2);
         }
         .site-footer__copy {
           font-size: var(--text-xs);
