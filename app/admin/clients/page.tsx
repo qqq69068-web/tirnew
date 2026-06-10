@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
-import { Users } from "lucide-react";
 
 export default async function AdminClientsPage() {
   const clients = await prisma.client.findMany({
@@ -10,43 +9,64 @@ export default async function AdminClientsPage() {
   });
 
   return (
-    <div className="p-8 max-w-4xl">
-      <div className="flex items-center gap-3 mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Клієнти</h1>
-        <span className="text-sm text-gray-400">{clients.length}</span>
+    <div className="admin-page fade-in">
+
+      {/* ── Header ── */}
+      <div className="admin-page-header">
+        <div>
+          <p className="section-eyebrow">База даних</p>
+          <h1 className="admin-page-title">Клієнти</h1>
+          <p className="admin-page-subtitle">{clients.length} зареєстрованих</p>
+        </div>
       </div>
 
+      {/* ── Empty state ── */}
       {clients.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-          <Users size={32} className="text-gray-200 mx-auto mb-3" />
-          <p className="text-gray-400">Клієнтів поки немає</p>
+        <div className="card-flat">
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <circle cx="20" cy="16" r="7"/>
+                <path d="M4 40c0-8.837 7.163-16 16-16s16 7.163 16 16"/>
+                <path d="M34 14a6 6 0 0 1 0 12"/>
+                <path d="M44 40c0-7.18-4.477-13.33-10.76-15.78"/>
+              </svg>
+            </div>
+            <h3>Клієнтів поки немає</h3>
+            <p>Клієнти з’являються після першого входу або бронювання.</p>
+          </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
               <tr>
-                {["Ім'я", "Email", "Телефон", "Замовлень", "Дата реєстрації"].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{h}</th>
+                {["\u0406\u043c\u2019\u044f", "Email", "\u0422\u0435\u043b\u0435\u0444\u043e\u043d", "\u0417\u0430\u043c\u043e\u0432\u043b\u0435\u043d\u044c", "\u0414\u0430\u0442\u0430 \u0440\u0435\u0454\u0441трації"].map((h) => (
+                  <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {clients.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-800">{c.name || "—"}</td>
-                  <td className="px-4 py-3 text-gray-500">{c.email}</td>
-                  <td className="px-4 py-3 text-gray-500">
+                <tr key={c.id}>
+                  <td className="cell-name">{c.name || "—"}</td>
+                  <td className="cell-muted">{c.email}</td>
+                  <td className="cell-muted">
                     {c.phone ? (
-                      <a href={`tel:${c.phone}`} className="text-teal-600 hover:underline">{c.phone}</a>
+                      <a
+                        href={`tel:${c.phone}`}
+                        className="cl-phone-link"
+                      >
+                        {c.phone}
+                      </a>
                     ) : "—"}
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal-50 text-teal-700 text-xs font-bold">
+                  <td>
+                    <span className="cl-booking-badge">
                       {c._count.bookings}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">
+                  <td className="cell-faint tabular">
                     {new Date(c.createdAt).toLocaleDateString("uk-UA")}
                   </td>
                 </tr>
@@ -55,6 +75,33 @@ export default async function AdminClientsPage() {
           </table>
         </div>
       )}
+
+      <style>{`
+        .cl-phone-link {
+          color: var(--accent);
+          font-weight: 500;
+          text-decoration: none;
+          font-variant-numeric: tabular-nums;
+          transition: opacity var(--transition-fast);
+        }
+        .cl-phone-link:hover {
+          opacity: 0.75;
+          text-decoration: underline;
+        }
+        .cl-booking-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: var(--accent-subtle);
+          color: var(--accent);
+          font-size: var(--text-xs);
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+        }
+      `}</style>
     </div>
   );
 }
