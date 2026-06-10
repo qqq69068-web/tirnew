@@ -267,7 +267,9 @@ export default function AiChat() {
 
   return (
     <>
+      {/* Trigger button — id="ai-chat-trigger" дозволяє відкривати чат з будь-якого місця на сайті */}
       <button
+        id="ai-chat-trigger"
         onClick={open ? () => setOpen(false) : handleOpen}
         aria-label="AI-помічник"
         style={{

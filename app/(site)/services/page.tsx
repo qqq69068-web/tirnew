@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { ArrowRight, CheckCircle2, Package, Truck, Car, Wrench } from "lucide-react";
+import { ArrowRight, CheckCircle2, Package, Truck, Car, Wrench, Phone, Sparkles } from "lucide-react";
 
 const tirServices = services.filter((s) => s.vehicleType === "truck");
 const carServices = services.filter((s) => s.vehicleType === "car");
@@ -43,6 +43,11 @@ export default function ServicesPage() {
     return () => clearTimeout(timeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
+
+  function openAiChat() {
+    const btn = document.getElementById("ai-chat-trigger") as HTMLButtonElement | null;
+    if (btn) btn.click();
+  }
 
   return (
     <>
@@ -166,13 +171,25 @@ export default function ServicesPage() {
             {/* CTA */}
             <div className="services-cta reveal">
               <p className="services-cta__eyebrow">Не знаєте, яка послуга потрібна?</p>
-              <h2 className="services-cta__title">Майстер підкаже і запише</h2>
+              <h2 className="services-cta__title">Запитайте майстра або AI&#8209;агента</h2>
               <p className="services-cta__text">
-                Зв&apos;яжіться з нами — опишемо проблему та запишемо на зручний час.
+                Зателефонуйте нам — опишемо проблему і запишемо на зручний час.
+                Або задайте питання AI&#8209;асистенту прямо на сайті — він відповість миттєво.
               </p>
-              <Link href="/contacts" className="btn btn-primary">
-                Зв&apos;язатись з нами
-              </Link>
+              <div className="services-cta__actions">
+                <Link href="/contacts" className="btn btn-primary services-cta__btn">
+                  <Phone size={15} aria-hidden />
+                  Зв&apos;язатись з майстром
+                </Link>
+                <button
+                  type="button"
+                  onClick={openAiChat}
+                  className="btn btn-outline services-cta__btn"
+                >
+                  <Sparkles size={15} aria-hidden />
+                  Запитати AI&#8209;агента
+                </button>
+              </div>
             </div>
 
           </div>
@@ -290,7 +307,7 @@ export default function ServicesPage() {
 
         .services-list {
           display: flex; flex-direction: column;
-          gap: var(--space-2);   /* було space-1, тепер ширша відстань */
+          gap: var(--space-2);
           margin-bottom: var(--space-5); padding: 0;
         }
 
@@ -299,7 +316,6 @@ export default function ServicesPage() {
           display: flex; align-items: center; gap: var(--space-3);
           background: var(--surface); border: 1px solid var(--border);
           border-radius: var(--radius);
-          /* більший padding — рядки вищі та просторіші */
           padding: var(--space-4) var(--space-5);
           text-decoration: none; color: var(--text);
           transition: background var(--transition-fast), border-color var(--transition-fast),
@@ -372,7 +388,14 @@ export default function ServicesPage() {
         }
         .services-cta__text {
           font-size: var(--text-sm); color: var(--text-muted);
-          max-width: 34ch; line-height: 1.6;
+          max-width: 42ch; line-height: 1.6;
+        }
+        .services-cta__actions {
+          display: flex; flex-wrap: wrap; gap: var(--space-3);
+          justify-content: center; margin-top: var(--space-1);
+        }
+        .services-cta__btn {
+          display: inline-flex; align-items: center; gap: var(--space-2);
         }
 
         /* ── RESPONSIVE ────────────────────────────── */
@@ -387,6 +410,8 @@ export default function ServicesPage() {
           .service-row-v2__index { display: none; }
           .service-row-v2__price { display: none; }
           .service-row-v2 { padding: var(--space-3) var(--space-4); }
+          .services-cta__actions { flex-direction: column; align-items: stretch; }
+          .services-cta__btn { justify-content: center; }
         }
 
         @media (prefers-reduced-motion: reduce) {
