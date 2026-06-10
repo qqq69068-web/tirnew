@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { ArrowLeft, CheckCircle2, Package, Clock, Tag } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Package, Clock, Tag, ChevronRight } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
 
 interface Props { params: Promise<{ slug: string }> }
@@ -28,49 +28,67 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   return (
     <>
-      <main className="service-detail">
+      <main className="sd">
 
-        {/* ─── HERO IMAGE ───────────────────────────────────────── */}
-        <div className="service-detail__hero">
+        {/* ─── HERO ───────────────────────────────────────────── */}
+        <div className="sd__hero">
           <img
             src={service.image}
             alt={service.title}
-            className="service-detail__hero-img"
+            className="sd__hero-img"
             width={1600}
-            height={400}
+            height={560}
             loading="eager"
           />
-          <div className="service-detail__hero-overlay" aria-hidden />
-          <div className="service-detail__hero-content">
-            <Link href="/services" className="service-detail__back">
-              <ArrowLeft size={13} aria-hidden /> Усі послуги
+          <div className="sd__hero-overlay" aria-hidden />
+          <div className="sd__hero-content container">
+            <Link href="/services" className="sd__back">
+              <ArrowLeft size={14} aria-hidden /> Усі послуги
             </Link>
-            <span className="badge badge--muted">{service.category}</span>
-            <h1 className="service-detail__hero-title">{service.title}</h1>
+            <div className="sd__hero-meta">
+              <span className="sd__category-badge">{service.category}</span>
+            </div>
+            <h1 className="sd__hero-title">{service.title}</h1>
+            {service.short && (
+              <p className="sd__hero-sub">{service.short}</p>
+            )}
           </div>
         </div>
 
-        {/* ─── BODY ─────────────────────────────────────────────── */}
-        <div className="service-detail__body container-narrow">
+        {/* ─── BREADCRUMB ─────────────────────────────────────── */}
+        <div className="sd__breadcrumb">
+          <div className="container">
+            <nav className="sd__bread-nav" aria-label="breadcrumb">
+              <Link href="/" className="sd__bread-link">Головна</Link>
+              <ChevronRight size={12} aria-hidden />
+              <Link href="/services" className="sd__bread-link">Послуги</Link>
+              <ChevronRight size={12} aria-hidden />
+              <span className="sd__bread-current">{service.title}</span>
+            </nav>
+          </div>
+        </div>
 
-          {/* 2-col grid */}
-          <div className="service-detail__grid">
+        {/* ─── BODY ───────────────────────────────────────────── */}
+        <div className="sd__body container">
+          <div className="sd__grid">
 
-            {/* Left: content */}
-            <div className="service-detail__content">
+            {/* ── LEFT: content ── */}
+            <div className="sd__content">
 
-              <section className="service-detail__section">
-                <h2 className="service-detail__section-title">Про послугу</h2>
-                <p className="service-detail__desc">{service.description}</p>
+              {/* About */}
+              <section className="sd__section">
+                <h2 className="sd__section-title">Про послугу</h2>
+                <p className="sd__desc">{service.description}</p>
               </section>
 
+              {/* Includes */}
               {service.details && service.details.length > 0 && (
-                <section className="service-detail__section">
-                  <h2 className="service-detail__section-title">Що включає</h2>
-                  <ul className="service-detail__checklist" role="list">
+                <section className="sd__section">
+                  <h2 className="sd__section-title">Що включає</h2>
+                  <ul className="sd__checklist" role="list">
                     {service.details.map((d) => (
-                      <li key={d} className="service-detail__check-item">
-                        <CheckCircle2 size={14} className="service-detail__check-icon" aria-hidden />
+                      <li key={d} className="sd__check-item">
+                        <CheckCircle2 size={15} className="sd__check-icon" aria-hidden />
                         <span>{d}</span>
                       </li>
                     ))}
@@ -78,23 +96,25 @@ export default async function ServiceDetailPage({ params }: Props) {
                 </section>
               )}
 
+              {/* Related */}
               {related.length > 0 && (
-                <section className="service-detail__section">
-                  <h2 className="service-detail__section-title">Схожі послуги</h2>
-                  <div className="service-detail__related">
+                <section className="sd__section sd__section--related">
+                  <h2 className="sd__section-title">Схожі послуги</h2>
+                  <div className="sd__related">
                     {related.map((r) => (
-                      <Link key={r.slug} href={`/services/${r.slug}`} className="related-card">
-                        <div className="related-card__img">
+                      <Link key={r.slug} href={`/services/${r.slug}`} className="sd-related">
+                        <div className="sd-related__img">
                           <img
                             src={r.image}
                             alt={r.title}
                             width={300}
-                            height={120}
+                            height={140}
                             loading="lazy"
                           />
                         </div>
-                        <div className="related-card__body">
-                          <p className="related-card__title">{r.title}</p>
+                        <div className="sd-related__body">
+                          <p className="sd-related__title">{r.title}</p>
+                          <span className="sd-related__arrow">→</span>
                         </div>
                       </Link>
                     ))}
@@ -103,284 +123,367 @@ export default async function ServiceDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* Right: price sidebar */}
-            <aside className="service-detail__sidebar">
-              <div className="price-card">
+            {/* ── RIGHT: price sidebar ── */}
+            <aside className="sd__sidebar">
+              <div className="sd-price">
 
-                <div className="price-card__header">
-                  <Tag size={12} className="price-card__tag-icon" aria-hidden />
-                  <span className="price-card__label">Вартість</span>
+                <div className="sd-price__eyebrow">
+                  <Tag size={11} aria-hidden />
+                  <span>Вартість</span>
                 </div>
 
-                <div className="price-card__price">{service.price}</div>
+                <div className="sd-price__value">{service.price}</div>
 
                 {service.hours && (
-                  <div className="price-card__hours">
-                    <Clock size={11} aria-hidden />
-                    {service.hours}
+                  <div className="sd-price__hours">
+                    <Clock size={12} aria-hidden />
+                    <span>{service.hours}</span>
                   </div>
                 )}
 
-                <div className="price-card__actions">
+                <div className="sd-price__divider" aria-hidden />
+
+                <div className="sd-price__actions">
                   {service.isPartsOrder ? (
-                    <Link href="/parts-order" className="btn btn-primary btn-block">
-                      <Package size={14} aria-hidden /> Замовити запчастини
+                    <Link href="/parts-order" className="btn btn-primary btn-block btn-lg">
+                      <Package size={15} aria-hidden /> Замовити запчастини
                     </Link>
                   ) : (
                     <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
                   )}
-                  <Link href="/services" className="btn btn-ghost btn-block">
+                  <Link href="/services" className="btn btn-outline btn-block">
                     ← Усі послуги
                   </Link>
                 </div>
+
+                {/* Trust signals */}
+                <ul className="sd-price__trust" role="list">
+                  <li>✔ Офіційна гарантія на роботи</li>
+                  <li>✔ Запчастини від виробника</li>
+                  <li>✔ Досвідчені майстри</li>
+                </ul>
               </div>
             </aside>
+
           </div>
         </div>
       </main>
 
-      {/* ─── SCOPED STYLES ───────────────────────────────────────── */}
+      {/* ─── SCOPED STYLES ────────────────────────────────────── */}
       <style>{`
-        .service-detail {
+
+        /* ── PAGE SHELL ─────────────────────────────── */
+        .sd {
           min-height: 100vh;
           background: var(--bg);
           color: var(--text);
         }
 
-        /* ── HERO ───────────────────────────────────────── */
-        .service-detail__hero {
+        /* ── HERO ───────────────────────────────────── */
+        .sd__hero {
           position: relative;
-          height: clamp(220px, 28vw, 320px);
+          height: clamp(300px, 38vw, 480px);
           overflow: hidden;
         }
-        .service-detail__hero-img {
+        .sd__hero-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           display: block;
         }
-        .service-detail__hero-overlay {
+        .sd__hero-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top,
-            rgba(0,0,0,0.82) 0%,
-            rgba(0,0,0,0.3) 55%,
-            transparent 100%
+          background: linear-gradient(
+            to top,
+            rgba(0,0,0,0.88) 0%,
+            rgba(0,0,0,0.45) 45%,
+            rgba(0,0,0,0.10) 100%
           );
         }
-        .service-detail__hero-content {
+        .sd__hero-content {
           position: absolute;
           bottom: 0;
-          left: 0;
-          padding: clamp(var(--space-4), 3vw, var(--space-6)) clamp(var(--space-4), 4vw, var(--space-8));
-          max-width: 720px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 100%;
+          padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
           display: flex;
           flex-direction: column;
-          gap: var(--space-2);
+          gap: 0.6rem;
         }
-        .service-detail__back {
+        .sd__back {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
+          gap: 5px;
           font-size: var(--text-xs);
-          color: rgba(255,255,255,0.65);
+          color: rgba(255,255,255,0.60);
           text-decoration: none;
           width: fit-content;
           transition: color var(--transition-fast);
+          margin-bottom: 0.25rem;
         }
-        .service-detail__back:hover { color: rgba(255,255,255,0.9); }
-        .service-detail__hero-title {
+        .sd__back:hover { color: rgba(255,255,255,0.9); }
+        .sd__category-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 3px 10px;
+          border-radius: var(--radius-pill);
+          background: rgba(185,28,28,0.18);
+          border: 1px solid rgba(185,28,28,0.38);
+          color: #fca5a5;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          width: fit-content;
+        }
+        .sd__hero-meta { display: flex; align-items: center; gap: 0.5rem; }
+        .sd__hero-title {
           font-family: var(--font-display);
-          font-size: clamp(1.35rem, 3.5vw, 2.2rem);
+          font-size: clamp(1.6rem, 4vw, 2.8rem);
           font-weight: 900;
-          line-height: 1.1;
+          line-height: 1.08;
           color: #fff;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.02em;
+          max-width: 700px;
+        }
+        .sd__hero-sub {
+          font-size: var(--text-sm);
+          color: rgba(255,255,255,0.62);
+          max-width: 560px;
+          line-height: 1.6;
         }
 
-        /* ── BODY ─────────────────────────────────────────── */
-        .service-detail__body {
-          padding-block: clamp(var(--space-6), 4vw, var(--space-10));
+        /* ── BREADCRUMB ─────────────────────────────── */
+        .sd__breadcrumb {
+          border-bottom: 1px solid var(--border);
+          background: var(--surface);
         }
-        .service-detail__grid {
+        .sd__bread-nav {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0.75rem 0;
+          color: var(--text-faint);
+          font-size: var(--text-xs);
+        }
+        .sd__bread-link {
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color var(--transition-fast);
+        }
+        .sd__bread-link:hover { color: var(--primary); }
+        .sd__bread-current { color: var(--text); font-weight: 500; }
+
+        /* ── BODY LAYOUT ────────────────────────────── */
+        .sd__body {
+          padding-block: clamp(2rem, 5vw, 3.5rem);
+        }
+        .sd__grid {
           display: grid;
-          grid-template-columns: 1fr 260px;
-          gap: clamp(var(--space-6), 4vw, var(--space-8));
+          grid-template-columns: 1fr 300px;
+          gap: clamp(2rem, 4vw, 3rem);
           align-items: start;
         }
-        .service-detail__content {
+
+        /* ── CONTENT (left) ─────────────────────────── */
+        .sd__content {
           display: flex;
           flex-direction: column;
-          gap: var(--space-6);
+          gap: 2.5rem;
         }
-        .service-detail__section {
+        .sd__section {
           display: flex;
           flex-direction: column;
-          gap: var(--space-3);
+          gap: 1rem;
         }
-        .service-detail__section-title {
+        .sd__section-title {
           font-family: var(--font-display);
-          font-size: var(--text-base);
+          font-size: var(--text-lg);
           font-weight: 700;
           color: var(--text);
-          padding-bottom: var(--space-2);
+          padding-bottom: 0.75rem;
           border-bottom: 1px solid var(--border);
+          margin-bottom: 0.25rem;
         }
-        .service-detail__desc {
-          font-size: var(--text-sm);
-          line-height: 1.75;
+        .sd__desc {
+          font-size: var(--text-base);
+          line-height: 1.78;
           color: var(--text-muted);
         }
 
         /* Checklist */
-        .service-detail__checklist {
+        .sd__checklist {
           display: flex;
           flex-direction: column;
-          gap: var(--space-2);
+          gap: 0.6rem;
           padding: 0;
           list-style: none;
         }
-        .service-detail__check-item {
+        .sd__check-item {
           display: flex;
           align-items: flex-start;
-          gap: var(--space-2);
-          font-size: var(--text-sm);
+          gap: 0.625rem;
+          font-size: var(--text-base);
           color: var(--text-muted);
-          line-height: 1.5;
+          line-height: 1.55;
+          padding: 0.5rem 0.75rem;
+          border-radius: var(--radius);
+          transition: background var(--transition-fast);
         }
-        .service-detail__check-icon {
+        .sd__check-item:hover { background: var(--surface); }
+        .sd__check-icon {
           color: var(--accent);
           flex-shrink: 0;
-          margin-top: 2px;
+          margin-top: 3px;
         }
 
-        /* Related cards */
-        .service-detail__related {
+        /* Related */
+        .sd__section--related { gap: 1.25rem; }
+        .sd__related {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-          gap: var(--space-3);
+          grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+          gap: 0.875rem;
         }
-        .related-card {
+        .sd-related {
           background: var(--surface);
           border-radius: var(--radius-lg);
           overflow: hidden;
           border: 1px solid var(--border);
           text-decoration: none;
-          display: block;
-          transition:
-            box-shadow var(--transition-fast),
-            border-color var(--transition-fast),
-            transform var(--transition-spring);
+          display: flex;
+          flex-direction: column;
+          transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-spring);
         }
-        .related-card:hover {
+        .sd-related:hover {
           box-shadow: var(--shadow-md);
           border-color: var(--border-accent);
-          transform: translateY(-2px);
+          transform: translateY(-3px);
         }
-        .related-card__img {
-          height: 90px;
+        .sd-related__img {
+          height: 110px;
           overflow: hidden;
+          flex-shrink: 0;
         }
-        .related-card__img img {
-          width: 100%;
-          height: 100%;
+        .sd-related__img img {
+          width: 100%; height: 100%;
           object-fit: cover;
           transition: transform 0.4s ease;
         }
-        .related-card:hover .related-card__img img {
-          transform: scale(1.04);
+        .sd-related:hover .sd-related__img img { transform: scale(1.05); }
+        .sd-related__body {
+          padding: 0.625rem 0.875rem 0.75rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
         }
-        .related-card__body {
-          padding: var(--space-2) var(--space-3);
-        }
-        .related-card__title {
-          font-size: var(--text-xs);
+        .sd-related__title {
+          font-size: var(--text-sm);
           font-weight: 500;
           color: var(--text);
           line-height: 1.4;
         }
+        .sd-related__arrow {
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+          flex-shrink: 0;
+          transition: color var(--transition-fast), transform var(--transition-fast);
+        }
+        .sd-related:hover .sd-related__arrow { color: var(--primary); transform: translateX(3px); }
 
-        /* ── PRICE SIDEBAR CARD ─────────────────────────── */
-        .service-detail__sidebar {
+        /* ── PRICE SIDEBAR ──────────────────────────── */
+        .sd__sidebar {
           position: sticky;
-          top: 76px;
+          top: 80px;
           align-self: flex-start;
         }
-        .price-card {
+        .sd-price {
           background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: var(--space-5);
-          box-shadow: var(--shadow-sm);
+          border: 1px solid var(--border-strong);
+          border-radius: var(--radius-xl);
+          padding: 1.75rem;
+          box-shadow: var(--shadow-md);
           display: flex;
           flex-direction: column;
-          gap: var(--space-4);
+          gap: 1.1rem;
         }
-        .price-card__header {
-          display: flex;
-          align-items: center;
-          gap: var(--space-1);
-        }
-        .price-card__tag-icon {
-          color: var(--text-faint);
-        }
-        .price-card__label {
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          color: var(--text-faint);
-          font-weight: 700;
-        }
-        .price-card__price {
-          font-family: var(--font-display);
-          font-size: var(--text-xl);
-          font-weight: 900;
-          color: var(--accent);
-          line-height: 1;
-        }
-        .price-card__hours {
+        .sd-price__eyebrow {
           display: flex;
           align-items: center;
           gap: 5px;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.13em;
+          color: var(--text-faint);
+          font-weight: 700;
+        }
+        .sd-price__value {
+          font-family: var(--font-display);
+          font-size: clamp(1.6rem, 3vw, 2.2rem);
+          font-weight: 900;
+          color: var(--accent);
+          line-height: 1;
+          letter-spacing: -0.02em;
+        }
+        .sd-price__hours {
+          display: flex;
+          align-items: center;
+          gap: 6px;
           font-size: var(--text-xs);
           color: var(--text-faint);
         }
-        .price-card__actions {
+        .sd-price__divider {
+          height: 1px;
+          background: var(--border);
+          margin-block: 0.25rem;
+        }
+        .sd-price__actions {
           display: flex;
           flex-direction: column;
-          gap: var(--space-2);
-          padding-top: var(--space-2);
-          border-top: 1px solid var(--border);
+          gap: 0.625rem;
         }
         .btn-block {
           width: 100%;
           justify-content: center;
         }
-
-        /* badge override for muted */
-        .badge--muted {
-          background: rgba(255,255,255,0.12);
-          border-color: rgba(255,255,255,0.2);
-          color: rgba(255,255,255,0.85);
+        .sd-price__trust {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+          padding-top: 0.25rem;
+        }
+        .sd-price__trust li {
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          line-height: 1.5;
         }
 
-        /* ── RESPONSIVE ───────────────────────────────────── */
+        /* ── RESPONSIVE ─────────────────────────────── */
         @media (max-width: 768px) {
-          .service-detail__grid {
+          .sd__grid {
             grid-template-columns: 1fr;
           }
-          .service-detail__sidebar {
+          .sd__sidebar {
             position: static;
             order: -1;
           }
-          .price-card {
-            border-radius: var(--radius);
+          .sd-price {
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+          }
+          .sd__hero {
+            height: clamp(240px, 55vw, 360px);
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .related-card:hover { transform: none; }
-          .related-card__img img { transition: none; }
+          .sd-related:hover { transform: none; }
+          .sd-related__img img { transition: none; }
         }
       `}</style>
     </>
