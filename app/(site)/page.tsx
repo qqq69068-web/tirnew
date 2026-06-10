@@ -140,40 +140,42 @@ export default function HomePage() {
           <div className="hp-hero__radial" />
         </div>
 
-        <div className="container hp-hero__content">
-          <div className="fade-in hp-hero__eyebrow">
-            <span className="hp-hero__dot" aria-hidden />
-            <span className="hp-hero__eyebrow-text">TIR Truck Service</span>
-            <span className="hp-hero__eyebrow-line" aria-hidden />
-          </div>
+        <div className="container">
+          <div className="hp-hero__content">
+            <div className="fade-in hp-hero__eyebrow">
+              <span className="hp-hero__dot" aria-hidden />
+              <span className="hp-hero__eyebrow-text">TIR Truck Service</span>
+              <span className="hp-hero__eyebrow-line" aria-hidden />
+            </div>
 
-          <h1 className="fade-in hp-hero__title anim-d1">
-            Сервіс
-            <span className="hp-hero__title-accent"> вантажних і легкових</span>
-            <br />автомобілів та причепів
-          </h1>
+            <h1 className="fade-in hp-hero__title anim-d1">
+              Сервіс
+              <span className="hp-hero__title-accent"> вантажних і легкових</span>
+              <br />автомобілів та причепів
+            </h1>
 
-          <p className="fade-in hp-hero__sub anim-d2">
-            Діагностика, ремонт, пневмосистеми, електрика й трансмісія для
-            вантажного та легкового транспорту. Власний склад запчастин.
-          </p>
+            <p className="fade-in hp-hero__sub anim-d2">
+              Діагностика, ремонт, пневмосистеми, електрика й трансмісія для
+              вантажного та легкового транспорту. Власний склад запчастин.
+            </p>
 
-          <div className="fade-in hp-hero__ctas anim-d3">
-            <Link href="/contacts" className="btn btn-primary btn-lg">
-              Зв&apos;язатись <ChevronRight size={16} aria-hidden />
-            </Link>
-            <Link href="/services" className="btn btn-outline btn-lg">
-              Послуги
-            </Link>
-          </div>
+            <div className="fade-in hp-hero__ctas anim-d3">
+              <Link href="/contacts" className="btn btn-primary btn-lg">
+                Зв&apos;язатись <ChevronRight size={16} aria-hidden />
+              </Link>
+              <Link href="/services" className="btn btn-outline btn-lg">
+                Послуги
+              </Link>
+            </div>
 
-          <div className="fade-in hp-stats anim-d4">
-            {stats.map((s, i) => (
-              <div key={s.label} className="hp-stats__item">
-                {i > 0 && <div className="hp-stats__divider" aria-hidden />}
-                <StatItem value={s.value} suffix={s.suffix} label={s.label} />
-              </div>
-            ))}
+            <div className="fade-in hp-stats anim-d4">
+              {stats.map((s, i) => (
+                <div key={s.label} className="hp-stats__item">
+                  {i > 0 && <div className="hp-stats__divider" aria-hidden />}
+                  <StatItem value={s.value} suffix={s.suffix} label={s.label} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -318,11 +320,14 @@ export default function HomePage() {
             transparent 70%
           );
         }
+        /* ← ВИПРАВЛЕННЯ: контент притиснутий до лівого краю */
         .hp-hero__content {
           position: relative;
           z-index: 1;
           padding-block: 9rem 7rem;
           max-width: 820px;
+          margin-left: 0;
+          margin-right: auto;
         }
         .hp-hero__eyebrow {
           display: flex;
