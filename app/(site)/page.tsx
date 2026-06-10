@@ -142,12 +142,15 @@ export default function HomePage() {
           <div className="hp-hero__overlay" />
           <div className="hp-hero__radial" />
           <div className="hp-hero__grid" aria-hidden />
+          {/* Engineering scan line */}
+          <div className="hp-hero__scanline" aria-hidden />
         </div>
 
         <div className="container hp-hero__content">
-          <div className="fade-in badge badge-primary">
+          <div className="fade-in hp-hero__eyebrow">
             <span className="hp-hero__dot" aria-hidden />
-            TIR Truck Service
+            <span className="hp-hero__eyebrow-text">TIR Truck Service</span>
+            <span className="hp-hero__eyebrow-line" aria-hidden />
           </div>
 
           <h1 className="fade-in hp-hero__title anim-d1">
@@ -181,10 +184,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Vertical scroll indicator — automotive style */}
         <div className="hp-hero__scroll" aria-hidden>
-          <span className="hp-hero__scroll-label">Горнути вниз</span>
-          <ChevronDown size={14} className="hp-hero__scroll-icon" />
+          <div className="hp-hero__scroll-track">
+            <div className="hp-hero__scroll-thumb" />
+          </div>
+          <span className="hp-hero__scroll-label">Scroll</span>
         </div>
 
         <div className="hp-hero__bottom-fade" aria-hidden />
@@ -201,6 +206,7 @@ export default function HomePage() {
                   <p className="hp-adv__title">{a.title}</p>
                   <p className="hp-adv__desc">{a.desc}</p>
                 </div>
+                <div className="hp-adv__accent" aria-hidden />
               </div>
             ))}
           </div>
@@ -271,11 +277,16 @@ export default function HomePage() {
           <div className="hp-process">
             {processSteps.map((step, i) => (
               <div key={step.num} className={`hp-process__step reveal d-${i + 1}`}>
-                {/* Connector line */}
-                {i < processSteps.length - 1 && (
-                  <div className="hp-process__connector" aria-hidden />
-                )}
-                <div className="hp-process__num">{step.num}</div>
+                <div className="hp-process__num-row">
+                  <span className="hp-process__num">{step.num}</span>
+                  {/* Animated connector — rendered for steps 1-3 */}
+                  {i < processSteps.length - 1 && (
+                    <div className="hp-process__connector" aria-hidden>
+                      <div className="hp-process__connector-line" />
+                      <div className="hp-process__connector-dot" />
+                    </div>
+                  )}
+                </div>
                 <div className="hp-process__icon" aria-hidden>
                   <step.icon size={18} strokeWidth={1.75} />
                 </div>
@@ -307,16 +318,19 @@ export default function HomePage() {
       <section className="section">
         <div className="container">
           <div className="reveal hp-cta">
+            {/* Dark engineering bg */}
             <div className="hp-cta__bg" aria-hidden />
+            <div className="hp-cta__grid" aria-hidden />
+            <div className="hp-cta__glow" aria-hidden />
             <div className="hp-cta__content">
-              <p className="section-eyebrow">Запис на ремонт</p>
+              <p className="section-eyebrow hp-cta__eyebrow">Запис на ремонт</p>
               <h2 className="hp-cta__title">Готові записатись?</h2>
               <p className="hp-cta__sub">
                 Подзвоніть або залиште заявку — майстер зателефонує й підбере зручний час.
               </p>
             </div>
             <div className="hp-cta__actions">
-              <a href="tel:+380664188826" className="btn btn-outline">
+              <a href="tel:+380664188826" className="btn btn-ghost-light">
                 <Phone size={15} aria-hidden /> Зателефонувати
               </a>
               <Link href="/contacts" className="btn btn-primary">
@@ -338,7 +352,7 @@ export default function HomePage() {
         .hp-hero {
           position: relative;
           overflow: hidden;
-          min-height: clamp(540px, 75vh, 820px);
+          min-height: clamp(580px, 80vh, 860px);
           display: flex;
           flex-direction: column;
         }
@@ -346,7 +360,14 @@ export default function HomePage() {
         .hp-hero__img {
           width: 100%; height: 100%;
           object-fit: cover;
-          filter: brightness(0.42) saturate(0.55);
+          filter: brightness(0.38) saturate(0.5);
+          /* Ken Burns — slow zoom for depth */
+          animation: kenBurns 22s ease-in-out infinite alternate;
+          transform-origin: center center;
+        }
+        @keyframes kenBurns {
+          0%   { transform: scale(1.0) translateX(0px); }
+          100% { transform: scale(1.08) translateX(-12px); }
         }
         .hp-hero__overlay {
           position: absolute; inset: 0;
@@ -354,29 +375,53 @@ export default function HomePage() {
         }
         .hp-hero__radial {
           position: absolute; inset: 0;
-          background: radial-gradient(ellipse 55% 55% at 8% 65%, rgba(185,28,28,0.18) 0%, transparent 68%);
+          background: radial-gradient(ellipse 50% 60% at 5% 70%, rgba(185,28,28,0.22) 0%, transparent 65%);
         }
         .hp-hero__grid {
           position: absolute; inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-          background-size: 72px 72px;
-          mask-image: radial-gradient(ellipse 100% 100% at 50% 100%, transparent 0%, black 60%);
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+          background-size: 64px 64px;
+          mask-image: radial-gradient(ellipse 100% 100% at 50% 100%, transparent 0%, black 55%);
           pointer-events: none;
+        }
+        /* Engineering scan line — subtle horizontal sweep */
+        .hp-hero__scanline {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, rgba(185,28,28,0.5) 30%, rgba(185,28,28,0.8) 50%, rgba(185,28,28,0.5) 70%, transparent 100%);
+          animation: scanDown 8s ease-in-out infinite;
+          pointer-events: none;
+          z-index: 1;
+        }
+        @keyframes scanDown {
+          0%   { top: -2px; opacity: 0; }
+          5%   { opacity: 1; }
+          95%  { opacity: 0.4; }
+          100% { top: 100%; opacity: 0; }
         }
         .hp-hero__bottom-fade {
           position: absolute;
           bottom: 0; left: 0; right: 0;
-          height: 80px;
+          height: 100px;
           background: linear-gradient(to bottom, transparent, var(--bg));
           pointer-events: none;
+          z-index: 2;
         }
         .hp-hero__content {
           position: relative;
-          z-index: 1;
-          padding-top: clamp(72px, 10vw, 120px);
+          z-index: 3;
+          padding-top: clamp(80px, 12vw, 130px);
           padding-bottom: clamp(80px, 12vw, 140px);
+        }
+
+        /* Eyebrow with extending line */
+        .hp-hero__eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-2);
         }
         .hp-hero__dot {
           display: inline-block;
@@ -384,16 +429,31 @@ export default function HomePage() {
           border-radius: 50%;
           background: var(--primary);
           flex-shrink: 0;
+          box-shadow: 0 0 8px rgba(185,28,28,0.6);
         }
+        .hp-hero__eyebrow-text {
+          font-size: var(--text-xs);
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.6);
+        }
+        .hp-hero__eyebrow-line {
+          display: inline-block;
+          width: 32px; height: 1px;
+          background: rgba(255,255,255,0.25);
+          flex-shrink: 0;
+        }
+
         .hp-hero__title {
           font-family: var(--font-display);
           font-size: var(--text-hero);
           font-weight: 800;
-          line-height: 1.02;
-          letter-spacing: -0.025em;
+          line-height: 1.0;
+          letter-spacing: -0.03em;
           color: var(--hero-text);
           margin-top: var(--space-5);
-          max-width: 14ch;
+          max-width: 13ch;
         }
         .hp-hero__title-accent { color: var(--primary); }
         .hp-hero__sub {
@@ -410,39 +470,53 @@ export default function HomePage() {
           gap: var(--space-3);
         }
 
-        /* Scroll indicator */
+        /* Vertical scroll indicator — automotive / motorsport style */
         .hp-hero__scroll {
           position: absolute;
-          bottom: var(--space-8);
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 2;
+          bottom: var(--space-10);
+          right: clamp(var(--space-6), 4vw, var(--space-12));
+          z-index: 4;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: var(--space-1);
-          animation: scrollBounce 2.4s ease-in-out infinite;
-          pointer-events: none;
+          gap: var(--space-2);
+        }
+        .hp-hero__scroll-track {
+          width: 1px;
+          height: 48px;
+          background: rgba(255,255,255,0.15);
+          border-radius: 1px;
+          overflow: hidden;
+          position: relative;
+        }
+        .hp-hero__scroll-thumb {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 40%;
+          background: var(--primary);
+          border-radius: 1px;
+          animation: scrollThumb 2.2s ease-in-out infinite;
+        }
+        @keyframes scrollThumb {
+          0%   { top: 0%;   opacity: 0; }
+          15%  { opacity: 1; }
+          85%  { opacity: 0.8; }
+          100% { top: 100%; opacity: 0; }
         }
         .hp-hero__scroll-label {
-          font-size: 9px;
-          letter-spacing: 0.16em;
+          font-size: 8px;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.35);
-        }
-        .hp-hero__scroll-icon {
-          color: rgba(255,255,255,0.35);
-        }
-        @keyframes scrollBounce {
-          0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
-          50%       { transform: translateX(-50%) translateY(6px); opacity: 1; }
+          color: rgba(255,255,255,0.30);
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
         }
 
         /* Stats */
         .hp-stats {
           margin-top: clamp(var(--space-10), 5vw, var(--space-16));
           padding-top: var(--space-6);
-          border-top: 1px solid rgba(255,255,255,0.12);
+          border-top: 1px solid rgba(255,255,255,0.1);
           display: flex;
           flex-wrap: wrap;
           gap: var(--space-2);
@@ -456,7 +530,7 @@ export default function HomePage() {
         }
         .hp-stats__divider {
           width: 1px; height: 28px;
-          background: rgba(255,255,255,0.15);
+          background: rgba(255,255,255,0.12);
           margin-right: var(--space-2);
         }
         .hp-stats__inner {
@@ -468,15 +542,15 @@ export default function HomePage() {
           font-family: var(--font-display);
           font-size: var(--text-2xl);
           font-weight: 800;
-          color: var(--primary);
+          color: #fff;
           line-height: 1;
           font-variant-numeric: tabular-nums;
         }
         .hp-stats__label {
           font-size: var(--text-xs);
-          color: rgba(255,255,255,0.50);
+          color: rgba(255,255,255,0.45);
           white-space: nowrap;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.05em;
         }
 
         /* ── ADVANTAGES ─────────────────────────────────── */
@@ -493,12 +567,14 @@ export default function HomePage() {
           display: flex;
           flex-direction: column;
           gap: var(--space-3);
-          padding: var(--space-6) var(--space-5);
+          padding: var(--space-6) var(--space-5) var(--space-5);
           background: var(--surface);
           transition: background var(--transition-base);
           position: relative;
+          overflow: hidden;
         }
-        .hp-adv__item::after {
+        /* Top accent bar — slides in on hover */
+        .hp-adv__item::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
@@ -506,15 +582,30 @@ export default function HomePage() {
           background: var(--primary);
           transform: scaleX(0);
           transform-origin: left center;
-          transition: transform 0.32s cubic-bezier(0.22,1,0.36,1);
+          transition: transform 0.38s cubic-bezier(0.22,1,0.36,1);
+        }
+        /* Bottom-right corner accent mark */
+        .hp-adv__accent {
+          position: absolute;
+          bottom: var(--space-4); right: var(--space-4);
+          width: 20px; height: 20px;
+          border-right: 1.5px solid var(--border-strong);
+          border-bottom: 1.5px solid var(--border-strong);
+          border-radius: 0 0 3px 0;
+          opacity: 0;
+          transform: scale(0.7);
+          transition:
+            opacity 0.3s ease,
+            transform 0.3s cubic-bezier(0.22,1,0.36,1);
         }
         .hp-adv__item:hover { background: var(--surface2); }
-        .hp-adv__item:hover::after { transform: scaleX(1); }
+        .hp-adv__item:hover::before { transform: scaleX(1); }
+        .hp-adv__item:hover .hp-adv__accent { opacity: 1; transform: scale(1); }
         .hp-adv__tag {
           font-family: var(--font-display);
           font-size: var(--text-xs);
           font-weight: 700;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           color: var(--primary);
           font-variant-numeric: tabular-nums;
         }
@@ -597,16 +688,16 @@ export default function HomePage() {
         /* Image */
         .hp-svc-card__img {
           position: relative;
-          height: 160px;
+          height: 165px;
           overflow: hidden;
         }
         .hp-svc-card__img img {
           width: 100%; height: 100%;
           object-fit: cover;
-          transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+          transition: transform 0.55s cubic-bezier(0.22,1,0.36,1);
         }
         .hp-svc-card:hover .hp-svc-card__img img {
-          transform: scale(1.06);
+          transform: scale(1.07);
         }
         .hp-svc-card__img-overlay {
           position: absolute;
@@ -692,24 +783,55 @@ export default function HomePage() {
           transition: background var(--transition-fast);
         }
         .hp-process__step:hover { background: var(--surface2); }
-        /* Horizontal connector */
-        .hp-process__connector {
-          position: absolute;
-          top: calc(var(--space-6) + 18px);
-          right: -1px;
-          width: 1px;
-          height: 36px;
-          background: var(--border);
-          z-index: 1;
-          display: none; /* hidden — gap lines handle separation */
+
+        /* Number row with connector */
+        .hp-process__num-row {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
         }
         .hp-process__num {
           font-family: var(--font-display);
           font-size: var(--text-xs);
           font-weight: 700;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           color: var(--primary);
+          flex-shrink: 0;
         }
+        /* Horizontal connector line */
+        .hp-process__connector {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          position: relative;
+          overflow: hidden;
+        }
+        .hp-process__connector-line {
+          flex: 1;
+          height: 1px;
+          background: var(--border-strong);
+          position: relative;
+          overflow: hidden;
+        }
+        .hp-process__connector-line::after {
+          content: '';
+          position: absolute;
+          top: 0; left: -100%; right: 0;
+          height: 100%;
+          background: var(--primary);
+          transition: left 0.6s cubic-bezier(0.22,1,0.36,1);
+        }
+        .hp-process__step:hover .hp-process__connector-line::after { left: 0; }
+        .hp-process__connector-dot {
+          width: 5px; height: 5px;
+          border-radius: 50%;
+          background: var(--border-strong);
+          flex-shrink: 0;
+          margin-left: var(--space-1);
+          transition: background var(--transition-fast);
+        }
+        .hp-process__step:hover .hp-process__connector-dot { background: var(--primary); }
+
         .hp-process__icon {
           width: 40px;
           height: 40px;
@@ -723,7 +845,7 @@ export default function HomePage() {
           transition: background var(--transition-fast), transform var(--transition-spring);
         }
         .hp-process__step:hover .hp-process__icon {
-          background: rgba(185,28,28,0.10);
+          background: rgba(185,28,28,0.12);
           transform: scale(1.06);
         }
         .hp-process__title {
@@ -751,7 +873,7 @@ export default function HomePage() {
           font-size: var(--text-xs);
           font-weight: 700;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           color: var(--text-faint);
           margin-bottom: var(--space-4);
         }
@@ -784,40 +906,67 @@ export default function HomePage() {
           transform: translateY(-2px);
         }
 
-        /* ── CTA BANNER ───────────────────────────────────── */
+        /* ── CTA BANNER ── DARK PREMIUM ───────────────────── */
         .hp-cta {
           position: relative;
-          background: var(--surface);
-          border: 1px solid var(--border);
+          /* Dark engineering panel — contrasts with page */
+          background: var(--surface-dark, #0f0f0f);
+          border: 1px solid rgba(255,255,255,0.07);
           border-radius: var(--radius-xl);
-          padding: clamp(var(--space-8), 4vw, var(--space-12)) clamp(var(--space-6), 4vw, var(--space-10));
+          padding: clamp(var(--space-10), 5vw, var(--space-14)) clamp(var(--space-6), 5vw, var(--space-12));
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
           gap: var(--space-8);
           overflow: hidden;
+          color: #fff;
         }
-        .hp-cta__bg {
-          position: absolute;
-          top: -60px; right: -60px;
-          width: 280px; height: 280px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(185,28,28,0.10) 0%, transparent 70%);
+        /* Dark bg layer that works in both modes */
+        [data-theme="light"] .hp-cta {
+          background: #111214;
+        }
+        [data-theme="dark"] .hp-cta,
+        .hp-cta {
+          background: #0c0d0f;
+        }
+        /* Grid pattern */
+        .hp-cta__grid {
+          position: absolute; inset: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+          background-size: 48px 48px;
           pointer-events: none;
         }
+        /* Red glow bottom-left */
+        .hp-cta__glow {
+          position: absolute;
+          bottom: -40px; left: -40px;
+          width: 260px; height: 260px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(185,28,28,0.25) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .hp-cta__bg { display: none; } /* old bg - hidden */
         .hp-cta__content { position: relative; z-index: 1; flex: 1; min-width: 220px; }
+        .hp-cta__eyebrow {
+          color: rgba(255,255,255,0.45) !important;
+          background: transparent !important;
+          border: none !important;
+          padding: 0 !important;
+        }
         .hp-cta__title {
           font-family: var(--font-display);
           font-size: var(--text-xl);
           font-weight: 800;
-          color: var(--text);
-          line-height: 1.15;
+          color: #fff;
+          line-height: 1.1;
           margin-top: var(--space-1);
         }
         .hp-cta__sub {
           font-size: var(--text-sm);
-          color: var(--text-muted);
+          color: rgba(255,255,255,0.50);
           margin-top: var(--space-2);
           max-width: 44ch;
           line-height: 1.6;
@@ -830,33 +979,64 @@ export default function HomePage() {
           flex-shrink: 0;
         }
 
+        /* Ghost light button — for dark backgrounds */
+        .btn-ghost-light {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-2);
+          padding: 0 var(--space-5);
+          height: 44px;
+          border-radius: var(--radius);
+          border: 1px solid rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.06);
+          color: rgba(255,255,255,0.85);
+          font-size: var(--text-sm);
+          font-weight: 500;
+          text-decoration: none;
+          cursor: pointer;
+          transition:
+            background var(--transition-fast),
+            border-color var(--transition-fast),
+            color var(--transition-fast);
+          white-space: nowrap;
+        }
+        .btn-ghost-light:hover {
+          background: rgba(255,255,255,0.12);
+          border-color: rgba(255,255,255,0.30);
+          color: #fff;
+        }
+
         /* ── RESPONSIVE ───────────────────────────────────── */
         @media (max-width: 900px) {
           .hp-process {
             grid-template-columns: repeat(2, 1fr);
           }
+          .hp-process__connector { display: none; }
+          .hp-hero__scroll { display: none; }
         }
         @media (max-width: 640px) {
           .hp-hero__ctas { flex-direction: column; }
           .hp-hero__ctas .btn { width: 100%; justify-content: center; }
-          .hp-hero__scroll { display: none; }
           .hp-stats { gap: var(--space-4); }
           .hp-stats__value { font-size: var(--text-xl); }
           .hp-section-head { flex-direction: column; align-items: flex-start; }
           .hp-cta { flex-direction: column; }
           .hp-cta__actions { width: 100%; }
-          .hp-cta__actions .btn { flex: 1; justify-content: center; }
+          .hp-cta__actions .btn,
+          .hp-cta__actions .btn-ghost-light { flex: 1; justify-content: center; }
           .hp-process { grid-template-columns: 1fr; }
           .hp-svc-card__img { height: 120px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .hp-hero__scroll { animation: none; }
+          .hp-hero__img { animation: none; }
+          .hp-hero__scanline { animation: none; opacity: 0; }
+          .hp-hero__scroll-thumb { animation: none; }
           .hp-svc-card:hover { transform: none; }
           .hp-svc-card__img img { transition: none; }
           .hp-process__icon { transition: none; }
           .hp-cat-tag:hover { transform: none; }
-          .hp-adv__item:hover::after { transform: scaleX(1); }
+          .hp-adv__item:hover::before { transform: scaleX(1); }
         }
       `}</style>
     </main>
