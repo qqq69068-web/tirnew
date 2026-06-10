@@ -3,7 +3,7 @@ export function TirnewLogo({ size = 32 }: { size?: number }) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 40 40"
+      viewBox="2 0 36 40"
       fill="none"
       aria-label="Tirnew — Truck Service"
       role="img"
