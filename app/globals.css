@@ -25,48 +25,38 @@
 
 /* ══════════════════════════════════════════════════════════════════
    ██  LIGHT THEME  —  "Service Bay Daylight"
-   ══════════════════════════════════════════════════════════════════
-   Philosophy:
-   • Page background: cool slate-gray (#f0f2f5) — not warm beige, not white
-   • Secondary background: slightly cooler slate (#e8eaed)
-   • Cards: pure white (#ffffff) — maximum contrast against slate page
-   • Elevated surfaces: white with border — modals, dropdowns stand out
-   • Borders: subtle cool gray — never warm, never too dark
-   • Text: near-black with blue-gray undertone (#111827) — not warm brown
-   • Red accent: deep automotive crimson (#c0392b) — professional, not alarming
-   • Secondary accent: steel teal (#0e7490) — industrial complement
    ══════════════════════════════════════════════════════════════════ */
 :root,
 [data-theme="light"] {
 
   /* ── Page backgrounds ── */
-  --bg:            #f0f2f5;   /* Cool slate-gray page canvas */
-  --bg2:           #e8eaed;   /* Slightly deeper section alternate */
-  --bg3:           #dde0e5;   /* Used for subtle inset sections */
+  --bg:            #f0f2f5;
+  --bg2:           #e8eaed;
+  --bg3:           #dde0e5;
 
   /* ── Card / surface layers ── */
-  --surface:       #ffffff;   /* White cards — clearly elevated from slate bg */
-  --surface2:      #f7f8fa;   /* Intra-card sections, table headers */
-  --surface3:      #eef0f3;   /* Hover rows, nested panels */
-  --surface-elevated: #ffffff; /* Modals, dropdowns — same as surface but explicit */
+  --surface:       #ffffff;
+  --surface2:      #f7f8fa;
+  --surface3:      #eef0f3;
+  --surface-elevated: #ffffff;
 
   /* ── Borders ── */
-  --border:        rgba(17, 24, 39, 0.08);   /* Subtle divider */
-  --border-strong: rgba(17, 24, 39, 0.15);   /* Input outlines, card edges */
-  --border-accent: rgba(192, 57, 43, 0.20);  /* Red-tinted borders */
-  --border-focus:  rgba(192, 57, 43, 0.35);  /* Focus rings */
+  --border:        rgba(17, 24, 39, 0.08);
+  --border-strong: rgba(17, 24, 39, 0.15);
+  --border-accent: rgba(192, 57, 43, 0.20);
+  --border-focus:  rgba(192, 57, 43, 0.35);
 
   /* ── Text ── */
-  --text:          #111827;   /* Near-black, blue-gray undertone */
-  --text-muted:    #4b5563;   /* Secondary text — clear & readable */
-  --text-faint:    #9ca3af;   /* Placeholders, hints, timestamps */
-  --text-inverse:  #ffffff;   /* On dark backgrounds */
+  --text:          #111827;
+  --text-muted:    #4b5563;
+  --text-faint:    #9ca3af;
+  --text-inverse:  #ffffff;
 
-  /* ── Brand: Automotive Crimson (red) ── */
-  --primary:        #c0392b;  /* Deep automotive red */
-  --primary-h:      #a93226;  /* Hover — slightly deeper */
-  --primary-dark:   #922b21;  /* Active state */
-  --primary-light:  #e74c3c;  /* Lighter variant for icons */
+  /* ── Brand: Automotive Crimson ── */
+  --primary:        #c0392b;
+  --primary-h:      #a93226;
+  --primary-dark:   #922b21;
+  --primary-light:  #e74c3c;
   --primary-glow:   rgba(192, 57, 43, 0.12);
   --primary-subtle: rgba(192, 57, 43, 0.07);
   --primary-subtle2:rgba(192, 57, 43, 0.12);
@@ -82,34 +72,30 @@
   --steel-light:    #94a3b8;
   --steel-subtle:   rgba(100, 116, 139, 0.10);
 
-  /* ── Status: New / Pending (amber) ── */
+  /* ── Status tokens ── */
   --status-new-bg:      #fefce8;
   --status-new-text:    #92400e;
   --status-new-border:  #fde68a;
 
-  /* ── Status: Done / Success (green) ── */
   --status-done-bg:     #f0fdf4;
   --status-done-text:   #166534;
   --status-done-border: #bbf7d0;
 
-  /* ── Status: In Progress (blue) ── */
   --status-progress-bg:     #eff6ff;
   --status-progress-text:   #1e40af;
   --status-progress-border: #bfdbfe;
 
-  /* ── Status: Cancelled (gray) ── */
   --status-cancel-bg:     #f9fafb;
   --status-cancel-text:   #374151;
   --status-cancel-border: #d1d5db;
 
-  /* ── Status: Received / Processing (red-tinted) ── */
   --status-received-bg:     #fff5f5;
   --status-received-text:   #9b2335;
   --status-received-border: #fecaca;
 
   /* ── Admin panel — sidebar stays dark in light mode (industry standard) ── */
   --admin-bg:                  #eef0f3;
-  --admin-sidebar-bg:          #1e2433;  /* Dark navy sidebar, theme-independent */
+  --admin-sidebar-bg:          #1e2433;
   --admin-sidebar-text:        #cbd5e1;
   --admin-sidebar-muted:       #64748b;
   --admin-sidebar-border:      rgba(255, 255, 255, 0.06);
@@ -117,7 +103,7 @@
   --admin-sidebar-active-text: #f87171;
   --admin-sidebar-hover-bg:    rgba(255, 255, 255, 0.06);
 
-  /* ── Shadows — cool-tinted, realistic depth ── */
+  /* ── Shadows ── */
   --shadow-sm:        0 1px 2px rgba(17, 24, 39, 0.06), 0 1px 3px rgba(17, 24, 39, 0.04);
   --shadow-md:        0 4px 12px rgba(17, 24, 39, 0.08), 0 2px 4px rgba(17, 24, 39, 0.05);
   --shadow-lg:        0 10px 32px rgba(17, 24, 39, 0.10), 0 4px 8px rgba(17, 24, 39, 0.06);
@@ -140,7 +126,7 @@
   --hero-badge-border: rgba(192, 57, 43, 0.32);
   --hero-badge-text:   #fca5a5;
 
-  /* ── Radius tokens (shared, no theme variant) ── */
+  /* ── Radius tokens ── */
   --radius:       0.5rem;
   --radius-md:    0.625rem;
   --radius-lg:    0.875rem;
@@ -152,53 +138,42 @@
 
 /* ══════════════════════════════════════════════════════════════════
    ██  DARK THEME  —  "Garage Night"
-   ══════════════════════════════════════════════════════════════════
-   Philosophy:
-   • Page background: warm graphite (#1a1d23) — NOT black, NOT #0c0b0a
-     Has a slight blue-gray warmth — like polished steel under workshop lights
-   • Secondary background: #22262f — clearly distinct from page background
-   • Cards: #2a2e38 — noticeably lighter than page, creates clear elevation
-   • Elevated surfaces: #31364200 — modals/dropdowns stand above cards
-   • Borders: subtle light — visible but not harsh
-   • Text: near-white with warm undertone (#e8eaed) — easy on eyes
-   • Red accent: bright signal red (#ef4444) — vivid against dark backgrounds
-   • Secondary accent: bright teal (#22d3ee) — neon-but-restrained industrial
    ══════════════════════════════════════════════════════════════════ */
 [data-theme="dark"] {
 
   /* ── Page backgrounds ── */
-  --bg:            #1a1d23;   /* Warm graphite — professional dark base */
-  --bg2:           #22262f;   /* Secondary sections — clearly distinct */
-  --bg3:           #191c22;   /* Deepest inset areas */
+  --bg:            #1a1d23;
+  --bg2:           #22262f;
+  --bg3:           #191c22;
 
   /* ── Card / surface layers ── */
-  --surface:       #272b35;   /* Cards — clearly elevated from #1a1d23 page */
-  --surface2:      #2f3341;   /* Table headers, nav hover backgrounds */
-  --surface3:      #363b4a;   /* Deep hover states, nested panels */
-  --surface-elevated: #30354500; /* Modals / dropdowns — above cards */
+  --surface:       #272b35;
+  --surface2:      #2f3341;
+  --surface3:      #363b4a;
+  --surface-elevated: #313645;
 
   /* ── Borders ── */
-  --border:        rgba(255, 255, 255, 0.07);   /* Subtle divider */
-  --border-strong: rgba(255, 255, 255, 0.12);   /* Input outlines, card edges */
-  --border-accent: rgba(239, 68, 68, 0.24);     /* Red-tinted borders */
-  --border-focus:  rgba(239, 68, 68, 0.40);     /* Focus rings */
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(239, 68, 68, 0.24);
+  --border-focus:  rgba(239, 68, 68, 0.40);
 
   /* ── Text ── */
-  --text:          #e8eaed;   /* Near-white, blue-gray undertone — easy to read */
-  --text-muted:    #8b949e;   /* Secondary text */
-  --text-faint:    #484f5a;   /* Placeholders, disabled, hints */
-  --text-inverse:  #111827;   /* On light accent backgrounds */
+  --text:          #e8eaed;
+  --text-muted:    #8b949e;
+  --text-faint:    #484f5a;
+  --text-inverse:  #111827;
 
-  /* ── Brand: Signal Red (brighter in dark mode for contrast) ── */
-  --primary:        #ef4444;  /* Signal red — vivid against dark */
-  --primary-h:      #dc2626;  /* Hover */
-  --primary-dark:   #b91c1c;  /* Active */
-  --primary-light:  #f87171;  /* Softer icons, links */
+  /* ── Brand: Signal Red ── */
+  --primary:        #ef4444;
+  --primary-h:      #dc2626;
+  --primary-dark:   #b91c1c;
+  --primary-light:  #f87171;
   --primary-glow:   rgba(239, 68, 68, 0.18);
   --primary-subtle: rgba(239, 68, 68, 0.10);
   --primary-subtle2:rgba(239, 68, 68, 0.16);
 
-  /* ── Secondary accent: Electric Teal (restrained) ── */
+  /* ── Secondary accent: Electric Teal ── */
   --accent:         #22d3ee;
   --accent-h:       #06b6d4;
   --accent-subtle:  rgba(34, 211, 238, 0.10);
@@ -209,34 +184,30 @@
   --steel-light:    #64748b;
   --steel-subtle:   rgba(148, 163, 184, 0.10);
 
-  /* ── Status: New / Pending ── */
+  /* ── Status tokens ── */
   --status-new-bg:      rgba(251, 191, 36, 0.12);
   --status-new-text:    #fbbf24;
   --status-new-border:  rgba(251, 191, 36, 0.28);
 
-  /* ── Status: Done / Success ── */
   --status-done-bg:     rgba(74, 222, 128, 0.10);
   --status-done-text:   #4ade80;
   --status-done-border: rgba(74, 222, 128, 0.26);
 
-  /* ── Status: In Progress ── */
   --status-progress-bg:     rgba(96, 165, 250, 0.10);
   --status-progress-text:   #60a5fa;
   --status-progress-border: rgba(96, 165, 250, 0.26);
 
-  /* ── Status: Cancelled ── */
   --status-cancel-bg:     rgba(148, 163, 184, 0.10);
   --status-cancel-text:   #94a3b8;
   --status-cancel-border: rgba(148, 163, 184, 0.22);
 
-  /* ── Status: Received / Processing ── */
   --status-received-bg:     rgba(239, 68, 68, 0.10);
   --status-received-text:   #f87171;
   --status-received-border: rgba(239, 68, 68, 0.24);
 
   /* ── Admin panel ── */
-  --admin-bg:                  #161920;   /* Slightly deeper than page bg */
-  --admin-sidebar-bg:          #111318;   /* Darkest — sidebar anchor */
+  --admin-bg:                  #161920;
+  --admin-sidebar-bg:          #111318;
   --admin-sidebar-text:        #b0b8c4;
   --admin-sidebar-muted:       #555d6b;
   --admin-sidebar-border:      rgba(255, 255, 255, 0.05);
@@ -244,7 +215,7 @@
   --admin-sidebar-active-text: #ef4444;
   --admin-sidebar-hover-bg:    rgba(255, 255, 255, 0.05);
 
-  /* ── Shadows — deeper, diffuse on dark backgrounds ── */
+  /* ── Shadows ── */
   --shadow-sm:        0 1px 3px rgba(0, 0, 0, 0.40);
   --shadow-md:        0 4px 14px rgba(0, 0, 0, 0.50);
   --shadow-lg:        0 10px 36px rgba(0, 0, 0, 0.58);
@@ -486,12 +457,14 @@ a { color: inherit; text-decoration: none; }
   padding-inline: clamp(var(--space-4), 3vw, var(--space-16));
 }
 
+/* Edge-to-edge sections with safe gutters */
 .container-full {
   width: 100%;
   padding-inline: clamp(var(--space-4), 3vw, var(--space-16));
 }
 
 /* ── SECTION SPACING SYSTEM ─────────────────────────────────────────── */
+/* Consistent vertical rhythm across ALL pages */
 .section {
   padding-block: clamp(var(--space-12), 7vw, var(--space-24));
 }
@@ -925,7 +898,8 @@ a { color: inherit; text-decoration: none; }
 #main-content { padding-top: 64px; }
 
 /* ═══════════════════════════════════════════════════════════════════
-   FOOTER — full-width, premium layout
+   FOOTER — full-width, 4-column premium layout
+   Optimized for 1440px and 1920px
 ═══════════════════════════════════════════════════════════════════ */
 .site-footer {
   background: var(--bg2);
@@ -1235,6 +1209,7 @@ a { color: inherit; text-decoration: none; }
 }
 .btn-icon.btn-sm { width: 34px; height: 34px; }
 
+/* Loading spinner inside button */
 .btn-spinner {
   width: 16px;
   height: 16px;
@@ -1425,7 +1400,7 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.6;
 }
 .form-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b949e' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-4) center;
   padding-right: var(--space-10);
@@ -1445,6 +1420,7 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
+/* Aliases for backward compat */
 .form-hint,
 .form-helper {
   font-size: var(--text-xs);
@@ -1477,6 +1453,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ── TABLE SYSTEM ───────────────────────────────────────────────────────────────── */
+/* .table-wrap is an alias for .table-wrapper */
 .table-wrapper,
 .table-wrap {
   background: var(--surface);
@@ -1487,7 +1464,8 @@ a { color: inherit; text-decoration: none; }
   -webkit-overflow-scrolling: touch;
 }
 
-.table-wrapper--sticky thead th {
+.table-wrapper--sticky thead th,
+.table-wrap--sticky thead th {
   position: sticky;
   top: 0;
   z-index: 1;
@@ -1803,7 +1781,7 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.65;
 }
 
-/* ── CONTACTS PAGE CLASSES ───────────────────── */
+/* ── CONTACTS PAGE CLASSES (replaces inline styles in contacts/page.tsx) ── */
 .contacts-hero {
   position: relative;
   overflow: hidden;
@@ -1986,17 +1964,20 @@ a { color: inherit; text-decoration: none; }
   min-height: 100dvh;
 }
 
+/* Wider sidebar on ultrawide */
 @media (min-width: 1600px) {
   .admin-sidebar { width: 260px; }
   .admin-main    { margin-left: 260px; }
 }
+
+/* Collapse sidebar on tablet/mobile */
 @media (max-width: 1024px) {
   .admin-sidebar {
     transform: translateX(-100%);
     box-shadow: var(--shadow-xl);
   }
   .admin-sidebar--open { transform: translateX(0); }
-  .admin-main    { margin-left: 0; }
+  .admin-main { margin-left: 0; }
 }
 
 .admin-topbar {
@@ -2023,6 +2004,7 @@ a { color: inherit; text-decoration: none; }
   .admin-content { padding: var(--space-4); }
 }
 
+/* Admin KPI stats grid — scales gracefully to ultrawide */
 .admin-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -2030,6 +2012,9 @@ a { color: inherit; text-decoration: none; }
 }
 @media (min-width: 1440px) {
   .admin-stats-grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (min-width: 1800px) {
+  .admin-stats-grid { grid-template-columns: repeat(6, 1fr); }
 }
 
 /* ── GLOBAL KEYFRAMES ─────────────────────────────────────────────────────────────── */
@@ -2056,6 +2041,7 @@ a { color: inherit; text-decoration: none; }
 
 .bg-surface  { background: var(--surface); }
 .bg-surface2 { background: var(--surface2); }
+.bg-surface3 { background: var(--surface3); }
 .bg-bg       { background: var(--bg); }
 
 .border-b { border-bottom: 1px solid var(--border); }
@@ -2106,6 +2092,7 @@ a { color: inherit; text-decoration: none; }
   margin-block: var(--space-8);
 }
 
+/* Empty state component */
 .empty-state {
   display: flex;
   flex-direction: column;
