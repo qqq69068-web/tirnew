@@ -1505,7 +1505,7 @@ a { color: inherit; text-decoration: none; }
 }
 .data-table tbody tr:hover { background: var(--surface2); }
 
-.data-table td.muted { color: var(--text-muted); }
+.data-table td.muted  { color: var(--text-muted); }
 .data-table td.strong { font-weight: 600; color: var(--text); }
 .data-table td.mono {
   font-variant-numeric: tabular-nums;
