@@ -22,6 +22,16 @@ const footerServices = [
   { href: "/services/electrics",      label: "Електрика" },
 ];
 
+// Pages that have a full-bleed hero photo — navbar stays transparent on these
+const HERO_PAGES = ["/", "/services"];
+
+function pageHasHero(pathname: string): boolean {
+  // exact match OR starts with /services/ (individual service pages may also have hero)
+  return HERO_PAGES.some((p) =>
+    p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(p + "/")
+  );
+}
+
 function isActive(href: string, pathname: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
@@ -39,6 +49,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef   = useRef<HTMLDivElement>(null);
   const pathname  = usePathname();
+
+  const hasHero = pageHasHero(pathname);
+  // Navbar shows solid background when: scrolled OR on a page without hero
+  const navSolid = scrolled || !hasHero;
 
   useEffect(() => {
     const saved = localStorage.getItem("tirnew-theme");
@@ -60,6 +74,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handler, { passive: true });
+    handler(); // check immediately on mount
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
@@ -119,7 +134,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="site-wrapper">
 
-      {/* ═══ PROGRESS BAR ═════════════════════════════════ */}
+      {/* ═══ PROGRESS BAR ═════════════════════════════════════ */}
       <div
         aria-hidden
         className="page-progress"
@@ -132,8 +147,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* ═══ NAVBAR ═════════════════════════════════════ */}
-      <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
+      {/* ═══ NAVBAR ═══════════════════════════════════════════ */}
+      <header className={`site-nav theme-transition${navSolid ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner">
 
           {/* Logo */}
@@ -278,9 +293,15 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         <div className="mobile-backdrop" aria-hidden onClick={() => setOpen(false)} />
       )}
 
-      <main id="main-content">{children}</main>
+      {/*
+        On hero pages (/, /services/*): content starts at top=0, hero photo fills behind navbar.
+        On all other pages: add padding-top so content isn't hidden under the fixed navbar.
+      */}
+      <main id="main-content" style={hasHero ? undefined : { paddingTop: "58px" }}>
+        {children}
+      </main>
 
-      {/* ═══ FOOTER ═════════════════════════════════════ */}
+      {/* ═══ FOOTER ═══════════════════════════════════════════════ */}
       <footer className="site-footer">
         <div className="container site-footer__grid">
 
@@ -353,10 +374,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
       <style>{`
         /* ══════════════════════════════════════════════════════
-           NAVBAR — transparent overlay, floats over hero photo
+           NAVBAR — transparent overlay on hero pages,
+                    solid frosted glass on all other pages
         ══════════════════════════════════════════════════════ */
 
-        /* Remove default top padding — navbar overlays content */
         #main-content {
           padding-top: 0;
         }
@@ -367,7 +388,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           left: 0;
           right: 0;
           z-index: 100;
-          /* fully transparent by default — sits over the hero photo */
           background: transparent;
           border-bottom: 1px solid transparent;
           transition:
@@ -376,9 +396,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             box-shadow 0.32s ease;
         }
 
-        /* Once user scrolls — fade in a subtle frosted glass background */
         .site-nav--scrolled {
-          background: oklch(from var(--bg) l c h / 0.88);
+          background: oklch(from var(--bg) l c h / 0.92);
           backdrop-filter: blur(20px) saturate(1.5);
           -webkit-backdrop-filter: blur(20px) saturate(1.5);
           border-bottom-color: var(--border);
@@ -397,7 +416,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           gap: var(--space-6);
         }
 
-        /* Logo — always white text so it's readable over the dark hero photo */
+        /* Logo */
         .site-nav__logo {
           display: flex;
           align-items: center;
@@ -415,7 +434,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           font-family: var(--font-display);
           font-size: var(--text-sm);
           font-weight: 800;
-          /* white over photo, transitions to normal text color after scroll */
           color: rgba(255,255,255,0.95);
           letter-spacing: -0.02em;
           transition: color 0.32s ease;
@@ -435,7 +453,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text-faint);
         }
 
-        /* Nav links — white over photo */
+        /* Nav links */
         .site-nav__links {
           display: flex;
           align-items: center;
@@ -453,9 +471,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: rgba(255,255,255,0.75);
           text-decoration: none;
           letter-spacing: -0.005em;
-          transition:
-            color 0.16s ease,
-            background 0.16s ease;
+          transition: color 0.16s ease, background 0.16s ease;
         }
         .nav-link:hover {
           color: rgba(255,255,255,1);
@@ -466,7 +482,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           font-weight: 600;
           background: rgba(255,255,255,0.12);
         }
-        /* After scroll — revert to normal theme colours */
         .site-nav--scrolled .nav-link {
           color: var(--text-muted);
         }
@@ -487,7 +502,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           flex-shrink: 0;
         }
 
-        /* Phone — white over photo */
+        /* Phone */
         .site-nav__phone {
           display: none;
           align-items: center;
@@ -526,10 +541,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           padding: var(--space-2) var(--space-3);
           border-radius: var(--radius-md);
           border: 1px solid rgba(255,255,255,0.18);
-          transition:
-            color 0.16s ease,
-            background 0.16s ease,
-            border-color 0.16s ease;
+          transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease;
         }
         .site-nav__cabinet:hover {
           color: rgba(255,255,255,1);
@@ -555,7 +567,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         @media (min-width: 768px) { .site-nav__cabinet { display: flex; } }
 
-        /* Theme toggle icon */
+        /* Theme toggle */
         .btn-icon--nav {
           width: 34px;
           height: 34px;
@@ -566,10 +578,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border: 1px solid rgba(255,255,255,0.18);
           color: rgba(255,255,255,0.70);
           background: transparent;
-          transition:
-            color 0.16s ease,
-            background 0.16s ease,
-            border-color 0.16s ease;
+          transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease;
         }
         .btn-icon--nav:hover {
           color: rgba(255,255,255,1);
@@ -586,7 +595,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           background: oklch(from var(--text) l c h / 0.05);
         }
 
-        /* CTA button stays branded (amber) in both states */
+        /* CTA button */
         .site-nav .btn-primary {
           background: var(--primary);
           color: #fff;
@@ -597,7 +606,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-color: var(--primary-h);
         }
 
-        /* Burger — white over photo */
+        /* Burger */
         .site-nav__burger {
           border-color: rgba(255,255,255,0.22);
         }
@@ -625,7 +634,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           background: var(--text);
         }
 
-        /* Mobile controls */
+        /* Mobile */
         @media (max-width: 767px) {
           .site-nav__links { display: none; }
           .site-nav__phone  { display: none !important; }
