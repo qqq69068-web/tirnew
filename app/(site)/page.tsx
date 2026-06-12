@@ -106,15 +106,14 @@ function TruckPhoto() {
       <div className="hp-truck__headlight" />
 
       {/*
-        img has scaleX(-1) → truck faces LEFT (cab on the left side).
-        Mask stays on wrapper (no flip) so fades work correctly:
-        Left fade 0%→45%: hides the hard-cut cab edge.
-        Right fade 80%→100%: softly hides the trailer end.
+        truck_PNG16209 — повні колеса, бічний вид.
+        scaleX(-1) на img → кабіна дивиться ВЛІВО.
+        Маска на обгортці не перевертається — фейди коректні.
       */}
       <div className="hp-truck__img-mask truck-entrance">
         <img
           className="hp-truck__img"
-          src="https://pngimg.com/uploads/truck/truck_PNG16212.png"
+          src="https://pngimg.com/uploads/truck/truck_PNG16209.png"
           alt=""
           width={1247}
           height={710}
@@ -142,8 +141,6 @@ export default function HomePage() {
 
       {/* ── HERO: pure dark background, no photo ── */}
       <section className="hp-hero">
-        {/* No hp-hero__bg / Unsplash image — replaced by CSS gradient on .hp-hero */}
-
         <div className="container">
           <div className="hp-hero__content">
             <div className="fade-in hp-hero__label">
@@ -325,12 +322,6 @@ export default function HomePage() {
           transition: transform 0.1s linear;
         }
 
-        /*
-          Mask on wrapper (NOT flipped) — fades work correctly.
-          img has scaleX(-1) inline → truck faces LEFT (cab on left).
-          LEFT side fade 0%→45%: hides the hard-cut cab edge.
-          RIGHT side fade 80%→100%: softly hides the trailer end.
-        */
         .hp-truck__img-mask {
           display: block;
           width: 100%;
@@ -363,11 +354,9 @@ export default function HomePage() {
             drop-shadow(0 4px 12px oklch(0 0 0 / 0.40))
             contrast(1.05) saturate(0.92) brightness(0.96);
           position: relative; z-index: 2;
-          /* scaleX(-1) flips only the img — mask on parent stays correct */
           transform: scaleX(-1);
         }
 
-        /* Drive-in animation: truck comes from the right */
         @keyframes truckDrive {
           0%   { opacity: 0; transform: translateX(110%); }
           8%   { opacity: 1; }
