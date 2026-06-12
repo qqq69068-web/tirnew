@@ -16,7 +16,18 @@ export default function PricePage() {
 
         {/* ─── HERO ────────────────────────────────────── */}
         <section className="price-hero">
-          <div className="price-hero__bg" aria-hidden />
+          <div className="price-hero__bg" aria-hidden>
+            <img
+              src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80"
+              alt=""
+              width={1600}
+              height={900}
+              loading="eager"
+              decoding="async"
+              className="price-hero__img"
+            />
+            <div className="price-hero__overlay" />
+          </div>
           <div className="price-hero__inner container">
             <p className="price-eyebrow">Вартість робіт</p>
             <h1 className="price-hero__title">Прайс на послуги</h1>
@@ -110,18 +121,48 @@ export default function PricePage() {
 
         /* ─── HERO ─────────────────────────────────── */
         .price-hero {
-          position: relative; overflow: hidden;
+          position: relative;
+          min-height: 44vh;
+          display: flex;
+          align-items: flex-end;
+          overflow: hidden;
           padding: clamp(var(--space-8), 6vw, var(--space-16)) 0 clamp(var(--space-6), 4vw, var(--space-10));
           border-bottom: 1px solid var(--border);
           background: var(--bg);
         }
         .price-hero__bg {
-          position: absolute; inset: 0;
-          background-image: url(https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80);
-          background-size: cover; background-position: center;
-          opacity: 0.06; mix-blend-mode: luminosity;
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
         }
-        .price-hero__inner { position: relative; display: flex; flex-direction: column; gap: var(--space-3); text-align: left; align-items: flex-start; }
+        .price-hero__img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 35%;
+          filter: brightness(0.38) contrast(1.05) saturate(0.7);
+        }
+        .price-hero__overlay {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(
+              108deg,
+              oklch(0.09 0.015 55 / 0.92) 0%,
+              oklch(0.09 0.015 55 / 0.50) 55%,
+              oklch(0.09 0.015 55 / 0.08) 100%
+            );
+        }
+        .price-hero__inner {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-3);
+          text-align: left;
+          align-items: flex-start;
+        }
         .price-eyebrow {
           font-size: var(--text-xs); font-weight: 700;
           text-transform: uppercase; letter-spacing: 0.14em; color: var(--primary);
