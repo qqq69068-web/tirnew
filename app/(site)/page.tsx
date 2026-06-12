@@ -360,8 +360,31 @@ export default function HomePage() {
           display: block;
           width: 100%;
           height: auto;
-          /* Scale and position so wheels sit on the ground line */
-          transform: scaleX(-1); /* mirror: make truck face left → into the page */
+          /*
+           * scaleX(-1) mirrors the truck so it faces left (into the page).
+           * mask-image fades out:
+           *   — left edge: 0% transparent → 22% fully visible  (hides the hard left cut of the PNG)
+           *   — right edge: 78% fully visible → 100% transparent (hides the hard right cut)
+           * Because the image is mirrored with scaleX(-1), "left" in CSS mask
+           * corresponds to the right side of the visual truck (the trailer end),
+           * and "right" in CSS mask corresponds to the truck cab / front.
+           * We want a stronger fade on the trailer end (left in mask = right visually).
+           */
+          transform: scaleX(-1);
+          -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 18%,
+            black 72%,
+            transparent 100%
+          );
+          mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 18%,
+            black 72%,
+            transparent 100%
+          );
           filter:
             drop-shadow(0 24px 48px oklch(0 0 0 / 0.55))
             drop-shadow(0 4px 12px oklch(0 0 0 / 0.40))
@@ -434,7 +457,6 @@ export default function HomePage() {
         /* Exhaust smoke */
         .hp-truck__exhaust {
           position: absolute;
-          /* position near the exhaust stacks of a mirrored right-facing truck */
           top: 8%; left: 42%;
           z-index: 3;
           pointer-events: none;
