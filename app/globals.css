@@ -7,50 +7,44 @@
 /* ═══════════════════════════════════════════════════════════════════
    TIRNEW — AUTOMOTIVE DESIGN SYSTEM 2026
    Art direction: Heavy truck workshop → warm industrial restraint
-   Palette: Warm Graphite surfaces + Amber Gold accent
+   Palette: Warm Graphite surfaces + Bright Yellow accent
    Fonts: Cabinet Grotesk (display) + Satoshi (body)
    Theme: SINGLE — "Garage Night"  (no toggle, always dark)
-
-   Backgrounds are warm mid-gray (not pitch-black), so the page
-   feels like concrete walls under workshop fluorescents — not a
-   generic "dark mode" app.
-   Cards sit noticeably lighter than the page → clear depth.
-   Amber accent reads as warning-light chrome — automotive, not generic.
 ═══════════════════════════════════════════════════════════════════ */
 
 :root {
 
   /* ── Page backgrounds — warm mid-gray concrete ── */
-  --bg:            #222120;   /* main page — dark but NOT black */
-  --bg2:           #1e1d1c;   /* alternate sections (slightly darker) */
-  --bg3:           #1a1918;   /* deepest bg — footer, etc. */
+  --bg:            #222120;
+  --bg2:           #1e1d1c;
+  --bg3:           #1a1918;
 
-  /* ── Card / surface layers — clearly lighter than bg ── */
-  --surface:       #2e2c2a;   /* cards — visible lift above bg */
-  --surface2:      #353330;   /* hover states, table rows */
-  --surface3:      #3c3a37;   /* nested depth */
-  --surface-elevated: #3a3835; /* elevated modals, popovers */
+  /* ── Card / surface layers ── */
+  --surface:       #2e2c2a;
+  --surface2:      #353330;
+  --surface3:      #3c3a37;
+  --surface-elevated: #3a3835;
 
-  /* ── Borders — warm-tinted, alpha ── */
-  --border:        rgba(255, 240, 200, 0.07);
-  --border-strong: rgba(255, 240, 200, 0.13);
-  --border-accent: rgba(212, 153, 31,  0.28);
-  --border-focus:  rgba(212, 153, 31,  0.50);
+  /* ── Borders ── */
+  --border:        rgba(255, 245, 180, 0.07);
+  --border-strong: rgba(255, 245, 180, 0.13);
+  --border-accent: rgba(255, 214, 0,   0.30);
+  --border-focus:  rgba(255, 214, 0,   0.55);
 
   /* ── Text ── */
-  --text:          #e4e0d8;   /* primary — warm white, not cold */
+  --text:          #e4e0d8;
   --text-muted:    #8a8070;
   --text-faint:    #504c46;
   --text-inverse:  #1c1a16;
 
-  /* ── Brand: Amber Gold — warm, workshop-adjacent ── */
-  --primary:        #d4991f;
-  --primary-h:      #be8518;
-  --primary-dark:   #a06c10;
-  --primary-light:  #f0c050;
-  --primary-glow:   rgba(212, 153, 31, 0.22);
-  --primary-subtle: rgba(212, 153, 31, 0.10);
-  --primary-subtle2:rgba(212, 153, 31, 0.17);
+  /* ── Brand: Bright Yellow ── */
+  --primary:        #ffd600;
+  --primary-h:      #f0c800;
+  --primary-dark:   #d4a800;
+  --primary-light:  #ffe033;
+  --primary-glow:   rgba(255, 214, 0, 0.22);
+  --primary-subtle: rgba(255, 214, 0, 0.10);
+  --primary-subtle2:rgba(255, 214, 0, 0.17);
 
   /* ── Secondary accent: Steel Blue ── */
   --accent:         #7ea8cc;
@@ -64,9 +58,9 @@
   --steel-subtle:   rgba(160, 144, 128, 0.10);
 
   /* ── Status tokens ── */
-  --status-new-bg:      rgba(212, 153, 31, 0.12);
-  --status-new-text:    #e8b84a;
-  --status-new-border:  rgba(212, 153, 31, 0.28);
+  --status-new-bg:      rgba(255, 214, 0, 0.12);
+  --status-new-text:    #ffe033;
+  --status-new-border:  rgba(255, 214, 0, 0.30);
 
   --status-done-bg:     rgba(74, 222, 128, 0.10);
   --status-done-text:   #4ade80;
@@ -80,19 +74,19 @@
   --status-cancel-text:   #a09080;
   --status-cancel-border: rgba(160, 144, 128, 0.22);
 
-  --status-received-bg:     rgba(212, 153, 31, 0.10);
-  --status-received-text:   #d4991f;
-  --status-received-border: rgba(212, 153, 31, 0.24);
+  --status-received-bg:     rgba(255, 214, 0, 0.10);
+  --status-received-text:   #ffd600;
+  --status-received-border: rgba(255, 214, 0, 0.26);
 
   /* ── Admin panel ── */
   --admin-bg:                  #1a1918;
   --admin-sidebar-bg:          #161514;
   --admin-sidebar-text:        #b0a898;
   --admin-sidebar-muted:       #58524a;
-  --admin-sidebar-border:      rgba(255, 240, 200, 0.05);
-  --admin-sidebar-active-bg:   rgba(212, 153, 31, 0.15);
-  --admin-sidebar-active-text: #d4991f;
-  --admin-sidebar-hover-bg:    rgba(255, 240, 200, 0.05);
+  --admin-sidebar-border:      rgba(255, 245, 180, 0.05);
+  --admin-sidebar-active-bg:   rgba(255, 214, 0, 0.12);
+  --admin-sidebar-active-text: #ffd600;
+  --admin-sidebar-hover-bg:    rgba(255, 245, 180, 0.05);
 
   /* ── Shadows ── */
   --shadow-sm:        0 1px 3px  rgba(0, 0, 0, 0.40);
@@ -100,22 +94,22 @@
   --shadow-lg:        0 10px 36px rgba(0, 0, 0, 0.60);
   --shadow-xl:        0 20px 60px rgba(0, 0, 0, 0.68);
   --shadow-card-hover:0 8px 28px rgba(0, 0, 0, 0.65);
-  --shadow-primary:   0 6px 22px rgba(212, 153, 31, 0.30);
+  --shadow-primary:   0 6px 22px rgba(255, 214, 0, 0.28);
   --shadow-inner:     inset 0 1px 4px rgba(0, 0, 0, 0.40);
   --shadow-admin-card:0 2px 8px rgba(0, 0, 0, 0.36), 0 1px 2px rgba(0, 0, 0, 0.26);
 
   /* ── Navigation ── */
   --nav-bg:         rgba(30, 29, 28, 0.85);
   --nav-bg-scroll:  rgba(30, 29, 28, 0.97);
-  --nav-border:     rgba(255, 240, 200, 0.08);
+  --nav-border:     rgba(255, 245, 180, 0.08);
 
   /* ── Hero overlay ── */
   --hero-overlay:       linear-gradient(180deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.58) 55%, rgba(26,25,24,0.96) 100%);
   --hero-text:          #ffffff;
   --hero-text-sub:      rgba(255, 255, 255, 0.62);
-  --hero-badge-bg:      rgba(212, 153, 31, 0.14);
-  --hero-badge-border:  rgba(212, 153, 31, 0.32);
-  --hero-badge-text:    #f0c060;
+  --hero-badge-bg:      rgba(255, 214, 0, 0.14);
+  --hero-badge-border:  rgba(255, 214, 0, 0.32);
+  --hero-badge-text:    #ffe033;
 
   /* ── Radius tokens ── */
   --radius:       0.4rem;
@@ -144,9 +138,11 @@
   --space-4:  1rem;
   --space-5:  1.25rem;
   --space-6:  1.5rem;
+  --space-7:  1.75rem;
   --space-8:  2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
+  --space-14: 3.5rem;
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
@@ -216,7 +212,7 @@ button {
 a { color: inherit; text-decoration: none; }
 
 ::selection {
-  background: rgba(212, 153, 31, 0.22);
+  background: rgba(255, 214, 0, 0.22);
   color: var(--text);
 }
 
@@ -1693,60 +1689,24 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ── TRUCK ENTRANCE ANIMATION ──────────────────────────────────────────── */
-/*
-  Usage: додай до SVG/img елементу фури клас .truck-entrance
-  Можна також використовувати .truck-entrance--slow для плавнішої версії
-
-  Фура заїжджає справа, спочатку швидко, потім плавно гальмує
-  на кінцевому місці — як справжній вантажівка.
-*/
 @keyframes truckDrive {
-  0% {
-    transform: translateX(120%);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  75% {
-    transform: translateX(4px);
-  }
-  85% {
-    transform: translateX(-3px);
-  }
-  92% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  0%   { transform: translateX(120%); opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { transform: translateX(4px); }
+  85%  { transform: translateX(-3px); }
+  92%  { transform: translateX(2px); }
+  100% { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes truckDriveSlow {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  12% {
-    opacity: 1;
-  }
-  70% {
-    transform: translateX(6px);
-  }
-  82% {
-    transform: translateX(-4px);
-  }
-  91% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  0%   { transform: translateX(100%); opacity: 0; }
+  12%  { opacity: 1; }
+  70%  { transform: translateX(6px); }
+  82%  { transform: translateX(-4px); }
+  91%  { transform: translateX(2px); }
+  100% { transform: translateX(0); opacity: 1; }
 }
 
-/* Легке підгойдування коліс після зупинки */
 @keyframes truckSettle {
   0%   { transform: translateY(0); }
   30%  { transform: translateY(-2px); }
@@ -1762,12 +1722,10 @@ a { color: inherit; text-decoration: none; }
   animation: truckDriveSlow 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Delay варіанти для truck */
 .truck-entrance-delay-200 { animation-delay: 0.2s; }
 .truck-entrance-delay-400 { animation-delay: 0.4s; }
 .truck-entrance-delay-600 { animation-delay: 0.6s; }
 
-/* Колеса (дочірній елемент) гойдаються після зупинки фури */
 .truck-entrance .truck-wheels,
 .truck-entrance--slow .truck-wheels {
   animation: truckDrive 1.1s cubic-bezier(0.22, 1, 0.36, 1) both,
