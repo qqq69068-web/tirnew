@@ -93,6 +93,7 @@ function TruckPhoto() {
       if (!hero) return;
       const rect = hero.getBoundingClientRect();
       const progress = Math.max(0, Math.min(1, -rect.top / rect.height));
+      // Only translateX — vertical position is handled purely by CSS
       el.style.transform = `translateX(${progress * 60}px)`;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -103,7 +104,7 @@ function TruckPhoto() {
     <div className="hp-truck" aria-hidden ref={wrapRef}>
       <div className="hp-truck__road" />
       <div className="hp-truck__shadow" />
-      <div className="hp-truck__headlight" />
+      {/* hp-truck__headlight removed — was causing yellow corner artifact */}
 
       <div className="hp-truck__img-mask truck-entrance">
         <img
@@ -309,11 +310,14 @@ export default function HomePage() {
           pointer-events: none;
         }
 
-        /* ══ TRUCK — вертикально центрований, зміщений трохи вниз ══ */
+        /* ══ TRUCK ══
+           Vertical position set purely via CSS (top + margin-top).
+           JS only writes translateX so it never overrides vertical placement.
+        */
         .hp-truck {
           position: absolute;
           top: 50%;
-          transform: translateY(-38%);
+          margin-top: -18%;   /* shift up so cab is near the CTA buttons */
           right: -2%;
           z-index: 4;
           pointer-events: none;
@@ -390,24 +394,7 @@ export default function HomePage() {
           z-index: 0;
           animation: shadowAppear 1s ease 0.3s both;
         }
-        .hp-truck__headlight {
-          position: absolute;
-          bottom: 3%; left: -8%;
-          width: 44%; height: 60%;
-          background: radial-gradient(
-            ellipse 80% 50% at 12% 90%,
-            oklch(0.92 0.12 88 / 0.12) 0%,
-            oklch(0.92 0.12 88 / 0.05) 40%,
-            transparent 70%
-          );
-          z-index: 1;
-          pointer-events: none;
-          animation: headlightPulse 3s ease-in-out 3.2s infinite alternate;
-        }
-        @keyframes headlightPulse {
-          from { opacity: 0.7; }
-          to   { opacity: 1; }
-        }
+
         .hp-truck__exhaust {
           position: absolute; top: 8%; left: 42%;
           z-index: 3; pointer-events: none;
