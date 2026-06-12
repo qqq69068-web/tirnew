@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Sun, Moon } from "lucide-react";
+import { User, Sun, Moon, Phone, MapPin, Clock } from "lucide-react";
 import AiChat from "@/components/AiChat";
 import { TirnewLogo } from "@/components/TirnewLogo";
 
@@ -15,11 +15,11 @@ const links = [
 ];
 
 const footerServices = [
-  { href: "/services/engine-repair",     label: "Ремонт двигунів" },
-  { href: "/services/gearbox-repair",    label: "Ремонт КПП" },
-  { href: "/services/brake-system",      label: "Гальмівна система" },
-  { href: "/services/pneumo-system",     label: "Пневмосистема" },
-  { href: "/services/electrics",         label: "Електрика" },
+  { href: "/services/engine-repair",  label: "Ремонт двигунів" },
+  { href: "/services/gearbox-repair", label: "Ремонт КПП" },
+  { href: "/services/brake-system",   label: "Гальмівна система" },
+  { href: "/services/pneumo-system",  label: "Пневмосистема" },
+  { href: "/services/electrics",      label: "Електрика" },
 ];
 
 function isActive(href: string, pathname: string): boolean {
@@ -37,8 +37,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const [progress, setProgress]       = useState(0);
   const [progVisible, setProgVisible] = useState(false);
   const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
+  const menuRef   = useRef<HTMLDivElement>(null);
+  const pathname  = usePathname();
 
   useEffect(() => {
     const saved = localStorage.getItem("tirnew-theme");
@@ -66,7 +66,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     setProgVisible(true);
     setProgress(0);
-    const t1 = setTimeout(() => setProgress(40), 50);
+    const t1 = setTimeout(() => setProgress(40),  50);
     const t2 = setTimeout(() => setProgress(70), 200);
     const t3 = setTimeout(() => setProgress(85), 500);
     const t4 = setTimeout(() => setProgress(100), 700);
@@ -86,7 +86,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       .catch(() => setIsClient(false));
   }, [pathname]);
 
-  // ── GLOBAL REVEAL OBSERVER ─────────────────────────────────────────
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) =>
@@ -103,31 +102,24 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         if (!el.classList.contains("visible")) obs.observe(el);
       });
     }, 60);
-    return () => {
-      clearTimeout(timer);
-      obs.disconnect();
-    };
+    return () => { clearTimeout(timer); obs.disconnect(); };
   }, [pathname]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const cabinetLabel     = isClient ? "Кабінет" : "Кабінет";
   const cabinetLabelFull = isClient ? "Особистий кабінет" : "Увійти / Реєстрація";
 
   return (
     <div className="site-wrapper">
 
-      {/* PROGRESS BAR */}
+      {/* ═══ PROGRESS BAR ═════════════════════════════════ */}
       <div
         aria-hidden
         className="page-progress"
@@ -140,21 +132,21 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* NAVBAR */}
+      {/* ═══ NAVBAR ═════════════════════════════════════ */}
       <header className={`site-nav theme-transition${scrolled ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner">
 
-          {/* LOGO */}
-          <Link href="/" className="site-nav__logo">
-            <TirnewLogo size={30} />
+          {/* Logo */}
+          <Link href="/" className="site-nav__logo" aria-label="Tirnew — головна">
+            <TirnewLogo size={28} />
             <div className="site-nav__brand">
               <span className="site-nav__brand-name">Tirnew</span>
               <span className="site-nav__brand-sub">Truck Service</span>
             </div>
           </Link>
 
-          {/* DESKTOP NAV LINKS — centered */}
-          <nav className="site-nav__links hidden md:flex" aria-label="Головне меню">
+          {/* Desktop nav links */}
+          <nav className="site-nav__links" aria-label="Головне меню">
             {links.map((l) => {
               const active = isActive(l.href, pathname);
               return (
@@ -165,51 +157,43 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                   aria-current={active ? "page" : undefined}
                 >
                   {l.label}
-                  {active && <span className="nav-link__bar" aria-hidden />}
                 </Link>
               );
             })}
           </nav>
 
-          {/* DESKTOP CONTROLS */}
+          {/* Desktop right controls */}
           <div className="site-nav__controls">
-            {/* Phone */}
-            <a href="tel:+380664188826" className="site-nav__phone hidden md:flex">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-              <span>+380 66 418 88 26</span>
+            <a href="tel:+380664188826" className="site-nav__phone" aria-label="Телефон">
+              <Phone size={12} strokeWidth={2} aria-hidden />
+              +380 66 418 88 26
             </a>
-
-            <div className="site-nav__divider hidden md:block" aria-hidden />
 
             <button
               onClick={toggleTheme}
               aria-label={dark ? "Світла тема" : "Темна тема"}
               className="btn-icon btn-icon--nav"
             >
-              <span className={`theme-icon${dark ? " theme-icon--sun" : " theme-icon--moon"}`}>
-                {dark
-                  ? <Sun  size={15} strokeWidth={2} aria-hidden />
-                  : <Moon size={15} strokeWidth={2} aria-hidden />}
-              </span>
+              {dark
+                ? <Sun  size={14} strokeWidth={2} aria-hidden />
+                : <Moon size={14} strokeWidth={2} aria-hidden />}
             </button>
 
-            {/* Cabinet — outlined accent */}
             <Link
               href="/cabinet"
-              className={`site-nav__cabinet site-nav__cabinet--outlined hidden md:inline-flex${isClient ? " site-nav__cabinet--auth" : ""}`}
+              className={`site-nav__cabinet${isClient ? " is-auth" : ""}`}
+              aria-label={cabinetLabelFull}
             >
               <User size={13} strokeWidth={2} aria-hidden />
-              {cabinetLabel}
+              <span>{isClient ? "Кабінет" : "Увійти"}</span>
             </Link>
 
-            <Link href="/contacts" className="btn btn-primary btn-sm hidden md:inline-flex">
+            <Link href="/contacts" className="btn btn-primary btn-sm">
               Зв&apos;язатись
             </Link>
 
-            {/* MOBILE BURGER */}
-            <div className="site-nav__mobile-wrap flex md:hidden" ref={menuRef}>
+            {/* Mobile burger */}
+            <div className="site-nav__mobile-wrap" ref={menuRef}>
               <button
                 onClick={() => setOpen((v) => !v)}
                 className={`site-nav__burger${open ? " open" : ""}`}
@@ -291,75 +275,412 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </header>
 
       {open && (
-        <div
-          className="mobile-backdrop"
-          aria-hidden
-          onClick={() => setOpen(false)}
-        />
+        <div className="mobile-backdrop" aria-hidden onClick={() => setOpen(false)} />
       )}
 
       <main id="main-content">{children}</main>
 
-      {/* FOOTER */}
+      {/* ═══ FOOTER ═════════════════════════════════════ */}
       <footer className="site-footer">
-        <div className="container site-footer__inner">
+        <div className="container site-footer__grid">
 
-          {/* COL 1 — Brand + contacts */}
+          {/* Col 1 — Brand */}
           <div className="site-footer__brand">
-            <Link href="/" className="site-footer__logo">
-              <TirnewLogo size={28} />
-              <div className="site-footer__logo-brand">
-                <span className="site-footer__logo-name">Tirnew</span>
-                <span className="site-footer__logo-sub">Truck Service</span>
+            <Link href="/" className="site-footer__logo" aria-label="Tirnew">
+              <TirnewLogo size={26} />
+              <div>
+                <p className="site-footer__logo-name">Tirnew</p>
+                <p className="site-footer__logo-sub">Truck Service</p>
               </div>
             </Link>
-            <p className="site-footer__desc">
-              Сервіс вантажних автомобілів,<br />
-              причепів і напівпричепів. Діагностика,<br />
-              ремонт, обслуговування.
+            <p className="site-footer__tagline">
+              Діагностика, ремонт і обслуговування<br />
+              вантажних авто, причепів<br />
+              і напівпричепів.
             </p>
-            <div className="site-footer__contacts">
-              <a href="tel:+380664188826" className="site-footer__contact site-footer__contact--phone">
-                +38 (066) 418-88-26
-              </a>
-              <span className="site-footer__contact site-footer__contact--address">
-                Рівненська обл., с. Велика Омеляна, вул. Шевченка 35
-              </span>
-              <span className="site-footer__contact site-footer__contact--hours">
-                Пн—Сб, 08:00—18:00
-              </span>
-            </div>
+            <ul className="site-footer__contacts">
+              <li>
+                <Phone size={13} className="site-footer__ci" aria-hidden />
+                <a href="tel:+380664188826" className="site-footer__clink">+38 (066) 418-88-26</a>
+              </li>
+              <li>
+                <MapPin size={13} className="site-footer__ci" aria-hidden />
+                <span>Рівненська обл., с. Велика Омеляна,<br />вул. Шевченка 35</span>
+              </li>
+              <li>
+                <Clock size={13} className="site-footer__ci" aria-hidden />
+                <span>Пн—Сб, 08:00—18:00</span>
+              </li>
+            </ul>
           </div>
 
-          {/* COL 2 — Navigation */}
-          <nav className="site-footer__nav" aria-label="Навігація футер">
-            <p className="site-footer__nav-title">Навігація</p>
-            {links.map((l) => (
-              <Link key={l.href} href={l.href} className="site-footer__link">{l.label}</Link>
-            ))}
-            <Link href="/cabinet" className="site-footer__link">Кабінет</Link>
+          {/* Col 2 — Navigation */}
+          <nav className="site-footer__col" aria-label="Навігація">
+            <p className="site-footer__col-title">Навігація</p>
+            <ul className="site-footer__col-list">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="site-footer__link">{l.label}</Link>
+                </li>
+              ))}
+              <li><Link href="/cabinet" className="site-footer__link">Кабінет</Link></li>
+            </ul>
           </nav>
 
-          {/* COL 3 — Services */}
-          <div className="site-footer__extra">
-            <p className="site-footer__nav-title">Послуги</p>
-            {footerServices.map((s) => (
-              <Link key={s.href} href={s.href} className="site-footer__link">{s.label}</Link>
-            ))}
+          {/* Col 3 — Services */}
+          <div className="site-footer__col">
+            <p className="site-footer__col-title">Послуги</p>
+            <ul className="site-footer__col-list">
+              {footerServices.map((s) => (
+                <li key={s.href}>
+                  <Link href={s.href} className="site-footer__link">{s.label}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
-
         </div>
 
-        <div className="site-footer__bottom">
-          <div className="container site-footer__bottom-inner">
-            <span className="site-footer__copy">&copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
-            <span className="site-footer__copy">Дипломний проект</span>
+        {/* Bottom bar */}
+        <div className="site-footer__bar">
+          <div className="container site-footer__bar-inner">
+            <span>&copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
+            <span>Дипломний проект</span>
           </div>
         </div>
       </footer>
 
       <AiChat />
 
+      <style>{`
+        /* ══════════════════════════════════════════════════════
+           NAVBAR
+        ══════════════════════════════════════════════════════ */
+        .site-nav {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          background: oklch(from var(--bg) l c h / 0.82);
+          backdrop-filter: blur(18px) saturate(1.4);
+          -webkit-backdrop-filter: blur(18px) saturate(1.4);
+          border-bottom: 1px solid transparent;
+          transition:
+            background 0.28s ease,
+            border-color 0.28s ease,
+            box-shadow 0.28s ease;
+        }
+        .site-nav--scrolled {
+          background: oklch(from var(--bg) l c h / 0.94);
+          border-bottom-color: var(--border);
+          box-shadow: 0 1px 0 0 var(--border),
+                      0 4px 24px oklch(0 0 0 / 0.06);
+        }
+        .site-nav__inner {
+          max-width: var(--content-wide);
+          margin-inline: auto;
+          padding-inline: var(--space-6);
+          height: 58px;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          gap: var(--space-6);
+        }
+
+        /* Logo */
+        .site-nav__logo {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          text-decoration: none;
+          flex-shrink: 0;
+        }
+        .site-nav__brand {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+          line-height: 1;
+        }
+        .site-nav__brand-name {
+          font-family: var(--font-display);
+          font-size: var(--text-sm);
+          font-weight: 800;
+          color: var(--text);
+          letter-spacing: -0.02em;
+        }
+        .site-nav__brand-sub {
+          font-size: 0.62rem;
+          font-weight: 500;
+          color: var(--text-faint);
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        /* Nav links */
+        .site-nav__links {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-1);
+        }
+        .nav-link {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          padding: var(--space-2) var(--space-3);
+          border-radius: var(--radius-md);
+          font-size: var(--text-sm);
+          font-weight: 500;
+          color: var(--text-muted);
+          text-decoration: none;
+          letter-spacing: -0.005em;
+          transition:
+            color 0.16s ease,
+            background 0.16s ease;
+        }
+        .nav-link:hover {
+          color: var(--text);
+          background: oklch(from var(--text) l c h / 0.05);
+        }
+        .nav-link.active {
+          color: var(--text);
+          font-weight: 600;
+          background: oklch(from var(--primary) l c h / 0.08);
+        }
+
+        /* Right controls */
+        .site-nav__controls {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          flex-shrink: 0;
+        }
+        .site-nav__phone {
+          display: none;
+          align-items: center;
+          gap: var(--space-2);
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          text-decoration: none;
+          letter-spacing: 0.02em;
+          padding: var(--space-2) var(--space-3);
+          border-radius: var(--radius-md);
+          transition: color 0.16s ease, background 0.16s ease;
+        }
+        .site-nav__phone:hover {
+          color: var(--text);
+          background: oklch(from var(--text) l c h / 0.05);
+        }
+        @media (min-width: 1024px) { .site-nav__phone { display: flex; } }
+
+        /* Cabinet btn — minimal ghost with icon */
+        .site-nav__cabinet {
+          display: none;
+          align-items: center;
+          gap: var(--space-2);
+          font-size: var(--text-sm);
+          font-weight: 500;
+          color: var(--text-muted);
+          text-decoration: none;
+          padding: var(--space-2) var(--space-3);
+          border-radius: var(--radius-md);
+          border: 1px solid var(--border);
+          transition:
+            color 0.16s ease,
+            background 0.16s ease,
+            border-color 0.16s ease;
+        }
+        .site-nav__cabinet:hover {
+          color: var(--text);
+          border-color: var(--border-strong);
+          background: oklch(from var(--text) l c h / 0.04);
+        }
+        .site-nav__cabinet.is-auth {
+          color: var(--primary);
+          border-color: oklch(from var(--primary) l c h / 0.25);
+        }
+        .site-nav__cabinet.is-auth:hover {
+          background: oklch(from var(--primary) l c h / 0.07);
+          border-color: oklch(from var(--primary) l c h / 0.38);
+        }
+        @media (min-width: 768px) { .site-nav__cabinet { display: flex; } }
+
+        /* Btn-icon */
+        .btn-icon--nav {
+          width: 34px;
+          height: 34px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: var(--radius-md);
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+          background: transparent;
+          transition:
+            color 0.16s ease,
+            background 0.16s ease,
+            border-color 0.16s ease;
+        }
+        .btn-icon--nav:hover {
+          color: var(--text);
+          border-color: var(--border-strong);
+          background: oklch(from var(--text) l c h / 0.05);
+        }
+
+        /* Mobile controls: hide desktop-only elements */
+        @media (max-width: 767px) {
+          .site-nav__links { display: none; }
+          .site-nav__phone  { display: none !important; }
+          .site-nav__cabinet { display: none !important; }
+          .site-nav__inner {
+            grid-template-columns: auto 1fr auto;
+          }
+          .site-nav__links { display: none !important; }
+        }
+        @media (min-width: 768px) {
+          .site-nav__mobile-wrap .site-nav__burger { display: none; }
+          .site-nav__mobile-wrap { display: none; }
+        }
+
+        /* ══════════════════════════════════════════════════════
+           FOOTER
+        ══════════════════════════════════════════════════════ */
+        .site-footer {
+          background: var(--surface);
+          border-top: 1px solid var(--border);
+        }
+        .site-footer__grid {
+          display: grid;
+          grid-template-columns: 1.6fr 1fr 1fr;
+          gap: clamp(var(--space-8), 4vw, var(--space-16));
+          padding-block: clamp(var(--space-12), 5vw, var(--space-20));
+          align-items: start;
+        }
+        @media (max-width: 860px) {
+          .site-footer__grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          .site-footer__brand {
+            grid-column: 1 / -1;
+          }
+        }
+        @media (max-width: 560px) {
+          .site-footer__grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* Brand col */
+        .site-footer__logo {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          text-decoration: none;
+          margin-bottom: var(--space-5);
+        }
+        .site-footer__logo-name {
+          font-family: var(--font-display);
+          font-size: var(--text-sm);
+          font-weight: 800;
+          color: var(--text);
+          letter-spacing: -0.02em;
+          line-height: 1.1;
+        }
+        .site-footer__logo-sub {
+          font-size: 0.62rem;
+          color: var(--text-faint);
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          font-weight: 500;
+          line-height: 1.1;
+        }
+        .site-footer__tagline {
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          line-height: 1.72;
+          margin-bottom: var(--space-6);
+          max-width: 30ch;
+        }
+
+        /* Contact list */
+        .site-footer__contacts {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-3);
+        }
+        .site-footer__contacts li {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--space-2);
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          line-height: 1.5;
+        }
+        .site-footer__ci {
+          flex-shrink: 0;
+          margin-top: 3px;
+          color: var(--primary);
+          opacity: 0.7;
+        }
+        .site-footer__clink {
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color 0.16s ease;
+        }
+        .site-footer__clink:hover { color: var(--primary); }
+
+        /* Nav/services columns */
+        .site-footer__col {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-1);
+        }
+        .site-footer__col-title {
+          font-size: var(--text-xs);
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--text-faint);
+          margin-bottom: var(--space-3);
+          padding-bottom: var(--space-3);
+          border-bottom: 1px solid var(--border);
+        }
+        .site-footer__col-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .site-footer__link {
+          display: inline-flex;
+          align-items: center;
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          text-decoration: none;
+          padding: 5px 0;
+          transition: color 0.16s ease, padding-left 0.16s ease;
+          border-radius: var(--radius-sm);
+        }
+        .site-footer__link:hover {
+          color: var(--text);
+          padding-left: var(--space-2);
+        }
+
+        /* Bottom bar */
+        .site-footer__bar {
+          border-top: 1px solid var(--border);
+          padding-block: var(--space-4);
+        }
+        .site-footer__bar-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: var(--space-4);
+          flex-wrap: wrap;
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+        }
+      `}</style>
     </div>
   );
 }
