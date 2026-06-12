@@ -18,7 +18,7 @@ export default function PricePage() {
         <section className="price-hero">
           <div className="price-hero__bg" aria-hidden>
             <img
-              src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80"
+              src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1600&q=80"
               alt=""
               width={1600}
               height={900}
@@ -128,7 +128,6 @@ export default function PricePage() {
           overflow: hidden;
           padding: clamp(var(--space-8), 6vw, var(--space-16)) 0 clamp(var(--space-6), 4vw, var(--space-10));
           border-bottom: 1px solid var(--border);
-          background: var(--bg);
         }
         .price-hero__bg {
           position: absolute;
@@ -140,8 +139,7 @@ export default function PricePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 35%;
-          filter: brightness(0.38) contrast(1.05) saturate(0.7);
+          object-position: center 40%;
         }
         .price-hero__overlay {
           position: absolute;
@@ -150,8 +148,8 @@ export default function PricePage() {
             linear-gradient(
               108deg,
               oklch(0.09 0.015 55 / 0.92) 0%,
-              oklch(0.09 0.015 55 / 0.50) 55%,
-              oklch(0.09 0.015 55 / 0.08) 100%
+              oklch(0.09 0.015 55 / 0.55) 55%,
+              oklch(0.09 0.015 55 / 0.15) 100%
             );
         }
         .price-hero__inner {
