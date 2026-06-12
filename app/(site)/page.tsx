@@ -106,13 +106,14 @@ function TruckPhoto() {
       <div className="hp-truck__headlight" />
 
       {/*
-        KEY FIX: mask-image goes on .hp-truck__img-mask (the wrapper div),
-        filter goes on the <img> itself.
-        Chromium ignores mask-image when filter is also on the same element.
+        No scaleX(-1) — truck faces LEFT (original PNG direction).
+        Mask is on the wrapper div; filter is on the img (Chromium compat).
+        Left fade: 0%→45% — aggressively hides the cut trailer edge.
+        Right fade: 80%→100% — softly hides the cab nose.
       */}
-      <div className="hp-truck__img-mask">
+      <div className="hp-truck__img-mask truck-entrance">
         <img
-          className="hp-truck__img truck-entrance"
+          className="hp-truck__img"
           src="https://pngimg.com/uploads/truck/truck_PNG16212.png"
           alt=""
           width={1247}
@@ -344,39 +345,34 @@ export default function HomePage() {
         }
 
         /*
-          MASK goes on the wrapper div — NOT on the img.
-          This is the Chromium fix: filter + mask-image on the same element
-          causes mask to be silently ignored.
-          The wrapper is mirrored (scaleX(-1)) so the truck faces left.
-          Mask gradient (left→right on mirrored element):
-            0–32%  = fade in from left  → hides the hard trailer-end cut
-            68–100% = fade out to right  → hides the hard cab-front cut
+          Truck faces LEFT (original PNG — no scaleX flip).
+          mask-image is on the wrapper; filter is on the img.
+          LEFT side fade (0%→45%): hides the hard-cut trailer end.
+          RIGHT side fade (80%→100%): softly hides the cab nose.
         */
         .hp-truck__img-mask {
           display: block;
           width: 100%;
-          transform: scaleX(-1);
           -webkit-mask-image: linear-gradient(
             to right,
             transparent 0%,
-            rgba(0,0,0,0.5) 16%,
-            black 32%,
-            black 68%,
-            rgba(0,0,0,0.5) 84%,
+            rgba(0,0,0,0.3) 20%,
+            black 45%,
+            black 80%,
+            rgba(0,0,0,0.4) 92%,
             transparent 100%
           );
           mask-image: linear-gradient(
             to right,
             transparent 0%,
-            rgba(0,0,0,0.5) 16%,
-            black 32%,
-            black 68%,
-            rgba(0,0,0,0.5) 84%,
+            rgba(0,0,0,0.3) 20%,
+            black 45%,
+            black 80%,
+            rgba(0,0,0,0.4) 92%,
             transparent 100%
           );
         }
 
-        /* filter lives here — separate from mask */
         .hp-truck__img {
           display: block;
           width: 100%;
@@ -388,17 +384,16 @@ export default function HomePage() {
           position: relative; z-index: 2;
         }
 
-        /* Drive-in from right — keep scaleX(-1) on wrapper, so translateX direction is flipped */
+        /* Drive-in animation: truck comes from the right */
         @keyframes truckDrive {
-          0%   { opacity: 0; transform: scaleX(-1) translateX(-110%); }
+          0%   { opacity: 0; transform: translateX(110%); }
           8%   { opacity: 1; }
-          58%  { transform: scaleX(-1) translateX(-2.5%); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
-          72%  { transform: scaleX(-1) translateX(1.2%); }
-          84%  { transform: scaleX(-1) translateX(-0.5%); }
-          93%  { transform: scaleX(-1) translateX(0.2%); }
-          100% { transform: scaleX(-1) translateX(0); }
+          58%  { transform: translateX(2.5%); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+          72%  { transform: translateX(-1.2%); }
+          84%  { transform: translateX(0.5%); }
+          93%  { transform: translateX(-0.2%); }
+          100% { transform: translateX(0); }
         }
-        /* Animation now on the mask wrapper (which has scaleX) */
         .hp-truck__img-mask.truck-entrance {
           animation: truckDrive 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
         }
@@ -426,10 +421,10 @@ export default function HomePage() {
         }
         .hp-truck__headlight {
           position: absolute;
-          bottom: 3%; left: -8%;
+          bottom: 3%; right: -8%;
           width: 44%; height: 60%;
           background: radial-gradient(
-            ellipse 80% 50% at 12% 90%,
+            ellipse 80% 50% at 88% 90%,
             oklch(0.92 0.12 88 / 0.12) 0%,
             oklch(0.92 0.12 88 / 0.05) 40%,
             transparent 70%
@@ -443,7 +438,7 @@ export default function HomePage() {
           to   { opacity: 1; }
         }
         .hp-truck__exhaust {
-          position: absolute; top: 8%; left: 42%;
+          position: absolute; top: 8%; right: 42%;
           z-index: 3; pointer-events: none;
         }
         .smoke {
