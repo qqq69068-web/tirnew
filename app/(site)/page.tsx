@@ -300,7 +300,7 @@ export default function HomePage() {
           margin-bottom: clamp(var(--space-12), 5vw, var(--space-16));
         }
 
-        /* ══ BOTTOM FADE — тільки під колесами, НЕ на кузові ══ */
+        /* ══ BOTTOM FADE ══ */
         .hp-hero__bottom-fade {
           position: absolute; bottom: 0; left: 0; right: 0;
           height: 80px;
@@ -309,15 +309,16 @@ export default function HomePage() {
           pointer-events: none;
         }
 
-        /* ══ TRUCK — z-index вище за bottom-fade ══ */
+        /* ══ TRUCK — вертикально центрований, зміщений трохи вниз ══ */
         .hp-truck {
           position: absolute;
-          bottom: 0; right: -2%;
+          top: 50%;
+          transform: translateY(-38%);
+          right: -2%;
           z-index: 4;
           pointer-events: none;
           width: clamp(420px, 56vw, 860px);
           will-change: transform;
-          transition: transform 0.1s linear;
         }
 
         .hp-truck__img-mask {
