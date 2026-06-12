@@ -102,7 +102,6 @@ function TruckPhoto() {
   return (
     <div className="hp-truck" aria-hidden ref={wrapRef}>
       <div className="hp-truck__shadow" />
-
       <div className="hp-truck__img-mask truck-entrance">
         <img
           className="hp-truck__img"
@@ -114,15 +113,6 @@ function TruckPhoto() {
           decoding="async"
           style={{ transform: "scaleX(-1)" }}
         />
-      </div>
-
-      {/* exhaust stack is on the cab roof — with scaleX(-1) the cab is on the LEFT side
-          of the element. Stack sits ~12% from left, ~10% from top of the image */}
-      <div className="hp-truck__exhaust">
-        <span className="smoke smoke-1" />
-        <span className="smoke smoke-2" />
-        <span className="smoke smoke-3" />
-        <span className="smoke smoke-4" />
       </div>
     </div>
   );
@@ -354,7 +344,6 @@ export default function HomePage() {
           transform: scaleX(-1);
         }
 
-        /* Shortened: 1.8s, simpler settle (no excessive bounce) */
         @keyframes truckDrive {
           0%   { opacity: 0; transform: translateX(110%); }
           10%  { opacity: 1; }
@@ -378,34 +367,6 @@ export default function HomePage() {
         @keyframes shadowAppear {
           from { opacity: 0; transform: scaleX(0.4); }
           to   { opacity: 1; transform: scaleX(1); }
-        }
-
-        /*
-          The truck image is scaleX(-1) — mirrored.
-          Original PNG: cab on LEFT, exhaust stack on cab roof-left area.
-          After mirror: cab is on the LEFT side of .hp-truck element.
-          Stack position: ~12% from left edge, ~8% from top of the truck element.
-        */
-        .hp-truck__exhaust {
-          position: absolute;
-          top: 8%;
-          left: 12%;
-          z-index: 5;
-          pointer-events: none;
-        }
-        .smoke {
-          display: block; position: absolute; border-radius: 50%;
-          background: radial-gradient(circle, oklch(0.75 0 0 / 0.30) 0%, transparent 70%);
-          animation: smokePuff 2.4s ease-out infinite;
-        }
-        .smoke-1 { width: 30px; height: 30px; left: 0;   top: 0;   animation-delay: 1.9s; }
-        .smoke-2 { width: 22px; height: 22px; left: 8px;  top: 2px; animation-delay: 2.3s; }
-        .smoke-3 { width: 18px; height: 18px; left: 2px;  top: 6px; animation-delay: 2.6s; }
-        .smoke-4 { width: 14px; height: 14px; left: 12px; top: 0;   animation-delay: 2.9s; }
-        @keyframes smokePuff {
-          0%   { opacity: 0;    transform: translateY(0) scale(0.3); }
-          15%  { opacity: 0.55; }
-          100% { opacity: 0;    transform: translateY(-56px) scale(3.5); }
         }
 
         @media (max-width: 600px) { .hp-truck { display: none; } }
