@@ -237,9 +237,8 @@ export default function HomePage() {
               <div key={step.num} className={`reveal hp-proc__step d-${i + 1}`}>
                 <div className="hp-proc__num-wrap">
                   <span className="hp-proc__num">{step.num}</span>
-                  {i < processSteps.length - 1 && <span className="hp-proc__connector" aria-hidden />}
+                  <div className="hp-proc__icon"><step.icon size={18} strokeWidth={1.6} /></div>
                 </div>
-                <div className="hp-proc__icon"><step.icon size={18} strokeWidth={1.6} /></div>
                 <h3 className="hp-proc__title">{step.title}</h3>
                 <p className="hp-proc__desc">{step.desc}</p>
               </div>
@@ -514,29 +513,42 @@ export default function HomePage() {
         .hp-svc-card:hover .hp-svc-card__arr { opacity: 1; transform: scale(1); }
 
         /* ══ PROCESS ══ */
-        .hp-proc-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .hp-proc-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
         .hp-proc-head { margin-bottom: clamp(var(--space-10), 5vw, var(--space-14)); }
-        .hp-proc { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-8); }
-        @media (max-width: 860px) { .hp-proc { grid-template-columns: repeat(2,1fr); gap: var(--space-8) var(--space-6); } }
-        @media (max-width: 480px) { .hp-proc { grid-template-columns: 1fr; gap: var(--space-6); } }
-        .hp-proc__step { position: relative; }
-        .hp-proc__num-wrap { display: flex; align-items: center; gap: 0; margin-bottom: var(--space-5); }
+        .hp-proc { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-5); }
+        @media (max-width: 860px) { .hp-proc { grid-template-columns: repeat(2,1fr); gap: var(--space-5); } }
+        @media (max-width: 480px) { .hp-proc { grid-template-columns: 1fr; gap: var(--space-4); } }
+        .hp-proc__step {
+          position: relative;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: var(--space-6);
+          display: flex; flex-direction: column; gap: var(--space-3);
+          transition: border-color .22s ease, box-shadow .22s ease, transform .22s cubic-bezier(.34,1.56,.64,1);
+        }
+        .hp-proc__step:hover {
+          border-color: var(--border-accent);
+          box-shadow: 0 6px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,214,0,0.10);
+          transform: translateY(-3px);
+        }
+        .hp-proc__num-wrap {
+          display: flex; align-items: center; justify-content: space-between;
+        }
         .hp-proc__num {
           font-family: var(--font-display); font-size: var(--text-xl); font-weight: 900;
-          color: var(--text); line-height: 1; letter-spacing: -0.04em; opacity: .15;
-          flex-shrink: 0; transition: opacity .22s ease, color .22s ease;
+          color: var(--primary); line-height: 1; letter-spacing: -0.04em;
         }
-        .hp-proc__step:hover .hp-proc__num { opacity: 1; color: var(--primary); }
-        .hp-proc__connector { flex: 1; height: 1px; background: var(--border); margin-left: var(--space-4); }
         .hp-proc__icon {
-          width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+          width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
           border-radius: var(--radius-md); border: 1px solid var(--border-strong);
-          color: var(--text-muted); background: var(--surface2); margin-bottom: var(--space-4);
+          color: var(--text-muted); background: var(--surface2);
           transition: border-color .22s ease, color .22s ease, background .22s ease, transform .22s cubic-bezier(.34,1.56,.64,1);
+          flex-shrink: 0;
         }
         .hp-proc__step:hover .hp-proc__icon { border-color: var(--border-accent); color: var(--primary); background: var(--primary-subtle); transform: scale(1.08); }
-        .hp-proc__title { font-family: var(--font-display); font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2); line-height: 1.2; letter-spacing: -0.01em; }
-        .hp-proc__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.65; max-width: none; }
+        .hp-proc__title { font-family: var(--font-display); font-size: var(--text-base); font-weight: 700; color: var(--text); line-height: 1.2; letter-spacing: -0.01em; }
+        .hp-proc__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.65; max-width: none; flex: 1; }
 
         /* ══ REVEAL ANIMATION ══ */
         .reveal {
