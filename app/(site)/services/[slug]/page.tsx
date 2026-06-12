@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { ArrowLeft, CheckCircle2, Package, Clock, Tag, ChevronRight } from "lucide-react";
+import { ArrowLeft, Package, Clock, Tag, ChevronRight } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
 
 interface Props { params: Promise<{ slug: string }> }
@@ -30,7 +30,7 @@ export default async function ServiceDetailPage({ params }: Props) {
     <>
       <main className="sd">
 
-        {/* ─── HERO ───────────────────────────────────────────── */}
+        {/* ─── HERO ─────────────────────────────────────── */}
         <div className="sd__hero">
           <img
             src={service.image}
@@ -39,15 +39,15 @@ export default async function ServiceDetailPage({ params }: Props) {
             width={1600}
             height={560}
             loading="eager"
+            decoding="async"
           />
           <div className="sd__hero-overlay" aria-hidden />
           <div className="sd__hero-content container">
             <Link href="/services" className="sd__back">
-              <ArrowLeft size={14} aria-hidden /> Усі послуги
+              <ArrowLeft size={13} aria-hidden />
+              Усі послуги
             </Link>
-            <div className="sd__hero-meta">
-              <span className="sd__category-badge">{service.category}</span>
-            </div>
+            <span className="sd__category-tag">{service.category}</span>
             <h1 className="sd__hero-title">{service.title}</h1>
             {service.short && (
               <p className="sd__hero-sub">{service.short}</p>
@@ -55,40 +55,38 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ─── BREADCRUMB ─────────────────────────────────────── */}
+        {/* ─── BREADCRUMB ─────────────────────────────── */}
         <div className="sd__breadcrumb">
           <div className="container">
             <nav className="sd__bread-nav" aria-label="breadcrumb">
               <Link href="/" className="sd__bread-link">Головна</Link>
-              <ChevronRight size={12} aria-hidden />
+              <ChevronRight size={11} aria-hidden />
               <Link href="/services" className="sd__bread-link">Послуги</Link>
-              <ChevronRight size={12} aria-hidden />
+              <ChevronRight size={11} aria-hidden />
               <span className="sd__bread-current">{service.title}</span>
             </nav>
           </div>
         </div>
 
-        {/* ─── BODY ───────────────────────────────────────────── */}
+        {/* ─── BODY ────────────────────────────────────────── */}
         <div className="sd__body container">
           <div className="sd__grid">
 
-            {/* ── LEFT: content ── */}
+            {/* LEFT: content */}
             <div className="sd__content">
 
-              {/* About */}
               <section className="sd__section">
                 <h2 className="sd__section-title">Про послугу</h2>
                 <p className="sd__desc">{service.description}</p>
               </section>
 
-              {/* Includes */}
               {service.details && service.details.length > 0 && (
                 <section className="sd__section">
                   <h2 className="sd__section-title">Що включає</h2>
                   <ul className="sd__checklist" role="list">
                     {service.details.map((d) => (
                       <li key={d} className="sd__check-item">
-                        <CheckCircle2 size={15} className="sd__check-icon" aria-hidden />
+                        <span className="sd__check-dot" aria-hidden />
                         <span>{d}</span>
                       </li>
                     ))}
@@ -96,25 +94,25 @@ export default async function ServiceDetailPage({ params }: Props) {
                 </section>
               )}
 
-              {/* Related */}
               {related.length > 0 && (
                 <section className="sd__section sd__section--related">
                   <h2 className="sd__section-title">Схожі послуги</h2>
                   <div className="sd__related">
                     {related.map((r) => (
-                      <Link key={r.slug} href={`/services/${r.slug}`} className="sd-related">
-                        <div className="sd-related__img">
+                      <Link key={r.slug} href={`/services/${r.slug}`} className="sd-rel">
+                        <div className="sd-rel__img">
                           <img
                             src={r.image}
                             alt={r.title}
                             width={300}
                             height={140}
                             loading="lazy"
+                            decoding="async"
                           />
                         </div>
-                        <div className="sd-related__body">
-                          <p className="sd-related__title">{r.title}</p>
-                          <span className="sd-related__arrow">→</span>
+                        <div className="sd-rel__body">
+                          <span className="sd-rel__title">{r.title}</span>
+                          <span className="sd-rel__arr" aria-hidden>&#8594;</span>
                         </div>
                       </Link>
                     ))}
@@ -123,12 +121,12 @@ export default async function ServiceDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* ── RIGHT: price sidebar ── */}
+            {/* RIGHT: sidebar */}
             <aside className="sd__sidebar">
               <div className="sd-price">
 
-                <div className="sd-price__eyebrow">
-                  <Tag size={11} aria-hidden />
+                <div className="sd-price__label">
+                  <Tag size={10} aria-hidden />
                   <span>Вартість</span>
                 </div>
 
@@ -136,17 +134,18 @@ export default async function ServiceDetailPage({ params }: Props) {
 
                 {service.hours && (
                   <div className="sd-price__hours">
-                    <Clock size={12} aria-hidden />
+                    <Clock size={11} aria-hidden />
                     <span>{service.hours}</span>
                   </div>
                 )}
 
-                <div className="sd-price__divider" aria-hidden />
+                <hr className="sd-price__hr" />
 
                 <div className="sd-price__actions">
                   {service.isPartsOrder ? (
-                    <Link href="/parts-order" className="btn btn-primary btn-block btn-lg">
-                      <Package size={15} aria-hidden /> Замовити запчастини
+                    <Link href="/parts-order" className="btn btn-primary btn-block">
+                      <Package size={14} aria-hidden />
+                      Замовити запчастини
                     </Link>
                   ) : (
                     <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
@@ -156,11 +155,10 @@ export default async function ServiceDetailPage({ params }: Props) {
                   </Link>
                 </div>
 
-                {/* Trust signals */}
                 <ul className="sd-price__trust" role="list">
-                  <li>✔ Офіційна гарантія на роботи</li>
-                  <li>✔ Запчастини від виробника</li>
-                  <li>✔ Досвідчені майстри</li>
+                  <li>Гарантія на всі роботи</li>
+                  <li>Запчастини від виробника</li>
+                  <li>Досвідчені майстри</li>
                 </ul>
               </div>
             </aside>
@@ -169,93 +167,101 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
       </main>
 
-      {/* ─── SCOPED STYLES ────────────────────────────────────── */}
       <style>{`
-
-        /* ── PAGE SHELL ─────────────────────────────── */
         .sd {
           min-height: 100vh;
           background: var(--bg);
           color: var(--text);
         }
 
-        /* ── HERO ───────────────────────────────────── */
+        /* ──── HERO ────────────────────────────────────── */
         .sd__hero {
           position: relative;
-          height: clamp(300px, 38vw, 480px);
+          height: clamp(280px, 36vw, 460px);
           overflow: hidden;
         }
         .sd__hero-img {
-          width: 100%;
-          height: 100%;
+          width: 100%; height: 100%;
           object-fit: cover;
-          display: block;
+          object-position: center 40%;
+          filter: brightness(0.30) contrast(1.06) saturate(0.60);
         }
         .sd__hero-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            to top,
-            rgba(0,0,0,0.88) 0%,
-            rgba(0,0,0,0.45) 45%,
-            rgba(0,0,0,0.10) 100%
-          );
+          position: absolute; inset: 0;
+          background:
+            linear-gradient(
+              to top,
+              oklch(0.09 0.015 55 / 0.97) 0%,
+              oklch(0.09 0.015 55 / 0.55) 40%,
+              transparent 100%
+            ),
+            linear-gradient(
+              108deg,
+              oklch(0.09 0.015 55 / 0.70) 0%,
+              transparent 65%
+            );
         }
         .sd__hero-content {
           position: absolute;
-          bottom: 0;
-          left: 50%;
+          bottom: 0; left: 50%;
           transform: translateX(-50%);
           width: 100%;
           padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
           display: flex;
           flex-direction: column;
-          gap: 0.6rem;
+          gap: 0.55rem;
         }
         .sd__back {
           display: inline-flex;
           align-items: center;
           gap: 5px;
           font-size: var(--text-xs);
-          color: rgba(255,255,255,0.60);
+          color: oklch(1 0 0 / 0.45);
           text-decoration: none;
           width: fit-content;
-          transition: color var(--transition-fast);
-          margin-bottom: 0.25rem;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          transition: color 0.16s ease;
+          margin-bottom: 0.2rem;
         }
-        .sd__back:hover { color: rgba(255,255,255,0.9); }
-        .sd__category-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 3px 10px;
-          border-radius: var(--radius-pill);
-          background: rgba(185,28,28,0.18);
-          border: 1px solid rgba(185,28,28,0.38);
-          color: #fca5a5;
+        .sd__back:hover { color: oklch(1 0 0 / 0.85); }
+
+        /* Category tag — text only, no colored pill */
+        .sd__category-tag {
           font-size: 10px;
           font-weight: 700;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          width: fit-content;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 7px;
         }
-        .sd__hero-meta { display: flex; align-items: center; gap: 0.5rem; }
+        .sd__category-tag::before {
+          content: '';
+          display: inline-block;
+          width: 14px; height: 1.5px;
+          background: currentColor;
+          border-radius: 2px;
+        }
+
         .sd__hero-title {
           font-family: var(--font-display);
-          font-size: clamp(1.6rem, 4vw, 2.8rem);
+          font-size: clamp(1.5rem, 3.8vw, 2.7rem);
           font-weight: 900;
-          line-height: 1.08;
+          line-height: 1.06;
           color: #fff;
-          letter-spacing: -0.02em;
-          max-width: 700px;
+          letter-spacing: -0.025em;
+          max-width: 680px;
         }
         .sd__hero-sub {
           font-size: var(--text-sm);
-          color: rgba(255,255,255,0.62);
-          max-width: 560px;
-          line-height: 1.6;
+          color: oklch(1 0 0 / 0.50);
+          max-width: 520px;
+          line-height: 1.65;
         }
 
-        /* ── BREADCRUMB ─────────────────────────────── */
+        /* ──── BREADCRUMB ────────────────────────────── */
         .sd__breadcrumb {
           border-bottom: 1px solid var(--border);
           background: var(--surface);
@@ -263,31 +269,39 @@ export default async function ServiceDetailPage({ params }: Props) {
         .sd__bread-nav {
           display: flex;
           align-items: center;
-          gap: 0.4rem;
-          padding: 0.75rem 0;
+          gap: 0.35rem;
+          padding-block: 0.7rem;
           color: var(--text-faint);
           font-size: var(--text-xs);
+          flex-wrap: wrap;
         }
         .sd__bread-link {
           color: var(--text-muted);
           text-decoration: none;
-          transition: color var(--transition-fast);
+          transition: color 0.15s ease;
         }
         .sd__bread-link:hover { color: var(--primary); }
-        .sd__bread-current { color: var(--text); font-weight: 500; }
+        .sd__bread-current {
+          color: var(--text);
+          font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 28ch;
+        }
 
-        /* ── BODY LAYOUT ────────────────────────────── */
+        /* ──── BODY LAYOUT ────────────────────────────── */
         .sd__body {
           padding-block: clamp(2rem, 5vw, 3.5rem);
         }
         .sd__grid {
           display: grid;
-          grid-template-columns: 1fr 300px;
+          grid-template-columns: 1fr 296px;
           gap: clamp(2rem, 4vw, 3rem);
           align-items: start;
         }
 
-        /* ── CONTENT (left) ─────────────────────────── */
+        /* ──── CONTENT (left) ──────────────────────────── */
         .sd__content {
           display: flex;
           flex-direction: column;
@@ -301,52 +315,61 @@ export default async function ServiceDetailPage({ params }: Props) {
         .sd__section-title {
           font-family: var(--font-display);
           font-size: var(--text-lg);
-          font-weight: 700;
+          font-weight: 800;
           color: var(--text);
-          padding-bottom: 0.75rem;
+          padding-bottom: 0.7rem;
           border-bottom: 1px solid var(--border);
-          margin-bottom: 0.25rem;
+          letter-spacing: -0.01em;
         }
         .sd__desc {
           font-size: var(--text-base);
-          line-height: 1.78;
+          line-height: 1.8;
           color: var(--text-muted);
+          max-width: 68ch;
         }
 
-        /* Checklist */
+        /* Checklist — dot instead of CheckCircle2-in-circle */
         .sd__checklist {
           display: flex;
           flex-direction: column;
-          gap: 0.6rem;
+          gap: 0;
           padding: 0;
           list-style: none;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          overflow: hidden;
         }
         .sd__check-item {
           display: flex;
           align-items: flex-start;
-          gap: 0.625rem;
-          font-size: var(--text-base);
+          gap: 0.75rem;
+          font-size: var(--text-sm);
           color: var(--text-muted);
           line-height: 1.55;
-          padding: 0.5rem 0.75rem;
-          border-radius: var(--radius);
-          transition: background var(--transition-fast);
+          padding: 0.7rem 1rem;
+          border-bottom: 1px solid var(--border);
+          transition: background 0.15s ease;
         }
+        .sd__check-item:last-child { border-bottom: none; }
         .sd__check-item:hover { background: var(--surface); }
-        .sd__check-icon {
-          color: var(--accent);
+        .sd__check-dot {
+          display: inline-block;
+          width: 5px; height: 5px;
+          border-radius: 50%;
+          background: var(--primary);
           flex-shrink: 0;
-          margin-top: 3px;
+          margin-top: 0.45em;
+          opacity: 0.7;
         }
 
         /* Related */
         .sd__section--related { gap: 1.25rem; }
         .sd__related {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-          gap: 0.875rem;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 0.75rem;
         }
-        .sd-related {
+        .sd-rel {
           background: var(--surface);
           border-radius: var(--radius-lg);
           overflow: hidden;
@@ -354,62 +377,66 @@ export default async function ServiceDetailPage({ params }: Props) {
           text-decoration: none;
           display: flex;
           flex-direction: column;
-          transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-spring);
+          transition:
+            box-shadow 0.18s ease,
+            border-color 0.18s ease,
+            transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .sd-related:hover {
-          box-shadow: var(--shadow-md);
-          border-color: var(--border-accent);
+        .sd-rel:hover {
+          box-shadow: 0 4px 16px oklch(0 0 0 / 0.09);
+          border-color: oklch(from var(--primary) l c h / 0.28);
           transform: translateY(-3px);
         }
-        .sd-related__img {
-          height: 110px;
+        .sd-rel__img {
+          height: 100px;
           overflow: hidden;
           flex-shrink: 0;
         }
-        .sd-related__img img {
+        .sd-rel__img img {
           width: 100%; height: 100%;
           object-fit: cover;
           transition: transform 0.4s ease;
+          filter: brightness(0.88) saturate(0.8);
         }
-        .sd-related:hover .sd-related__img img { transform: scale(1.05); }
-        .sd-related__body {
-          padding: 0.625rem 0.875rem 0.75rem;
+        .sd-rel:hover .sd-rel__img img { transform: scale(1.05); filter: brightness(0.95) saturate(0.9); }
+        .sd-rel__body {
+          padding: 0.6rem 0.875rem 0.75rem;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 0.5rem;
         }
-        .sd-related__title {
-          font-size: var(--text-sm);
-          font-weight: 500;
+        .sd-rel__title {
+          font-size: var(--text-xs);
+          font-weight: 600;
           color: var(--text);
           line-height: 1.4;
         }
-        .sd-related__arrow {
+        .sd-rel__arr {
           font-size: var(--text-xs);
           color: var(--text-faint);
           flex-shrink: 0;
-          transition: color var(--transition-fast), transform var(--transition-fast);
+          transition: color 0.16s ease, transform 0.18s ease;
         }
-        .sd-related:hover .sd-related__arrow { color: var(--primary); transform: translateX(3px); }
+        .sd-rel:hover .sd-rel__arr { color: var(--primary); transform: translateX(3px); }
 
-        /* ── PRICE SIDEBAR ──────────────────────────── */
+        /* ──── PRICE SIDEBAR ───────────────────────────── */
         .sd__sidebar {
           position: sticky;
-          top: 80px;
+          top: 78px;
           align-self: flex-start;
         }
         .sd-price {
           background: var(--surface);
-          border: 1px solid var(--border-strong);
+          border: 1px solid var(--border);
           border-radius: var(--radius-xl);
-          padding: 1.75rem;
-          box-shadow: var(--shadow-md);
+          padding: 1.5rem 1.75rem;
+          box-shadow: 0 4px 20px oklch(0 0 0 / 0.07);
           display: flex;
           flex-direction: column;
-          gap: 1.1rem;
+          gap: 1rem;
         }
-        .sd-price__eyebrow {
+        .sd-price__label {
           display: flex;
           align-items: center;
           gap: 5px;
@@ -421,49 +448,67 @@ export default async function ServiceDetailPage({ params }: Props) {
         }
         .sd-price__value {
           font-family: var(--font-display);
-          font-size: clamp(1.6rem, 3vw, 2.2rem);
+          font-size: clamp(1.5rem, 3vw, 2.1rem);
           font-weight: 900;
-          color: var(--accent);
+          color: var(--primary);
           line-height: 1;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.025em;
+          font-variant-numeric: tabular-nums;
         }
         .sd-price__hours {
           display: flex;
           align-items: center;
           gap: 6px;
           font-size: var(--text-xs);
-          color: var(--text-faint);
+          color: var(--text-muted);
+          margin-top: -0.25rem;
         }
-        .sd-price__divider {
-          height: 1px;
-          background: var(--border);
-          margin-block: 0.25rem;
+        .sd-price__hr {
+          border: none;
+          border-top: 1px solid var(--border);
+          margin: 0;
         }
         .sd-price__actions {
           display: flex;
           flex-direction: column;
-          gap: 0.625rem;
+          gap: 0.5rem;
         }
         .btn-block {
           width: 100%;
           justify-content: center;
         }
+
+        /* Trust list — dots instead of checkmark emoji */
         .sd-price__trust {
           list-style: none;
-          padding: 0;
+          padding: 0.25rem 0 0;
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
-          padding-top: 0.25rem;
+          gap: 0.35rem;
+          border-top: 1px solid var(--border);
+          padding-top: 0.875rem;
         }
         .sd-price__trust li {
           font-size: var(--text-xs);
           color: var(--text-muted);
           line-height: 1.5;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+        .sd-price__trust li::before {
+          content: '';
+          display: inline-block;
+          width: 4px; height: 4px;
+          border-radius: 50%;
+          background: var(--primary);
+          opacity: 0.5;
+          flex-shrink: 0;
+          margin-top: 0.42em;
         }
 
-        /* ── RESPONSIVE ─────────────────────────────── */
+        /* ──── RESPONSIVE ─────────────────────────────── */
         @media (max-width: 768px) {
           .sd__grid {
             grid-template-columns: 1fr;
@@ -473,17 +518,16 @@ export default async function ServiceDetailPage({ params }: Props) {
             order: -1;
           }
           .sd-price {
-            border-radius: var(--radius-lg);
             padding: 1.25rem;
           }
           .sd__hero {
-            height: clamp(240px, 55vw, 360px);
+            height: clamp(220px, 52vw, 340px);
           }
+          .sd__bread-current { max-width: 20ch; }
         }
-
         @media (prefers-reduced-motion: reduce) {
-          .sd-related:hover { transform: none; }
-          .sd-related__img img { transition: none; }
+          .sd-rel:hover { transform: none; }
+          .sd-rel__img img { transition: none; }
         }
       `}</style>
     </>
