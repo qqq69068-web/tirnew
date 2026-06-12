@@ -105,11 +105,6 @@ function TruckPhoto() {
       <div className="hp-truck__shadow" />
       <div className="hp-truck__headlight" />
 
-      {/*
-        truck_PNG16209 — повні колеса, бічний вид.
-        scaleX(-1) на img → кабіна дивиться ВЛІВО.
-        Маска на обгортці не перевертається — фейди коректні.
-      */}
       <div className="hp-truck__img-mask truck-entrance">
         <img
           className="hp-truck__img"
@@ -139,7 +134,6 @@ export default function HomePage() {
   return (
     <main ref={ref} className="hp-root">
 
-      {/* ── HERO: pure dark background, no photo ── */}
       <section className="hp-hero">
         <div className="container">
           <div className="hp-hero__content">
@@ -267,7 +261,6 @@ export default function HomePage() {
       <style>{`
         .hp-root { background: var(--bg); }
 
-        /* ══ HERO — pure gradient, no photo ══ */
         .hp-hero {
           position: relative; min-height: 96vh;
           display: flex; align-items: center; overflow: hidden;
@@ -306,17 +299,22 @@ export default function HomePage() {
           display: flex; gap: var(--space-3); flex-wrap: wrap;
           margin-bottom: clamp(var(--space-12), 5vw, var(--space-16));
         }
+
+        /* ══ BOTTOM FADE — тільки під колесами, НЕ на кузові ══ */
         .hp-hero__bottom-fade {
-          position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+          position: absolute; bottom: 0; left: 0; right: 0;
+          height: 80px;
           background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
-          z-index: 3; pointer-events: none;
+          z-index: 1;
+          pointer-events: none;
         }
 
-        /* ══ TRUCK ══ */
+        /* ══ TRUCK — z-index вище за bottom-fade ══ */
         .hp-truck {
           position: absolute;
           bottom: 0; right: -2%;
-          z-index: 2; pointer-events: none;
+          z-index: 4;
+          pointer-events: none;
           width: clamp(420px, 56vw, 860px);
           will-change: transform;
           transition: transform 0.1s linear;
