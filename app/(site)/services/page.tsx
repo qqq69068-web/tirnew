@@ -224,7 +224,7 @@ export default function ServicesPage() {
           display: flex;
           align-items: center;
           overflow: hidden;
-          border-bottom: 1px solid var(--border);
+          /* No bottom border — fade handles the transition */
         }
         .svc-hero__bg {
           position: absolute; inset: 0; z-index: 0;
@@ -250,6 +250,10 @@ export default function ServicesPage() {
           position: relative; z-index: 1;
           padding-block: 8rem 5rem;
           max-width: 700px;
+          /* KEY FIX: force left alignment — container centres itself but text must be left */
+          text-align: left;
+          margin-left: 0;
+          margin-right: auto;
         }
         .svc-hero__label {
           display: inline-flex;
@@ -276,6 +280,7 @@ export default function ServicesPage() {
           letter-spacing: -0.03em;
           color: #fff;
           margin-bottom: var(--space-5);
+          text-align: left;
         }
         .svc-hero__sub {
           font-size: var(--text-sm);
@@ -283,6 +288,7 @@ export default function ServicesPage() {
           line-height: 1.75;
           margin-bottom: var(--space-10);
           max-width: 52ch;
+          text-align: left;
         }
         .svc-hero__meta {
           display: flex;
@@ -291,6 +297,7 @@ export default function ServicesPage() {
           gap: 0;
           padding-top: var(--space-6);
           border-top: 1px solid oklch(1 0 0 / 0.08);
+          justify-content: flex-start;
         }
         .svc-hero__stat { display: flex; flex-direction: column; gap: 3px; }
         .svc-hero__divider {
@@ -314,22 +321,26 @@ export default function ServicesPage() {
           letter-spacing: 0.10em;
           font-weight: 600;
         }
+        /* Fade into the bg colour — no harsh white stripe */
         .svc-hero__fade {
           position: absolute; bottom: 0; left: 0; right: 0;
-          height: 120px;
+          height: 160px;
           background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
           z-index: 1; pointer-events: none;
         }
 
         /* ═══════════════════════════════════════════
-           TABS
+           TABS — seamless continuation of the page bg
         ═══════════════════════════════════════════ */
         .svc-tabs-bar {
-          background: var(--surface);
+          /* Match the page background so there's no sudden colour jump */
+          background: var(--bg);
           border-bottom: 1px solid var(--border);
           position: sticky;
           top: 58px;
           z-index: 30;
+          /* Subtle top shadow to separate from content above on scroll */
+          box-shadow: 0 1px 0 var(--border);
         }
         .svc-tabs-bar__inner { display: flex; gap: 0; }
         .svc-tab {
@@ -376,12 +387,12 @@ export default function ServicesPage() {
         }
 
         /* ═══════════════════════════════════════════
-           LIST SECTION
+           LIST SECTION — same bg as page, no white box
         ═══════════════════════════════════════════ */
         .svc-list-section {
           padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16);
-          /* subtle surface tint — visible in light mode, seamless in dark */
-          background: var(--surface, var(--bg));
+          /* Use page bg — no surface jump */
+          background: var(--bg);
         }
 
         /* Centered narrow container for the list */
@@ -429,13 +440,13 @@ export default function ServicesPage() {
           margin: 0;
         }
 
-        /* Service row */
+        /* Service row — slight surface lift so rows pop from bg */
         .svc-row {
           display: flex;
           align-items: center;
           gap: var(--space-3);
           padding: var(--space-4) var(--space-5);
-          background: var(--bg);
+          background: var(--surface);
           border: 1px solid var(--border);
           border-radius: var(--radius-lg);
           text-decoration: none;
@@ -447,7 +458,7 @@ export default function ServicesPage() {
             transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .svc-row:hover {
-          background: var(--surface);
+          background: var(--surface2);
           border-color: oklch(from var(--primary) l c h / 0.28);
           box-shadow: 0 2px 12px oklch(0 0 0 / 0.06);
           transform: translateX(5px);
@@ -498,7 +509,7 @@ export default function ServicesPage() {
           justify-content: space-between;
           gap: var(--space-4);
           padding: var(--space-4) var(--space-5);
-          background: var(--bg);
+          background: var(--surface);
           border: 1px solid var(--border);
           border-radius: var(--radius-lg);
           text-decoration: none;
@@ -506,7 +517,7 @@ export default function ServicesPage() {
         }
         .parts-banner:hover {
           border-color: oklch(from var(--primary) l c h / 0.28);
-          background: var(--surface);
+          background: var(--surface2);
         }
         .parts-banner__left {
           display: flex;
@@ -548,7 +559,7 @@ export default function ServicesPage() {
           grid-template-columns: 1fr auto;
           align-items: center;
           gap: clamp(var(--space-6), 4vw, var(--space-12));
-          background: var(--bg);
+          background: var(--surface);
           border: 1px solid var(--border);
           border-radius: var(--radius-xl);
           padding: clamp(var(--space-6), 3vw, var(--space-10)) clamp(var(--space-6), 3vw, var(--space-10));
