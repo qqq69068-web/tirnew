@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Sun, Moon, Phone, MapPin, Clock } from "lucide-react";
+import { User, Phone, MapPin, Clock } from "lucide-react";
 import AiChat from "@/components/AiChat";
 import { TirnewLogo } from "@/components/TirnewLogo";
 
@@ -26,7 +26,6 @@ const footerServices = [
 const HERO_PAGES = ["/", "/services"];
 
 function pageHasHero(pathname: string): boolean {
-  // exact match OR starts with /services/ (individual service pages may also have hero)
   return HERO_PAGES.some((p) =>
     p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(p + "/")
   );
@@ -43,7 +42,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen]               = useState(false);
   const [scrolled, setScrolled]       = useState(false);
   const [isClient, setIsClient]       = useState<boolean | null>(null);
-  const [dark, setDark]               = useState(true);
   const [progress, setProgress]       = useState(0);
   const [progVisible, setProgVisible] = useState(false);
   const progTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -51,30 +49,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   const pathname  = usePathname();
 
   const hasHero = pageHasHero(pathname);
-  // Navbar shows solid background when: scrolled OR on a page without hero
   const navSolid = scrolled || !hasHero;
-
-  useEffect(() => {
-    const saved = localStorage.getItem("tirnew-theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const isDark = saved ? saved === "dark" : prefersDark;
-    setDark(isDark);
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setDark((prev) => {
-      const next = !prev;
-      document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-      localStorage.setItem("tirnew-theme", next ? "dark" : "light");
-      return next;
-    });
-  }, []);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handler, { passive: true });
-    handler(); // check immediately on mount
+    handler();
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
@@ -148,7 +128,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       />
 
       {/* ═══ NAVBAR ═══════════════════════════════════════════ */}
-      <header className={`site-nav theme-transition${navSolid ? " site-nav--scrolled" : ""}`}>
+      <header className={`site-nav${navSolid ? " site-nav--scrolled" : ""}`}>
         <div className="site-nav__inner">
 
           {/* Logo */}
@@ -183,16 +163,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               <Phone size={12} strokeWidth={2} aria-hidden />
               +380 66 418 88 26
             </a>
-
-            <button
-              onClick={toggleTheme}
-              aria-label={dark ? "Світла тема" : "Темна тема"}
-              className="btn-icon btn-icon--nav"
-            >
-              {dark
-                ? <Sun  size={14} strokeWidth={2} aria-hidden />
-                : <Moon size={14} strokeWidth={2} aria-hidden />}
-            </button>
 
             <Link
               href="/cabinet"
@@ -260,21 +230,13 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                     <User size={13} aria-hidden />
                     {cabinetLabelFull}
                   </Link>
-                  <button
-                    onClick={toggleTheme}
-                    className="mobile-dd-link mobile-dd-link--icon mobile-dd-link--btn"
-                    style={{ transitionDelay: open ? `${(links.length + 1) * 30}ms` : "0ms" }}
-                  >
-                    {dark ? <Sun size={13} aria-hidden /> : <Moon size={13} aria-hidden />}
-                    {dark ? "Світла тема" : "Темна тема"}
-                  </button>
                 </div>
 
                 <div className="mobile-dropdown__sep" />
 
                 <div
                   className="mobile-dropdown__ctas"
-                  style={{ transitionDelay: open ? `${(links.length + 2) * 30}ms` : "0ms" }}
+                  style={{ transitionDelay: open ? `${(links.length + 1) * 30}ms` : "0ms" }}
                 >
                   <a href="tel:+380664188826" className="mobile-dd-cta mobile-dd-cta--outline">
                     +380 66 418 88 26
@@ -293,10 +255,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         <div className="mobile-backdrop" aria-hidden onClick={() => setOpen(false)} />
       )}
 
-      {/*
-        On hero pages (/, /services/*): content starts at top=0, hero photo fills behind navbar.
-        On all other pages: add padding-top so content isn't hidden under the fixed navbar.
-      */}
       <main id="main-content" style={hasHero ? undefined : { paddingTop: "58px" }}>
         {children}
       </main>
@@ -373,11 +331,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <AiChat />
 
       <style>{`
-        /* ══════════════════════════════════════════════════════
-           NAVBAR — transparent overlay on hero pages,
-                    solid frosted glass on all other pages
-        ══════════════════════════════════════════════════════ */
-
         #main-content {
           padding-top: 0;
         }
@@ -416,7 +369,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           gap: var(--space-6);
         }
 
-        /* Logo */
         .site-nav__logo {
           display: flex;
           align-items: center;
@@ -453,7 +405,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           color: var(--text-faint);
         }
 
-        /* Nav links */
         .site-nav__links {
           display: flex;
           align-items: center;
@@ -494,7 +445,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           background: oklch(from var(--primary) l c h / 0.08);
         }
 
-        /* Right controls */
         .site-nav__controls {
           display: flex;
           align-items: center;
@@ -502,7 +452,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           flex-shrink: 0;
         }
 
-        /* Phone */
         .site-nav__phone {
           display: none;
           align-items: center;
@@ -529,7 +478,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         @media (min-width: 1024px) { .site-nav__phone { display: flex; } }
 
-        /* Cabinet btn */
         .site-nav__cabinet {
           display: none;
           align-items: center;
@@ -567,35 +515,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         @media (min-width: 768px) { .site-nav__cabinet { display: flex; } }
 
-        /* Theme toggle */
-        .btn-icon--nav {
-          width: 34px;
-          height: 34px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: var(--radius-md);
-          border: 1px solid rgba(255,255,255,0.18);
-          color: rgba(255,255,255,0.70);
-          background: transparent;
-          transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease;
-        }
-        .btn-icon--nav:hover {
-          color: rgba(255,255,255,1);
-          border-color: rgba(255,255,255,0.38);
-          background: rgba(255,255,255,0.10);
-        }
-        .site-nav--scrolled .btn-icon--nav {
-          color: var(--text-muted);
-          border-color: var(--border);
-        }
-        .site-nav--scrolled .btn-icon--nav:hover {
-          color: var(--text);
-          border-color: var(--border-strong);
-          background: oklch(from var(--text) l c h / 0.05);
-        }
-
-        /* CTA button */
         .site-nav .btn-primary {
           background: var(--primary);
           color: #fff;
@@ -606,7 +525,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-color: var(--primary-h);
         }
 
-        /* Burger */
         .site-nav__burger {
           border-color: rgba(255,255,255,0.22);
         }
@@ -634,7 +552,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           background: var(--text);
         }
 
-        /* Mobile */
         @media (max-width: 767px) {
           .site-nav__links { display: none; }
           .site-nav__phone  { display: none !important; }
