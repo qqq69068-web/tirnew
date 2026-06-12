@@ -93,7 +93,6 @@ function TruckPhoto() {
       if (!hero) return;
       const rect = hero.getBoundingClientRect();
       const progress = Math.max(0, Math.min(1, -rect.top / rect.height));
-      // Only translateX — vertical position is handled purely by CSS
       el.style.transform = `translateX(${progress * 60}px)`;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -102,9 +101,8 @@ function TruckPhoto() {
 
   return (
     <div className="hp-truck" aria-hidden ref={wrapRef}>
-      <div className="hp-truck__road" />
+      {/* hp-truck__road removed — was causing yellowish strip below wheels */}
       <div className="hp-truck__shadow" />
-      {/* hp-truck__headlight removed — was causing yellow corner artifact */}
 
       <div className="hp-truck__img-mask truck-entrance">
         <img
@@ -301,7 +299,6 @@ export default function HomePage() {
           margin-bottom: clamp(var(--space-12), 5vw, var(--space-16));
         }
 
-        /* ══ BOTTOM FADE ══ */
         .hp-hero__bottom-fade {
           position: absolute; bottom: 0; left: 0; right: 0;
           height: 80px;
@@ -310,14 +307,10 @@ export default function HomePage() {
           pointer-events: none;
         }
 
-        /* ══ TRUCK ══
-           Vertical position set purely via CSS (top + margin-top).
-           JS only writes translateX so it never overrides vertical placement.
-        */
         .hp-truck {
           position: absolute;
           top: 50%;
-          margin-top: -18%;   /* shift up so cab is near the CTA buttons */
+          margin-top: -18%;
           right: -2%;
           z-index: 4;
           pointer-events: none;
@@ -385,14 +378,6 @@ export default function HomePage() {
         @keyframes shadowAppear {
           from { opacity: 0; transform: scaleX(0.4); }
           to   { opacity: 1; transform: scaleX(1); }
-        }
-        .hp-truck__road {
-          position: absolute;
-          bottom: 0; left: -5%; right: -5%;
-          height: 18px;
-          background: linear-gradient(to top, oklch(0.18 0.01 55 / 0.6) 0%, transparent 100%);
-          z-index: 0;
-          animation: shadowAppear 1s ease 0.3s both;
         }
 
         .hp-truck__exhaust {
