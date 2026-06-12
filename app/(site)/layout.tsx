@@ -353,27 +353,39 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
       <style>{`
         /* ══════════════════════════════════════════════════════
-           NAVBAR
+           NAVBAR — transparent overlay, floats over hero photo
         ══════════════════════════════════════════════════════ */
+
+        /* Remove default top padding — navbar overlays content */
+        #main-content {
+          padding-top: 0;
+        }
+
         .site-nav {
-          position: sticky;
+          position: fixed;
           top: 0;
+          left: 0;
+          right: 0;
           z-index: 100;
-          background: oklch(from var(--bg) l c h / 0.82);
-          backdrop-filter: blur(18px) saturate(1.4);
-          -webkit-backdrop-filter: blur(18px) saturate(1.4);
+          /* fully transparent by default — sits over the hero photo */
+          background: transparent;
           border-bottom: 1px solid transparent;
           transition:
-            background 0.28s ease,
-            border-color 0.28s ease,
-            box-shadow 0.28s ease;
+            background 0.32s ease,
+            border-color 0.32s ease,
+            box-shadow 0.32s ease;
         }
+
+        /* Once user scrolls — fade in a subtle frosted glass background */
         .site-nav--scrolled {
-          background: oklch(from var(--bg) l c h / 0.94);
+          background: oklch(from var(--bg) l c h / 0.88);
+          backdrop-filter: blur(20px) saturate(1.5);
+          -webkit-backdrop-filter: blur(20px) saturate(1.5);
           border-bottom-color: var(--border);
           box-shadow: 0 1px 0 0 var(--border),
-                      0 4px 24px oklch(0 0 0 / 0.06);
+                      0 4px 24px oklch(0 0 0 / 0.08);
         }
+
         .site-nav__inner {
           max-width: var(--content-wide);
           margin-inline: auto;
@@ -385,7 +397,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           gap: var(--space-6);
         }
 
-        /* Logo */
+        /* Logo — always white text so it's readable over the dark hero photo */
         .site-nav__logo {
           display: flex;
           align-items: center;
@@ -403,18 +415,27 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           font-family: var(--font-display);
           font-size: var(--text-sm);
           font-weight: 800;
-          color: var(--text);
+          /* white over photo, transitions to normal text color after scroll */
+          color: rgba(255,255,255,0.95);
           letter-spacing: -0.02em;
+          transition: color 0.32s ease;
+        }
+        .site-nav--scrolled .site-nav__brand-name {
+          color: var(--text);
         }
         .site-nav__brand-sub {
           font-size: 0.62rem;
           font-weight: 500;
-          color: var(--text-faint);
+          color: rgba(255,255,255,0.50);
           letter-spacing: 0.06em;
           text-transform: uppercase;
+          transition: color 0.32s ease;
+        }
+        .site-nav--scrolled .site-nav__brand-sub {
+          color: var(--text-faint);
         }
 
-        /* Nav links */
+        /* Nav links — white over photo */
         .site-nav__links {
           display: flex;
           align-items: center;
@@ -429,7 +450,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           border-radius: var(--radius-md);
           font-size: var(--text-sm);
           font-weight: 500;
-          color: var(--text-muted);
+          color: rgba(255,255,255,0.75);
           text-decoration: none;
           letter-spacing: -0.005em;
           transition:
@@ -437,12 +458,24 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             background 0.16s ease;
         }
         .nav-link:hover {
+          color: rgba(255,255,255,1);
+          background: rgba(255,255,255,0.10);
+        }
+        .nav-link.active {
+          color: rgba(255,255,255,1);
+          font-weight: 600;
+          background: rgba(255,255,255,0.12);
+        }
+        /* After scroll — revert to normal theme colours */
+        .site-nav--scrolled .nav-link {
+          color: var(--text-muted);
+        }
+        .site-nav--scrolled .nav-link:hover {
           color: var(--text);
           background: oklch(from var(--text) l c h / 0.05);
         }
-        .nav-link.active {
+        .site-nav--scrolled .nav-link.active {
           color: var(--text);
-          font-weight: 600;
           background: oklch(from var(--primary) l c h / 0.08);
         }
 
@@ -453,13 +486,15 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           gap: var(--space-2);
           flex-shrink: 0;
         }
+
+        /* Phone — white over photo */
         .site-nav__phone {
           display: none;
           align-items: center;
           gap: var(--space-2);
           font-size: 0.72rem;
           font-weight: 600;
-          color: var(--text-muted);
+          color: rgba(255,255,255,0.70);
           text-decoration: none;
           letter-spacing: 0.02em;
           padding: var(--space-2) var(--space-3);
@@ -467,44 +502,60 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           transition: color 0.16s ease, background 0.16s ease;
         }
         .site-nav__phone:hover {
+          color: rgba(255,255,255,1);
+          background: rgba(255,255,255,0.10);
+        }
+        .site-nav--scrolled .site-nav__phone {
+          color: var(--text-muted);
+        }
+        .site-nav--scrolled .site-nav__phone:hover {
           color: var(--text);
           background: oklch(from var(--text) l c h / 0.05);
         }
         @media (min-width: 1024px) { .site-nav__phone { display: flex; } }
 
-        /* Cabinet btn — minimal ghost with icon */
+        /* Cabinet btn */
         .site-nav__cabinet {
           display: none;
           align-items: center;
           gap: var(--space-2);
           font-size: var(--text-sm);
           font-weight: 500;
-          color: var(--text-muted);
+          color: rgba(255,255,255,0.75);
           text-decoration: none;
           padding: var(--space-2) var(--space-3);
           border-radius: var(--radius-md);
-          border: 1px solid var(--border);
+          border: 1px solid rgba(255,255,255,0.18);
           transition:
             color 0.16s ease,
             background 0.16s ease,
             border-color 0.16s ease;
         }
         .site-nav__cabinet:hover {
+          color: rgba(255,255,255,1);
+          border-color: rgba(255,255,255,0.38);
+          background: rgba(255,255,255,0.10);
+        }
+        .site-nav--scrolled .site-nav__cabinet {
+          color: var(--text-muted);
+          border-color: var(--border);
+        }
+        .site-nav--scrolled .site-nav__cabinet:hover {
           color: var(--text);
           border-color: var(--border-strong);
           background: oklch(from var(--text) l c h / 0.04);
         }
         .site-nav__cabinet.is-auth {
+          color: var(--primary-light);
+          border-color: rgba(255,255,255,0.22);
+        }
+        .site-nav--scrolled .site-nav__cabinet.is-auth {
           color: var(--primary);
           border-color: oklch(from var(--primary) l c h / 0.25);
         }
-        .site-nav__cabinet.is-auth:hover {
-          background: oklch(from var(--primary) l c h / 0.07);
-          border-color: oklch(from var(--primary) l c h / 0.38);
-        }
         @media (min-width: 768px) { .site-nav__cabinet { display: flex; } }
 
-        /* Btn-icon */
+        /* Theme toggle icon */
         .btn-icon--nav {
           width: 34px;
           height: 34px;
@@ -512,8 +563,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           align-items: center;
           justify-content: center;
           border-radius: var(--radius-md);
-          border: 1px solid var(--border);
-          color: var(--text-muted);
+          border: 1px solid rgba(255,255,255,0.18);
+          color: rgba(255,255,255,0.70);
           background: transparent;
           transition:
             color 0.16s ease,
@@ -521,12 +572,60 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             border-color 0.16s ease;
         }
         .btn-icon--nav:hover {
+          color: rgba(255,255,255,1);
+          border-color: rgba(255,255,255,0.38);
+          background: rgba(255,255,255,0.10);
+        }
+        .site-nav--scrolled .btn-icon--nav {
+          color: var(--text-muted);
+          border-color: var(--border);
+        }
+        .site-nav--scrolled .btn-icon--nav:hover {
           color: var(--text);
           border-color: var(--border-strong);
           background: oklch(from var(--text) l c h / 0.05);
         }
 
-        /* Mobile controls: hide desktop-only elements */
+        /* CTA button stays branded (amber) in both states */
+        .site-nav .btn-primary {
+          background: var(--primary);
+          color: #fff;
+          border-color: var(--primary);
+        }
+        .site-nav .btn-primary:hover {
+          background: var(--primary-h);
+          border-color: var(--primary-h);
+        }
+
+        /* Burger — white over photo */
+        .site-nav__burger {
+          border-color: rgba(255,255,255,0.22);
+        }
+        .site-nav__burger:hover {
+          background: rgba(255,255,255,0.10);
+          border-color: rgba(255,255,255,0.38);
+        }
+        .burger-line {
+          background: rgba(255,255,255,0.80);
+        }
+        .site-nav__burger:hover .burger-line {
+          background: rgba(255,255,255,1);
+        }
+        .site-nav--scrolled .site-nav__burger {
+          border-color: var(--border);
+        }
+        .site-nav--scrolled .site-nav__burger:hover {
+          background: var(--surface2);
+          border-color: var(--border-strong);
+        }
+        .site-nav--scrolled .burger-line {
+          background: var(--text-muted);
+        }
+        .site-nav--scrolled .site-nav__burger:hover .burger-line {
+          background: var(--text);
+        }
+
+        /* Mobile controls */
         @media (max-width: 767px) {
           .site-nav__links { display: none; }
           .site-nav__phone  { display: none !important; }
@@ -569,7 +668,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           }
         }
 
-        /* Brand col */
         .site-footer__logo {
           display: flex;
           align-items: center;
@@ -601,7 +699,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           max-width: 30ch;
         }
 
-        /* Contact list */
         .site-footer__contacts {
           list-style: none;
           display: flex;
@@ -629,7 +726,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         }
         .site-footer__clink:hover { color: var(--primary); }
 
-        /* Nav/services columns */
         .site-footer__col {
           display: flex;
           flex-direction: column;
@@ -666,7 +762,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           padding-left: var(--space-2);
         }
 
-        /* Bottom bar */
         .site-footer__bar {
           border-top: 1px solid var(--border);
           padding-block: var(--space-4);
