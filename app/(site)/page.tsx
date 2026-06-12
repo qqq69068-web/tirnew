@@ -118,13 +118,113 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
   );
 }
 
+// Animated truck SVG — drives in from the right, parks
+function TruckSVG() {
+  return (
+    <div className="hp-truck" aria-hidden>
+      <svg
+        className="hp-truck__svg truck-entrance"
+        viewBox="0 0 520 160"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* === TRAILER === */}
+        {/* Trailer body */}
+        <rect x="8" y="28" width="310" height="98" rx="4" fill="#2a2826" stroke="#3d3b38" strokeWidth="1.5" />
+        {/* Trailer roof stripe */}
+        <rect x="8" y="28" width="310" height="8" rx="4" fill="#333130" />
+        {/* Tirnew branding on trailer */}
+        <rect x="30" y="52" width="140" height="36" rx="3" fill="#1e1d1b" />
+        <text x="100" y="75" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700" fill="#d4991f" letterSpacing="2">TIRNEW</text>
+        <text x="100" y="86" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="7" fontWeight="500" fill="#6b6864" letterSpacing="3">TRUCK SERVICE</text>
+        {/* Trailer ribbing lines */}
+        <line x1="200" y1="36" x2="200" y2="118" stroke="#323028" strokeWidth="1" />
+        <line x1="230" y1="36" x2="230" y2="118" stroke="#323028" strokeWidth="1" />
+        <line x1="260" y1="36" x2="260" y2="118" stroke="#323028" strokeWidth="1" />
+        <line x1="290" y1="36" x2="290" y2="118" stroke="#323028" strokeWidth="1" />
+        {/* Trailer bottom rail */}
+        <rect x="8" y="118" width="310" height="8" rx="0" fill="#1e1d1b" />
+        {/* Trailer rear door handle */}
+        <rect x="314" y="65" width="4" height="30" rx="2" fill="#444240" />
+        {/* Trailer wheels — rear axle */}
+        <circle cx="60" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="60" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="60" cy="130" r="3" fill="#4a4846" />
+        <circle cx="100" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="100" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="100" cy="130" r="3" fill="#4a4846" />
+        {/* Trailer wheels — front axle */}
+        <circle cx="240" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="240" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="240" cy="130" r="3" fill="#4a4846" />
+        <circle cx="280" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="280" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="280" cy="130" r="3" fill="#4a4846" />
+
+        {/* === FIFTH WHEEL / COUPLING === */}
+        <rect x="310" y="118" width="30" height="6" rx="2" fill="#2e2c2a" />
+
+        {/* === CAB (TRACTOR) === */}
+        {/* Cab body */}
+        <rect x="330" y="42" width="140" height="84" rx="6" fill="#252321" stroke="#3a3836" strokeWidth="1.5" />
+        {/* Cab roof */}
+        <path d="M338 42 Q345 18 380 14 L460 14 Q490 14 466 42 Z" fill="#1e1d1b" stroke="#3a3836" strokeWidth="1.5" />
+        {/* Sleeper roof fairing */}
+        <rect x="330" y="42" width="30" height="10" rx="3" fill="#1e1d1b" />
+        {/* Windshield */}
+        <path d="M368 42 Q372 22 392 18 L448 18 Q462 18 458 42 Z" fill="#1a2535" stroke="#243448" strokeWidth="1" />
+        {/* Windshield glare */}
+        <path d="M380 22 Q385 20 400 20 L420 20 Q428 20 424 28 L408 28 Q395 28 380 22 Z" fill="white" opacity="0.06" />
+        {/* Side window */}
+        <rect x="332" y="50" width="28" height="30" rx="3" fill="#1a2535" stroke="#243448" strokeWidth="1" />
+        {/* Door line */}
+        <line x1="395" y1="42" x2="395" y2="122" stroke="#2e2c2a" strokeWidth="1.5" />
+        {/* Door handle */}
+        <rect x="385" y="80" width="14" height="3" rx="1.5" fill="#4a4846" />
+        {/* Exhaust stack */}
+        <rect x="458" y="4" width="7" height="38" rx="3.5" fill="#2a2826" stroke="#3a3836" strokeWidth="1" />
+        <rect x="459" y="4" width="5" height="4" rx="2.5" fill="#1e1d1b" />
+        {/* Amber clearance lights on cab roof */}
+        <rect x="370" y="13" width="6" height="4" rx="1" fill="#d4991f" opacity="0.8" />
+        <rect x="382" y="13" width="6" height="4" rx="1" fill="#d4991f" opacity="0.8" />
+        <rect x="394" y="13" width="6" height="4" rx="1" fill="#d4991f" opacity="0.8" />
+        {/* Front grille */}
+        <rect x="456" y="48" width="14" height="50" rx="2" fill="#1a1918" stroke="#2e2c2a" strokeWidth="1" />
+        <line x1="456" y1="58" x2="470" y2="58" stroke="#2e2c2a" strokeWidth="1" />
+        <line x1="456" y1="68" x2="470" y2="68" stroke="#2e2c2a" strokeWidth="1" />
+        <line x1="456" y1="78" x2="470" y2="78" stroke="#2e2c2a" strokeWidth="1" />
+        <line x1="456" y1="88" x2="470" y2="88" stroke="#2e2c2a" strokeWidth="1" />
+        <line x1="463" y1="48" x2="463" y2="98" stroke="#2e2c2a" strokeWidth="1" />
+        {/* Headlights */}
+        <rect x="464" y="44" width="6" height="8" rx="2" fill="#c8d8f0" opacity="0.7" />
+        {/* Bumper */}
+        <rect x="452" y="100" width="20" height="10" rx="3" fill="#1e1d1b" stroke="#2e2c2a" strokeWidth="1" />
+        {/* Cab wheels — steer axle */}
+        <circle cx="390" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="390" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="390" cy="130" r="3" fill="#4a4846" />
+        {/* Cab wheels — drive axle */}
+        <circle cx="448" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="448" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="448" cy="130" r="3" fill="#4a4846" />
+        <circle cx="468" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
+        <circle cx="468" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
+        <circle cx="468" cy="130" r="3" fill="#4a4846" />
+
+        {/* === GROUND SHADOW === */}
+        <ellipse cx="260" cy="150" rx="240" ry="7" fill="black" opacity="0.18" />
+      </svg>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const ref = useReveal();
 
   return (
     <main ref={ref} className="hp-root">
 
-      {/* ╔═══ HERO ═══════════════════════════════════════════════╗ */}
+      {/* ╔═══ HERO ════════════════════════════════════════════════╗ */}
       <section className="hp-hero">
         <div className="hp-hero__bg">
           <img
@@ -177,6 +277,9 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Animated truck — bottom right of hero */}
+        <TruckSVG />
+
         <div className="hp-hero__bottom-fade" aria-hidden />
       </section>
 
@@ -199,7 +302,7 @@ export default function HomePage() {
                   Великий асортимент оригінальних і аналогових деталей — мінімальний простій техніки.
                 </p>
               </div>
-              <div className="hp-adv-card__glyph" aria-hidden>✦</div>
+              <div className="hp-adv-card__glyph" aria-hidden>✶</div>
             </div>
 
             {/* 3 smaller cards */}
@@ -216,7 +319,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ╔═══ SERVICES PREVIEW ═══════════════════════════════════╗ */}
+      {/* ╔═══ SERVICES PREVIEW ════════════════════════════╗ */}
       <section className="section hp-svc-section">
         <div className="container">
           <div className="reveal hp-svc-head">
@@ -334,7 +437,6 @@ export default function HomePage() {
           max-width: 680px;
         }
 
-        /* Label — minimal horizontal line + text */
         .hp-hero__label {
           display: inline-flex;
           align-items: center;
@@ -354,7 +456,6 @@ export default function HomePage() {
           flex-shrink: 0;
         }
 
-        /* Title — clean weight, no italic gimmick */
         .hp-hero__title {
           font-family: var(--font-display);
           font-size: clamp(2.6rem, 6.5vw, 5.2rem);
@@ -385,6 +486,74 @@ export default function HomePage() {
           background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
           z-index: 1;
           pointer-events: none;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           TRUCK ANIMATION
+        ══════════════════════════════════════════════════════ */
+        .hp-truck {
+          position: absolute;
+          bottom: 60px;
+          right: 0;
+          z-index: 2;
+          pointer-events: none;
+          width: clamp(320px, 42vw, 580px);
+        }
+        .hp-truck__svg {
+          width: 100%;
+          height: auto;
+          display: block;
+          overflow: visible;
+        }
+
+        /* Truck drive-in: fast from right, slow down, micro-bounce, park */
+        @keyframes truckDrive {
+          0%   { transform: translateX(110%); }
+          60%  { transform: translateX(4%); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+          78%  { transform: translateX(-1.5%); }
+          88%  { transform: translateX(0.6%); }
+          94%  { transform: translateX(-0.3%); }
+          100% { transform: translateX(0%); }
+        }
+
+        /* Wheels spin while driving (stops when parked) */
+        @keyframes wheelSpin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+
+        .truck-entrance {
+          animation: truckDrive 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+        }
+
+        /* Wheel spin — target wheel hub groups via CSS transforms on circles */
+        .truck-entrance circle:nth-child(odd) {
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: wheelSpin 0.6s linear 0.5s 3;
+        }
+
+        /* Exhaust puff after parking */
+        @keyframes exhaustPuff {
+          0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+          30%  { opacity: 0.5; }
+          100% { opacity: 0; transform: translateY(-18px) scale(1.8); }
+        }
+        .hp-truck::after {
+          content: '';
+          position: absolute;
+          top: 6px;
+          right: 60px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: oklch(0.6 0 0 / 0.35);
+          animation: exhaustPuff 1.2s ease-out 2.4s 3;
+        }
+
+        /* Hide truck on very small screens — text is priority */
+        @media (max-width: 600px) {
+          .hp-truck { display: none; }
         }
 
         /* Stats row */
@@ -434,7 +603,6 @@ export default function HomePage() {
           margin-bottom: clamp(var(--space-8), 4vw, var(--space-12));
         }
 
-        /* 4-column bento: large card spans 2 rows on left */
         .hp-adv-grid {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
@@ -442,14 +610,10 @@ export default function HomePage() {
           gap: var(--space-3);
         }
         @media (max-width: 860px) {
-          .hp-adv-grid {
-            grid-template-columns: 1fr 1fr;
-          }
+          .hp-adv-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 560px) {
-          .hp-adv-grid {
-            grid-template-columns: 1fr;
-          }
+          .hp-adv-grid { grid-template-columns: 1fr; }
         }
 
         .hp-adv-card {
@@ -472,7 +636,6 @@ export default function HomePage() {
           transform: translateY(-2px);
         }
 
-        /* Featured card spans full left column, 2 rows */
         .hp-adv-card--featured {
           grid-column: 1 / 2;
           grid-row: 1 / 3;
@@ -482,7 +645,6 @@ export default function HomePage() {
           justify-content: space-between;
         }
 
-        /* Decorative glyph instead of circle blob */
         .hp-adv-card__glyph {
           font-size: 3.5rem;
           line-height: 1;
@@ -566,9 +728,7 @@ export default function HomePage() {
         /* ══════════════════════════════════════════════════════
            SERVICES
         ══════════════════════════════════════════════════════ */
-        .hp-svc-section {
-          border-top: 1px solid var(--border);
-        }
+        .hp-svc-section { border-top: 1px solid var(--border); }
         .hp-svc-head {
           display: flex;
           align-items: flex-end;
@@ -591,10 +751,7 @@ export default function HomePage() {
           transition: color 0.18s ease, gap 0.18s ease;
           flex-shrink: 0;
         }
-        .hp-all-link:hover {
-          color: var(--primary);
-          gap: var(--space-3);
-        }
+        .hp-all-link:hover { color: var(--primary); gap: var(--space-3); }
 
         .hp-services {
           display: grid;
@@ -694,22 +851,17 @@ export default function HomePage() {
           transform: scale(0.8);
           transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .hp-svc-card:hover .hp-svc-card__arr {
-          opacity: 1;
-          transform: scale(1);
-        }
+        .hp-svc-card:hover .hp-svc-card__arr { opacity: 1; transform: scale(1); }
 
         /* ══════════════════════════════════════════════════════
-           PROCESS — horizontal stepped layout
+           PROCESS
         ══════════════════════════════════════════════════════ */
         .hp-proc-section {
           background: var(--surface);
           border-top: 1px solid var(--border);
           border-bottom: 1px solid var(--border);
         }
-        .hp-proc-head {
-          margin-bottom: clamp(var(--space-10), 5vw, var(--space-14));
-        }
+        .hp-proc-head { margin-bottom: clamp(var(--space-10), 5vw, var(--space-14)); }
         .hp-proc {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -722,11 +874,7 @@ export default function HomePage() {
           .hp-proc { grid-template-columns: 1fr; gap: var(--space-6); }
         }
 
-        .hp-proc__step {
-          position: relative;
-        }
-
-        /* Number + horizontal connector line */
+        .hp-proc__step { position: relative; }
         .hp-proc__num-wrap {
           display: flex;
           align-items: center;
@@ -744,18 +892,13 @@ export default function HomePage() {
           flex-shrink: 0;
           transition: opacity 0.22s ease, color 0.22s ease;
         }
-        .hp-proc__step:hover .hp-proc__num {
-          opacity: 1;
-          color: var(--primary);
-        }
+        .hp-proc__step:hover .hp-proc__num { opacity: 1; color: var(--primary); }
         .hp-proc__connector {
           flex: 1;
           height: 1px;
           background: var(--border);
           margin-left: var(--space-4);
         }
-
-        /* Icon box — flat, no colored circle */
         .hp-proc__icon {
           width: 40px;
           height: 40px;
@@ -779,7 +922,6 @@ export default function HomePage() {
           background: var(--primary-subtle);
           transform: scale(1.08);
         }
-
         .hp-proc__title {
           font-family: var(--font-display);
           font-size: var(--text-base);
