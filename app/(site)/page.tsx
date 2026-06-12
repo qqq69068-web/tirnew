@@ -106,10 +106,10 @@ function TruckPhoto() {
       <div className="hp-truck__headlight" />
 
       {/*
-        No scaleX(-1) — truck faces LEFT (original PNG direction).
-        Mask is on the wrapper div; filter is on the img (Chromium compat).
-        Left fade: 0%→45% — aggressively hides the cut trailer edge.
-        Right fade: 80%→100% — softly hides the cab nose.
+        img has scaleX(-1) → truck faces LEFT (cab on the left side).
+        Mask stays on wrapper (no flip) so fades work correctly:
+        Left fade 0%→45%: hides the hard-cut cab edge.
+        Right fade 80%→100%: softly hides the trailer end.
       */}
       <div className="hp-truck__img-mask truck-entrance">
         <img
@@ -120,6 +120,7 @@ function TruckPhoto() {
           height={710}
           loading="eager"
           decoding="async"
+          style={{ transform: "scaleX(-1)" }}
         />
       </div>
 
@@ -139,19 +140,9 @@ export default function HomePage() {
   return (
     <main ref={ref} className="hp-root">
 
+      {/* ── HERO: pure dark background, no photo ── */}
       <section className="hp-hero">
-        <div className="hp-hero__bg">
-          <img
-            src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1800&q=80"
-            alt=""
-            width={1800}
-            height={1200}
-            loading="eager"
-            decoding="async"
-            className="hp-hero__img"
-          />
-          <div className="hp-hero__overlay" />
-        </div>
+        {/* No hp-hero__bg / Unsplash image — replaced by CSS gradient on .hp-hero */}
 
         <div className="container">
           <div className="hp-hero__content">
@@ -279,26 +270,16 @@ export default function HomePage() {
       <style>{`
         .hp-root { background: var(--bg); }
 
-        /* ══ HERO ══ */
+        /* ══ HERO — pure gradient, no photo ══ */
         .hp-hero {
           position: relative; min-height: 96vh;
           display: flex; align-items: center; overflow: hidden;
-        }
-        .hp-hero__bg { position: absolute; inset: 0; z-index: 0; }
-        .hp-hero__img {
-          width: 100%; height: 100%; object-fit: cover; object-position: center 35%;
-          filter: brightness(0.32) contrast(1.12) saturate(0.65);
-        }
-        .hp-hero__overlay {
-          position: absolute; inset: 0;
           background:
-            linear-gradient(110deg,
-              oklch(0.09 0.015 55 / 0.99) 0%,
-              oklch(0.09 0.015 55 / 0.78) 38%,
-              oklch(0.09 0.015 55 / 0.10) 100%
-            ),
-            linear-gradient(to top, oklch(0.09 0.015 55 / 1) 0%, transparent 48%);
+            radial-gradient(ellipse 80% 60% at 72% 55%, oklch(0.14 0.025 200 / 0.55) 0%, transparent 65%),
+            radial-gradient(ellipse 60% 80% at 90% 20%, oklch(0.12 0.02 55 / 0.4) 0%, transparent 60%),
+            linear-gradient(160deg, oklch(0.10 0.018 55) 0%, oklch(0.08 0.010 200) 100%);
         }
+
         .hp-hero__content {
           position: relative; z-index: 2;
           padding-block: 11rem 8rem; max-width: 620px;
@@ -345,10 +326,10 @@ export default function HomePage() {
         }
 
         /*
-          Truck faces LEFT (original PNG — no scaleX flip).
-          mask-image is on the wrapper; filter is on the img.
-          LEFT side fade (0%→45%): hides the hard-cut trailer end.
-          RIGHT side fade (80%→100%): softly hides the cab nose.
+          Mask on wrapper (NOT flipped) — fades work correctly.
+          img has scaleX(-1) inline → truck faces LEFT (cab on left).
+          LEFT side fade 0%→45%: hides the hard-cut cab edge.
+          RIGHT side fade 80%→100%: softly hides the trailer end.
         */
         .hp-truck__img-mask {
           display: block;
@@ -382,6 +363,8 @@ export default function HomePage() {
             drop-shadow(0 4px 12px oklch(0 0 0 / 0.40))
             contrast(1.05) saturate(0.92) brightness(0.96);
           position: relative; z-index: 2;
+          /* scaleX(-1) flips only the img — mask on parent stays correct */
+          transform: scaleX(-1);
         }
 
         /* Drive-in animation: truck comes from the right */
@@ -421,10 +404,10 @@ export default function HomePage() {
         }
         .hp-truck__headlight {
           position: absolute;
-          bottom: 3%; right: -8%;
+          bottom: 3%; left: -8%;
           width: 44%; height: 60%;
           background: radial-gradient(
-            ellipse 80% 50% at 88% 90%,
+            ellipse 80% 50% at 12% 90%,
             oklch(0.92 0.12 88 / 0.12) 0%,
             oklch(0.92 0.12 88 / 0.05) 40%,
             transparent 70%
@@ -438,7 +421,7 @@ export default function HomePage() {
           to   { opacity: 1; }
         }
         .hp-truck__exhaust {
-          position: absolute; top: 8%; right: 42%;
+          position: absolute; top: 8%; left: 42%;
           z-index: 3; pointer-events: none;
         }
         .smoke {
