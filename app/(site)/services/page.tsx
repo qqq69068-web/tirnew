@@ -98,6 +98,7 @@ export default function ServicesPage() {
             </div>
           </div>
 
+          {/* Extended fade — covers hero bottom AND overlaps into tabs-bar */}
           <div className="svc-hero__fade" aria-hidden />
         </section>
 
@@ -220,14 +221,16 @@ export default function ServicesPage() {
         ═══════════════════════════════════════════ */
         .svc-hero {
           position: relative;
-          min-height: 52vh;
+          /* Tighter height — no extra void at top */
+          min-height: 44vh;
           display: flex;
-          align-items: center;
-          overflow: hidden;
-          /* No bottom border — fade handles the transition */
+          align-items: flex-end;
+          overflow: visible;
+          /* Let fade bleed below */
         }
         .svc-hero__bg {
           position: absolute; inset: 0; z-index: 0;
+          overflow: hidden;
         }
         .svc-hero__img {
           width: 100%; height: 100%;
@@ -244,13 +247,13 @@ export default function ServicesPage() {
               oklch(0.09 0.015 55 / 0.60) 50%,
               oklch(0.09 0.015 55 / 0.10) 100%
             ),
-            linear-gradient(to top, oklch(0.09 0.015 55 / 0.95) 0%, transparent 45%);
+            linear-gradient(to top, oklch(0.09 0.015 55 / 0.98) 0%, transparent 50%);
         }
         .svc-hero__content {
-          position: relative; z-index: 1;
-          padding-block: 8rem 5rem;
+          position: relative; z-index: 2;
+          /* Reduced top padding — navbar is 60px, 4rem gives natural breathing room */
+          padding-block: clamp(3rem, 8vw, 5rem) 3.5rem;
           max-width: 700px;
-          /* KEY FIX: force left alignment — container centres itself but text must be left */
           text-align: left;
           margin-left: 0;
           margin-right: auto;
@@ -264,7 +267,7 @@ export default function ServicesPage() {
           letter-spacing: 0.13em;
           text-transform: uppercase;
           color: oklch(1 0 0 / 0.38);
-          margin-bottom: var(--space-6);
+          margin-bottom: var(--space-5);
         }
         .svc-hero__label-line {
           display: inline-block;
@@ -279,14 +282,14 @@ export default function ServicesPage() {
           line-height: 1.04;
           letter-spacing: -0.03em;
           color: #fff;
-          margin-bottom: var(--space-5);
+          margin-bottom: var(--space-4);
           text-align: left;
         }
         .svc-hero__sub {
           font-size: var(--text-sm);
           color: oklch(1 0 0 / 0.48);
           line-height: 1.75;
-          margin-bottom: var(--space-10);
+          margin-bottom: var(--space-8);
           max-width: 52ch;
           text-align: left;
         }
@@ -295,7 +298,7 @@ export default function ServicesPage() {
           align-items: center;
           flex-wrap: wrap;
           gap: 0;
-          padding-top: var(--space-6);
+          padding-top: var(--space-5);
           border-top: 1px solid oklch(1 0 0 / 0.08);
           justify-content: flex-start;
         }
@@ -321,26 +324,36 @@ export default function ServicesPage() {
           letter-spacing: 0.10em;
           font-weight: 600;
         }
-        /* Fade into the bg colour — no harsh white stripe */
+
+        /*
+          FADE — tall enough to cover the full bottom of the photo
+          AND bleed past the hero edge so the tabs-bar sits inside
+          the faded zone, removing the sharp colour jump entirely.
+        */
         .svc-hero__fade {
-          position: absolute; bottom: 0; left: 0; right: 0;
-          height: 160px;
-          background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
-          z-index: 1; pointer-events: none;
+          position: absolute;
+          bottom: -48px;   /* bleed below hero into tabs-bar territory */
+          left: 0; right: 0;
+          height: 260px;
+          background: linear-gradient(
+            to top,
+            var(--bg) 0%,
+            var(--bg) 18%,
+            transparent 100%
+          );
+          z-index: 1;
+          pointer-events: none;
         }
 
         /* ═══════════════════════════════════════════
-           TABS — seamless continuation of the page bg
+           TABS — sits above the fade bleed
         ═══════════════════════════════════════════ */
         .svc-tabs-bar {
-          /* Match the page background so there's no sudden colour jump */
           background: var(--bg);
           border-bottom: 1px solid var(--border);
           position: sticky;
           top: 58px;
           z-index: 30;
-          /* Subtle top shadow to separate from content above on scroll */
-          box-shadow: 0 1px 0 var(--border);
         }
         .svc-tabs-bar__inner { display: flex; gap: 0; }
         .svc-tab {
@@ -387,15 +400,13 @@ export default function ServicesPage() {
         }
 
         /* ═══════════════════════════════════════════
-           LIST SECTION — same bg as page, no white box
+           LIST SECTION
         ═══════════════════════════════════════════ */
         .svc-list-section {
           padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16);
-          /* Use page bg — no surface jump */
           background: var(--bg);
         }
 
-        /* Centered narrow container for the list */
         .svc-list-container {
           max-width: 860px;
           margin-inline: auto;
@@ -431,7 +442,6 @@ export default function ServicesPage() {
           padding-bottom: 4px;
         }
 
-        /* List */
         .svc-list {
           display: flex;
           flex-direction: column;
@@ -440,7 +450,6 @@ export default function ServicesPage() {
           margin: 0;
         }
 
-        /* Service row — slight surface lift so rows pop from bg */
         .svc-row {
           display: flex;
           align-items: center;
@@ -592,7 +601,6 @@ export default function ServicesPage() {
           white-space: nowrap;
         }
 
-        /* hp-label reuse */
         .hp-label {
           font-size: var(--text-xs);
           font-weight: 700;
@@ -621,7 +629,7 @@ export default function ServicesPage() {
           .svc-cta__right { flex-direction: row; flex-wrap: wrap; }
         }
         @media (max-width: 640px) {
-          .svc-hero__content { padding-block: 6rem 3.5rem; }
+          .svc-hero__content { padding-block: 2.5rem 2.5rem; }
           .svc-hero__divider { margin-inline: var(--space-4); }
           .svc-row__idx   { display: none; }
           .svc-row__price { display: none; }
