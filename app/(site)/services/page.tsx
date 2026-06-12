@@ -53,7 +53,7 @@ export default function ServicesPage() {
     <>
       <div ref={ref} className="svc-page">
 
-        {/* ═══ HERO ════════════════════════════════════ */}
+        {/* ═══ HERO ══════════════════════════════════ */}
         <section className="svc-hero">
           <div className="svc-hero__bg" aria-hidden>
             <img
@@ -101,7 +101,7 @@ export default function ServicesPage() {
           <div className="svc-hero__fade" aria-hidden />
         </section>
 
-        {/* ═══ TABS ════════════════════════════════════ */}
+        {/* ═══ TABS ══════════════════════════════════ */}
         <div className="svc-tabs-bar">
           <div className="container svc-tabs-bar__inner">
             {(["tir", "car"] as const).map((t) => (
@@ -124,9 +124,9 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        {/* ═══ LIST ════════════════════════════════════ */}
+        {/* ═══ LIST ══════════════════════════════════ */}
         <section className="svc-list-section">
-          <div className="container">
+          <div className="svc-list-container">
 
             <div className="svc-list-head reveal">
               <div>
@@ -142,46 +142,44 @@ export default function ServicesPage() {
               <span className="svc-list-count">{list.length} послуг</span>
             </div>
 
-            <div className="svc-list-wrap">
-              <ul className="svc-list" role="list">
-                {list.map((s, i) => (
-                  <li
-                    key={s.slug}
-                    className={`reveal reveal-delay-${Math.min(i % 6 + 1, 6)}`}
-                    style={{ listStyle: "none" }}
-                  >
-                    <Link href={`/services/${s.slug}`} className="svc-row">
-                      <span className="svc-row__idx" aria-hidden>
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className="svc-row__title">{s.title}</span>
-                      {s.price && (
-                        <span className="svc-row__price">{s.price}</span>
-                      )}
-                      <span className="svc-row__arr" aria-hidden>
-                        <ArrowRight size={13} />
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            <ul className="svc-list" role="list">
+              {list.map((s, i) => (
+                <li
+                  key={s.slug}
+                  className={`reveal reveal-delay-${Math.min(i % 6 + 1, 6)}`}
+                  style={{ listStyle: "none" }}
+                >
+                  <Link href={`/services/${s.slug}`} className="svc-row">
+                    <span className="svc-row__idx" aria-hidden>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="svc-row__title">{s.title}</span>
+                    {s.price && (
+                      <span className="svc-row__price">{s.price}</span>
+                    )}
+                    <span className="svc-row__arr" aria-hidden>
+                      <ArrowRight size={13} />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
-              {/* Parts banner — flat, no icon circle */}
-              <Link href="/parts-order" className="parts-banner reveal">
-                <div className="parts-banner__left">
-                  <Package size={16} className="parts-banner__ico" aria-hidden />
-                  <div>
-                    <p className="parts-banner__title">Замовлення запчастин</p>
-                    <p className="parts-banner__sub">Підберемо оригінал або перевірений аналог, організуємо доставку</p>
-                  </div>
+            {/* Parts banner */}
+            <Link href="/parts-order" className="parts-banner reveal">
+              <div className="parts-banner__left">
+                <Package size={16} className="parts-banner__ico" aria-hidden />
+                <div>
+                  <p className="parts-banner__title">Замовлення запчастин</p>
+                  <p className="parts-banner__sub">Підберемо оригінал або перевірений аналог, організуємо доставку</p>
                 </div>
-                <span className="parts-banner__cta">
-                  Детальніше <ArrowRight size={12} aria-hidden />
-                </span>
-              </Link>
-            </div>
+              </div>
+              <span className="parts-banner__cta">
+                Детальніше <ArrowRight size={12} aria-hidden />
+              </span>
+            </Link>
 
-            {/* CTA — asymmetric layout */}
+            {/* CTA — asymmetric two-column */}
             <div className="svc-cta reveal">
               <div className="svc-cta__left">
                 <p className="hp-label">Консультація</p>
@@ -286,8 +284,6 @@ export default function ServicesPage() {
           margin-bottom: var(--space-10);
           max-width: 52ch;
         }
-
-        /* Stats row — same style as homepage */
         .svc-hero__meta {
           display: flex;
           align-items: center;
@@ -296,9 +292,7 @@ export default function ServicesPage() {
           padding-top: var(--space-6);
           border-top: 1px solid oklch(1 0 0 / 0.08);
         }
-        .svc-hero__stat {
-          display: flex; flex-direction: column; gap: 3px;
-        }
+        .svc-hero__stat { display: flex; flex-direction: column; gap: 3px; }
         .svc-hero__divider {
           width: 1px; height: 2rem;
           background: oklch(1 0 0 / 0.10);
@@ -337,10 +331,7 @@ export default function ServicesPage() {
           top: 58px;
           z-index: 30;
         }
-        .svc-tabs-bar__inner {
-          display: flex;
-          gap: 0;
-        }
+        .svc-tabs-bar__inner { display: flex; gap: 0; }
         .svc-tab {
           display: inline-flex;
           align-items: center;
@@ -354,10 +345,7 @@ export default function ServicesPage() {
           border-bottom: 2px solid transparent;
           cursor: pointer;
           white-space: nowrap;
-          transition:
-            color 0.16s ease,
-            border-color 0.16s ease,
-            background 0.16s ease;
+          transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
         }
         .svc-tab:hover {
           color: var(--text);
@@ -371,8 +359,7 @@ export default function ServicesPage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 20px;
-          height: 18px;
+          min-width: 20px; height: 18px;
           padding: 0 5px;
           border-radius: var(--radius-full);
           background: var(--surface2, var(--surface-offset, #eee));
@@ -393,6 +380,18 @@ export default function ServicesPage() {
         ═══════════════════════════════════════════ */
         .svc-list-section {
           padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16);
+          /* subtle surface tint — visible in light mode, seamless in dark */
+          background: var(--surface, var(--bg));
+        }
+
+        /* Centered narrow container for the list */
+        .svc-list-container {
+          max-width: 860px;
+          margin-inline: auto;
+          padding-inline: var(--space-4);
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-6);
         }
 
         .svc-list-head {
@@ -400,7 +399,6 @@ export default function ServicesPage() {
           align-items: flex-end;
           justify-content: space-between;
           gap: var(--space-4);
-          margin-bottom: var(--space-6);
           flex-wrap: wrap;
         }
         .svc-list-h2 {
@@ -422,16 +420,13 @@ export default function ServicesPage() {
           padding-bottom: 4px;
         }
 
-        .svc-list-wrap {
-          max-width: 900px;
-        }
-
+        /* List */
         .svc-list {
           display: flex;
           flex-direction: column;
           gap: var(--space-1);
-          margin-bottom: var(--space-4);
           padding: 0;
+          margin: 0;
         }
 
         /* Service row */
@@ -440,7 +435,7 @@ export default function ServicesPage() {
           align-items: center;
           gap: var(--space-3);
           padding: var(--space-4) var(--space-5);
-          background: var(--surface);
+          background: var(--bg);
           border: 1px solid var(--border);
           border-radius: var(--radius-lg);
           text-decoration: none;
@@ -452,7 +447,7 @@ export default function ServicesPage() {
             transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .svc-row:hover {
-          background: var(--surface2, oklch(from var(--surface) calc(l - 0.02) c h));
+          background: var(--surface);
           border-color: oklch(from var(--primary) l c h / 0.28);
           box-shadow: 0 2px 12px oklch(0 0 0 / 0.06);
           transform: translateX(5px);
@@ -485,39 +480,33 @@ export default function ServicesPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 24px;
-          height: 24px;
+          width: 24px; height: 24px;
           border-radius: 50%;
           color: var(--text-faint);
           flex-shrink: 0;
-          transition:
-            color 0.18s ease,
-            transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+          transition: color 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .svc-row:hover .svc-row__arr {
           color: var(--primary);
           transform: translateX(3px);
         }
 
-        /* Parts banner — flat horizontal strip */
+        /* Parts banner */
         .parts-banner {
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: var(--space-4);
           padding: var(--space-4) var(--space-5);
-          background: var(--surface);
+          background: var(--bg);
           border: 1px solid var(--border);
           border-radius: var(--radius-lg);
           text-decoration: none;
-          margin-bottom: var(--space-8);
-          transition:
-            background 0.18s ease,
-            border-color 0.18s ease;
+          transition: background 0.18s ease, border-color 0.18s ease;
         }
         .parts-banner:hover {
           border-color: oklch(from var(--primary) l c h / 0.28);
-          background: oklch(from var(--surface) calc(l - 0.01) c h);
+          background: var(--surface);
         }
         .parts-banner__left {
           display: flex;
@@ -525,11 +514,7 @@ export default function ServicesPage() {
           gap: var(--space-3);
           min-width: 0;
         }
-        .parts-banner__ico {
-          color: var(--primary);
-          opacity: 0.7;
-          flex-shrink: 0;
-        }
+        .parts-banner__ico { color: var(--primary); opacity: 0.7; flex-shrink: 0; }
         .parts-banner__title {
           font-size: var(--text-sm);
           font-weight: 600;
@@ -553,20 +538,17 @@ export default function ServicesPage() {
           opacity: 0.8;
           transition: opacity 0.16s ease, gap 0.16s ease;
         }
-        .parts-banner:hover .parts-banner__cta {
-          opacity: 1;
-          gap: var(--space-2);
-        }
+        .parts-banner:hover .parts-banner__cta { opacity: 1; gap: var(--space-2); }
 
         /* ═══════════════════════════════════════════
-           CTA — asymmetric two-column
+           CTA
         ═══════════════════════════════════════════ */
         .svc-cta {
           display: grid;
           grid-template-columns: 1fr auto;
           align-items: center;
           gap: clamp(var(--space-6), 4vw, var(--space-12));
-          background: var(--surface);
+          background: var(--bg);
           border: 1px solid var(--border);
           border-radius: var(--radius-xl);
           padding: clamp(var(--space-6), 3vw, var(--space-10)) clamp(var(--space-6), 3vw, var(--space-10));
@@ -624,13 +606,8 @@ export default function ServicesPage() {
            RESPONSIVE
         ═══════════════════════════════════════════ */
         @media (max-width: 860px) {
-          .svc-cta {
-            grid-template-columns: 1fr;
-          }
-          .svc-cta__right {
-            flex-direction: row;
-            flex-wrap: wrap;
-          }
+          .svc-cta { grid-template-columns: 1fr; }
+          .svc-cta__right { flex-direction: row; flex-wrap: wrap; }
         }
         @media (max-width: 640px) {
           .svc-hero__content { padding-block: 6rem 3.5rem; }
