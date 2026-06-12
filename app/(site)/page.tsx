@@ -28,7 +28,6 @@ const processSteps = [
 
 const featured = services.slice(0, 3);
 
-// ─── Intersection-based scroll reveal ────────────────────────────────────────
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -44,7 +43,6 @@ function useReveal() {
   return ref;
 }
 
-// ─── Animated number counter ─────────────────────────────────────────────────
 function useCounter(target: number, duration = 1200) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -84,15 +82,12 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
   );
 }
 
-// ─── Real truck PNG with parallax + glow animations ──────────────────────────
 function TruckPhoto() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-
-    // Subtle parallax on scroll
     const onScroll = () => {
       const hero = el.closest(".hp-hero") as HTMLElement | null;
       if (!hero) return;
@@ -100,34 +95,33 @@ function TruckPhoto() {
       const progress = Math.max(0, Math.min(1, -rect.top / rect.height));
       el.style.transform = `translateX(${progress * 60}px)`;
     };
-
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <div className="hp-truck" aria-hidden ref={wrapRef}>
-      {/* Road reflection strip */}
       <div className="hp-truck__road" />
-
-      {/* Ground shadow ellipse */}
       <div className="hp-truck__shadow" />
-
-      {/* Headlight glow on road */}
       <div className="hp-truck__headlight" />
 
-      {/* Actual truck PNG — transparent background, Freightliner Cascadia */}
-      <img
-        className="hp-truck__img truck-entrance"
-        src="https://pngimg.com/uploads/truck/truck_PNG16212.png"
-        alt=""
-        width={1247}
-        height={710}
-        loading="eager"
-        decoding="async"
-      />
+      {/*
+        KEY FIX: mask-image goes on .hp-truck__img-mask (the wrapper div),
+        filter goes on the <img> itself.
+        Chromium ignores mask-image when filter is also on the same element.
+      */}
+      <div className="hp-truck__img-mask">
+        <img
+          className="hp-truck__img truck-entrance"
+          src="https://pngimg.com/uploads/truck/truck_PNG16212.png"
+          alt=""
+          width={1247}
+          height={710}
+          loading="eager"
+          decoding="async"
+        />
+      </div>
 
-      {/* Exhaust smoke particles */}
       <div className="hp-truck__exhaust">
         <span className="smoke smoke-1" />
         <span className="smoke smoke-2" />
@@ -144,7 +138,6 @@ export default function HomePage() {
   return (
     <main ref={ref} className="hp-root">
 
-      {/* ╔═══ HERO ════════════════════════════════════════════════════╗ */}
       <section className="hp-hero">
         <div className="hp-hero__bg">
           <img
@@ -192,13 +185,10 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Real truck photo with animations */}
         <TruckPhoto />
-
         <div className="hp-hero__bottom-fade" aria-hidden />
       </section>
 
-      {/* ╔═══ ADVANTAGES ══════════════════════════════════════════════╗ */}
       <section className="hp-adv-section">
         <div className="container">
           <div className="reveal hp-adv-header">
@@ -229,7 +219,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ╔═══ SERVICES PREVIEW ════════════════════════════════════════╗ */}
       <section className="section hp-svc-section">
         <div className="container">
           <div className="reveal hp-svc-head">
@@ -264,7 +253,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ╔═══ PROCESS ═════════════════════════════════════════════════╗ */}
       <section className="section hp-proc-section">
         <div className="container">
           <div className="reveal hp-proc-head">
@@ -345,7 +333,7 @@ export default function HomePage() {
           z-index: 3; pointer-events: none;
         }
 
-        /* ══ TRUCK PHOTO ══ */
+        /* ══ TRUCK ══ */
         .hp-truck {
           position: absolute;
           bottom: 0; right: -2%;
@@ -355,36 +343,44 @@ export default function HomePage() {
           transition: transform 0.1s linear;
         }
 
-        /* The actual PNG */
-        .hp-truck__img {
+        /*
+          MASK goes on the wrapper div — NOT on the img.
+          This is the Chromium fix: filter + mask-image on the same element
+          causes mask to be silently ignored.
+          The wrapper is mirrored (scaleX(-1)) so the truck faces left.
+          Mask gradient (left→right on mirrored element):
+            0–32%  = fade in from left  → hides the hard trailer-end cut
+            68–100% = fade out to right  → hides the hard cab-front cut
+        */
+        .hp-truck__img-mask {
           display: block;
           width: 100%;
-          height: auto;
-          /*
-           * scaleX(-1) mirrors the truck so it faces left (into the page).
-           * mask-image fades out:
-           *   — left edge: 0% transparent → 22% fully visible  (hides the hard left cut of the PNG)
-           *   — right edge: 78% fully visible → 100% transparent (hides the hard right cut)
-           * Because the image is mirrored with scaleX(-1), "left" in CSS mask
-           * corresponds to the right side of the visual truck (the trailer end),
-           * and "right" in CSS mask corresponds to the truck cab / front.
-           * We want a stronger fade on the trailer end (left in mask = right visually).
-           */
           transform: scaleX(-1);
           -webkit-mask-image: linear-gradient(
             to right,
             transparent 0%,
-            black 18%,
-            black 72%,
+            rgba(0,0,0,0.5) 16%,
+            black 32%,
+            black 68%,
+            rgba(0,0,0,0.5) 84%,
             transparent 100%
           );
           mask-image: linear-gradient(
             to right,
             transparent 0%,
-            black 18%,
-            black 72%,
+            rgba(0,0,0,0.5) 16%,
+            black 32%,
+            black 68%,
+            rgba(0,0,0,0.5) 84%,
             transparent 100%
           );
+        }
+
+        /* filter lives here — separate from mask */
+        .hp-truck__img {
+          display: block;
+          width: 100%;
+          height: auto;
           filter:
             drop-shadow(0 24px 48px oklch(0 0 0 / 0.55))
             drop-shadow(0 4px 12px oklch(0 0 0 / 0.40))
@@ -392,7 +388,7 @@ export default function HomePage() {
           position: relative; z-index: 2;
         }
 
-        /* Drive-in from the right side */
+        /* Drive-in from right — keep scaleX(-1) on wrapper, so translateX direction is flipped */
         @keyframes truckDrive {
           0%   { opacity: 0; transform: scaleX(-1) translateX(-110%); }
           8%   { opacity: 1; }
@@ -402,11 +398,11 @@ export default function HomePage() {
           93%  { transform: scaleX(-1) translateX(0.2%); }
           100% { transform: scaleX(-1) translateX(0); }
         }
-        .truck-entrance {
+        /* Animation now on the mask wrapper (which has scaleX) */
+        .hp-truck__img-mask.truck-entrance {
           animation: truckDrive 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
         }
 
-        /* Ground shadow */
         .hp-truck__shadow {
           position: absolute;
           bottom: 4%; left: 5%; right: 5%;
@@ -420,21 +416,14 @@ export default function HomePage() {
           from { opacity: 0; transform: scaleX(0.4); }
           to   { opacity: 1; transform: scaleX(1); }
         }
-
-        /* Road reflection under truck */
         .hp-truck__road {
           position: absolute;
           bottom: 0; left: -5%; right: -5%;
           height: 18px;
-          background: linear-gradient(to top,
-            oklch(0.18 0.01 55 / 0.6) 0%,
-            transparent 100%
-          );
+          background: linear-gradient(to top, oklch(0.18 0.01 55 / 0.6) 0%, transparent 100%);
           z-index: 0;
           animation: shadowAppear 1s ease 0.3s both;
         }
-
-        /* Headlight cone on ground */
         .hp-truck__headlight {
           position: absolute;
           bottom: 3%; left: -8%;
@@ -453,18 +442,12 @@ export default function HomePage() {
           from { opacity: 0.7; }
           to   { opacity: 1; }
         }
-
-        /* Exhaust smoke */
         .hp-truck__exhaust {
-          position: absolute;
-          top: 8%; left: 42%;
-          z-index: 3;
-          pointer-events: none;
+          position: absolute; top: 8%; left: 42%;
+          z-index: 3; pointer-events: none;
         }
         .smoke {
-          display: block;
-          position: absolute;
-          border-radius: 50%;
+          display: block; position: absolute; border-radius: 50%;
           background: radial-gradient(circle, oklch(0.7 0 0 / 0.35) 0%, transparent 70%);
           animation: smokePuff 2.2s ease-out infinite;
         }
@@ -472,14 +455,12 @@ export default function HomePage() {
         .smoke-2 { width: 22px; height: 22px; left: 10px; top: 2px; animation-delay: 3.5s; }
         .smoke-3 { width: 18px; height: 18px; left: 4px;  top: 4px; animation-delay: 3.8s; }
         .smoke-4 { width: 14px; height: 14px; left: 14px; top: 0;   animation-delay: 4.1s; }
-
         @keyframes smokePuff {
-          0%   { opacity: 0;    transform: translateY(0)    scale(0.3); }
+          0%   { opacity: 0;    transform: translateY(0) scale(0.3); }
           15%  { opacity: 0.6; }
           100% { opacity: 0;    transform: translateY(-52px) scale(3.2); }
         }
 
-        /* Hide truck on very small screens */
         @media (max-width: 600px) { .hp-truck { display: none; } }
         @media (max-width: 900px) { .hp-truck { width: clamp(300px, 70vw, 500px); } }
 
@@ -489,10 +470,7 @@ export default function HomePage() {
           padding-top: var(--space-8); border-top: 1px solid oklch(1 0 0 / 0.08);
         }
         .hp-stats__item { display: flex; align-items: center; }
-        .hp-stats__sep {
-          width: 1px; height: 2rem; background: oklch(1 0 0 / 0.10);
-          margin-inline: var(--space-6);
-        }
+        .hp-stats__sep { width: 1px; height: 2rem; background: oklch(1 0 0 / 0.10); margin-inline: var(--space-6); }
         .hp-stats__inner { display: flex; flex-direction: column; gap: 4px; }
         .hp-stats__value {
           font-family: var(--font-display);
@@ -517,7 +495,6 @@ export default function HomePage() {
         }
         @media (max-width: 860px) { .hp-adv-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 560px) { .hp-adv-grid { grid-template-columns: 1fr; } }
-
         .hp-adv-card {
           position: relative; display: flex; flex-direction: column;
           background: var(--surface); border: 1px solid var(--border);
