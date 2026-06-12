@@ -97,9 +97,7 @@ export default function ServicesPage() {
               </div>
             </div>
           </div>
-
-          {/* Extended fade — covers hero bottom AND overlaps into tabs-bar */}
-          <div className="svc-hero__fade" aria-hidden />
+          {/* fade removed — sharp photo edge */}
         </section>
 
         {/* ═══ TABS ══════════════════════════════════ */}
@@ -221,12 +219,10 @@ export default function ServicesPage() {
         ═══════════════════════════════════════════ */
         .svc-hero {
           position: relative;
-          /* Tighter height — no extra void at top */
           min-height: 44vh;
           display: flex;
           align-items: flex-end;
-          overflow: visible;
-          /* Let fade bleed below */
+          overflow: hidden;
         }
         .svc-hero__bg {
           position: absolute; inset: 0; z-index: 0;
@@ -236,22 +232,20 @@ export default function ServicesPage() {
           width: 100%; height: 100%;
           object-fit: cover;
           object-position: center 35%;
-          filter: brightness(0.32) contrast(1.08) saturate(0.65);
+          filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
         .svc-hero__overlay {
           position: absolute; inset: 0;
           background:
             linear-gradient(
               108deg,
-              oklch(0.09 0.015 55 / 0.96) 0%,
-              oklch(0.09 0.015 55 / 0.60) 50%,
-              oklch(0.09 0.015 55 / 0.10) 100%
-            ),
-            linear-gradient(to top, oklch(0.09 0.015 55 / 0.98) 0%, transparent 50%);
+              oklch(0.09 0.015 55 / 0.92) 0%,
+              oklch(0.09 0.015 55 / 0.50) 55%,
+              oklch(0.09 0.015 55 / 0.08) 100%
+            );
         }
         .svc-hero__content {
           position: relative; z-index: 2;
-          /* Reduced top padding — navbar is 60px, 4rem gives natural breathing room */
           padding-block: clamp(3rem, 8vw, 5rem) 3.5rem;
           max-width: 700px;
           text-align: left;
@@ -325,28 +319,8 @@ export default function ServicesPage() {
           font-weight: 600;
         }
 
-        /*
-          FADE — tall enough to cover the full bottom of the photo
-          AND bleed past the hero edge so the tabs-bar sits inside
-          the faded zone, removing the sharp colour jump entirely.
-        */
-        .svc-hero__fade {
-          position: absolute;
-          bottom: -48px;   /* bleed below hero into tabs-bar territory */
-          left: 0; right: 0;
-          height: 260px;
-          background: linear-gradient(
-            to top,
-            var(--bg) 0%,
-            var(--bg) 18%,
-            transparent 100%
-          );
-          z-index: 1;
-          pointer-events: none;
-        }
-
         /* ═══════════════════════════════════════════
-           TABS — sits above the fade bleed
+           TABS — sits directly below hero, no gap
         ═══════════════════════════════════════════ */
         .svc-tabs-bar {
           background: var(--bg);
