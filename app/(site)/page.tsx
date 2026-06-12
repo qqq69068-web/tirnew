@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { services } from "@/lib/services";
-import { Phone, ArrowRight, ChevronRight, ClipboardList, Wrench, CheckCircle, Headphones } from "lucide-react";
+import { ArrowRight, ChevronRight, ClipboardList, Wrench, CheckCircle, Headphones } from "lucide-react";
 
 const stats = [
-  { value: 20,      suffix: "+", label: "Років досвіду" },
-  { value: services.length, suffix: "+", label: "Видів послуг" },
-  { value: 5000,    suffix: "+", label: "Ремонтів" },
-  { value: 24,      suffix: "/7", label: "Підтримка" },
+  { value: 20,               suffix: "+",  label: "Років досвіду" },
+  { value: services.length,  suffix: "+",  label: "Видів послуг" },
+  { value: 5000,             suffix: "+",  label: "Ремонтів" },
+  { value: 24,               suffix: "/7", label: "Підтримка" },
 ];
 
 const advantages = [
@@ -137,26 +137,24 @@ export default function HomePage() {
             className="hp-hero__img"
           />
           <div className="hp-hero__overlay" />
-          <div className="hp-hero__radial" />
         </div>
 
         <div className="container">
           <div className="hp-hero__content">
-            <div className="fade-in hp-hero__eyebrow">
-              <span className="hp-hero__dot" aria-hidden />
-              <span className="hp-hero__eyebrow-text">TIR Truck Service</span>
-              <span className="hp-hero__eyebrow-line" aria-hidden />
+
+            <div className="fade-in hp-hero__label">
+              <span className="hp-hero__label-dot" aria-hidden />
+              TIR Truck Service · Рівне
             </div>
 
             <h1 className="fade-in hp-hero__title anim-d1">
-              Сервіс
-              <span className="hp-hero__title-accent"> вантажних і легкових</span>
-              <br />автомобілів та причепів
+              Сервіс вантажних<br />
+              <span className="hp-hero__title-em">і легкових</span> авто
             </h1>
 
             <p className="fade-in hp-hero__sub anim-d2">
-              Діагностика, ремонт, пневмосистеми, електрика й трансмісія для
-              вантажного та легкового транспорту. Власний склад запчастин.
+              Діагностика, ремонт, пневмосистеми, електрика й трансмісія.
+              Власний склад запчастин.
             </p>
 
             <div className="fade-in hp-hero__ctas anim-d3">
@@ -171,7 +169,7 @@ export default function HomePage() {
             <div className="fade-in hp-stats anim-d4">
               {stats.map((s, i) => (
                 <div key={s.label} className="hp-stats__item">
-                  {i > 0 && <div className="hp-stats__divider" aria-hidden />}
+                  {i > 0 && <div className="hp-stats__sep" aria-hidden />}
                   <StatItem value={s.value} suffix={s.suffix} label={s.label} />
                 </div>
               ))}
@@ -179,42 +177,50 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="hp-hero__scroll" aria-hidden>
-          <div className="hp-hero__scroll-track">
-            <div className="hp-hero__scroll-thumb" />
-          </div>
-          <span className="hp-hero__scroll-label">Scroll</span>
-        </div>
-
         <div className="hp-hero__bottom-fade" aria-hidden />
       </section>
 
-      {/* ╔═══ ADVANTAGES ═════════════════════════════════════════╗ */}
-      <section className="section-sm">
+      {/* ╔═══ ADVANTAGES — asymmetric bento ═════════════════════╗ */}
+      <section className="hp-adv-section">
         <div className="container">
-          <div className="reveal hp-adv">
-            {advantages.map((a, i) => (
-              <div key={a.tag} className={`hp-adv__item reveal d-${i + 1}`}>
-                <span className="hp-adv__tag">{a.tag}</span>
-                <div className="hp-adv__body">
-                  <p className="hp-adv__title">{a.title}</p>
-                  <p className="hp-adv__desc">{a.desc}</p>
-                </div>
-                <div className="hp-adv__accent" aria-hidden />
+          <div className="hp-adv-grid">
+
+            {/* Featured left card */}
+            <div className="reveal hp-adv-card hp-adv-card--featured">
+              <span className="hp-adv-card__num">01</span>
+              <div className="hp-adv-card__body">
+                <h3 className="hp-adv-card__title">Власний склад<br />запчастин</h3>
+                <p className="hp-adv-card__desc">
+                  Великий асортимент оригінальних і аналогових деталей — мінімальний простій техніки.
+                </p>
               </div>
-            ))}
+              <div className="hp-adv-card__corner" aria-hidden />
+            </div>
+
+            {/* Right column — 3 smaller cards */}
+            <div className="hp-adv-right">
+              {advantages.slice(1).map((a, i) => (
+                <div key={a.tag} className={`reveal hp-adv-card hp-adv-card--sm d-${i + 1}`}>
+                  <span className="hp-adv-card__num">{a.tag}</span>
+                  <div className="hp-adv-card__body">
+                    <h3 className="hp-adv-card__title">{a.title}</h3>
+                    <p className="hp-adv-card__desc">{a.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* ╔═══ SERVICES PREVIEW ═══════════════════════════╗ */}
+      {/* ╔═══ SERVICES PREVIEW ═══════════════════════════════════╗ */}
       <section className="section">
         <div className="container">
-          <div className="reveal hp-section-head">
-            <div>
-              <p className="section-eyebrow">Що ми робимо</p>
-              <h2 className="hp-section-title">Популярні послуги</h2>
-              <p className="hp-section-sub">Найчастіші запити від наших клієнтів</p>
+          <div className="reveal hp-svc-head">
+            <div className="hp-svc-head__left">
+              <p className="hp-label">Що ми робимо</p>
+              <h2 className="hp-h2">Популярні послуги</h2>
             </div>
             <Link href="/services" className="hp-all-link">
               Всі послуги <ArrowRight size={14} aria-hidden />
@@ -226,22 +232,23 @@ export default function HomePage() {
               <Link
                 key={s.slug}
                 href={`/services/${s.slug}`}
-                className={`hp-svc-card reveal d-${i + 1}`}
+                className={`reveal hp-svc-card d-${i + 1}`}
               >
                 {s.image && (
                   <div className="hp-svc-card__img">
                     <img src={s.image} alt={s.title} width={480} height={180} loading="lazy" />
-                    <div className="hp-svc-card__img-overlay" aria-hidden />
+                    <div className="hp-svc-card__img-fade" aria-hidden />
                   </div>
                 )}
-                <div className="hp-svc-card__line" aria-hidden />
                 <div className="hp-svc-card__body">
-                  <p className="hp-svc-card__title">{s.title}</p>
+                  <h3 className="hp-svc-card__title">{s.title}</h3>
                   <p className="hp-svc-card__desc">{s.short}</p>
                 </div>
-                <div className="hp-svc-card__footer">
+                <div className="hp-svc-card__foot">
                   <span className="hp-svc-card__price">{s.price}</span>
-                  <span className="hp-svc-card__arrow" aria-hidden><ArrowRight size={14} /></span>
+                  <span className="hp-svc-card__arr" aria-hidden>
+                    <ArrowRight size={14} />
+                  </span>
                 </div>
               </Link>
             ))}
@@ -249,32 +256,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ╔═══ PROCESS ═════════════════════════════════════════╗ */}
-      <section className="section hp-process-section">
+      {/* ╔═══ PROCESS — numbered timeline ════════════════════════╗ */}
+      <section className="section hp-proc-section">
         <div className="container">
-          <div className="reveal hp-section-head">
-            <div>
-              <p className="section-eyebrow">Як це працює</p>
-              <h2 className="hp-section-title">Процес роботи</h2>
-            </div>
+          <div className="reveal hp-proc-head">
+            <p className="hp-label">Як це працює</p>
+            <h2 className="hp-h2">Процес роботи</h2>
           </div>
-          <div className="hp-process">
+
+          <div className="hp-proc">
             {processSteps.map((step, i) => (
-              <div key={step.num} className={`hp-process__step reveal d-${i + 1}`}>
-                <div className="hp-process__num-row">
-                  <span className="hp-process__num">{step.num}</span>
-                  {i < processSteps.length - 1 && (
-                    <div className="hp-process__connector" aria-hidden>
-                      <div className="hp-process__connector-line" />
-                      <div className="hp-process__connector-dot" />
-                    </div>
-                  )}
+              <div key={step.num} className={`reveal hp-proc__step d-${i + 1}`}>
+                <div className="hp-proc__top">
+                  <span className="hp-proc__num">{step.num}</span>
+                  <div className="hp-proc__icon">
+                    <step.icon size={17} strokeWidth={1.75} />
+                  </div>
                 </div>
-                <div className="hp-process__icon" aria-hidden>
-                  <step.icon size={18} strokeWidth={1.75} />
-                </div>
-                <h3 className="hp-process__title">{step.title}</h3>
-                <p className="hp-process__desc">{step.desc}</p>
+                <h3 className="hp-proc__title">{step.title}</h3>
+                <p className="hp-proc__desc">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -282,136 +282,128 @@ export default function HomePage() {
       </section>
 
       <style>{`
-        /* ═══ HP ROOT ══════════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════
+           HP ROOT
+        ══════════════════════════════════════════════════════ */
         .hp-root { background: var(--bg); }
 
-        /* ═══ HERO ═════════════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════
+           HERO
+        ══════════════════════════════════════════════════════ */
         .hp-hero {
           position: relative;
-          min-height: 92vh;
+          min-height: 96vh;
           display: flex;
           align-items: center;
           overflow: hidden;
         }
         .hp-hero__bg {
-          position: absolute; inset: 0;
-          z-index: 0;
+          position: absolute; inset: 0; z-index: 0;
         }
         .hp-hero__img {
           width: 100%; height: 100%;
           object-fit: cover;
-          object-position: center;
-          filter: brightness(0.55) contrast(1.05);
+          object-position: center 30%;
+          filter: brightness(0.45) contrast(1.08) saturate(0.85);
         }
         .hp-hero__overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(
-            105deg,
-            oklch(0.13 0.005 240 / 0.92) 0%,
-            oklch(0.13 0.005 240 / 0.7) 55%,
-            oklch(0.13 0.005 240 / 0.15) 100%
-          );
+          background:
+            linear-gradient(105deg,
+              oklch(0.10 0.01 60 / 0.97) 0%,
+              oklch(0.10 0.01 60 / 0.78) 45%,
+              oklch(0.10 0.01 60 / 0.18) 100%
+            ),
+            linear-gradient(to top,
+              oklch(0.10 0.01 60 / 0.95) 0%,
+              transparent 55%
+            );
         }
-        .hp-hero__radial {
-          position: absolute; inset: 0;
-          background: radial-gradient(
-            ellipse 60% 80% at 10% 60%,
-            oklch(0.45 0.19 25 / 0.18) 0%,
-            transparent 70%
-          );
-        }
-        /* ← ВИПРАВЛЕННЯ: контент притиснутий до лівого краю */
+
         .hp-hero__content {
           position: relative;
           z-index: 1;
-          padding-block: 9rem 7rem;
-          max-width: 820px;
-          margin-left: 0;
-          margin-right: auto;
+          padding-block: 10rem 8rem;
+          max-width: 760px;
         }
-        .hp-hero__eyebrow {
-          display: flex;
+
+        .hp-hero__label {
+          display: inline-flex;
           align-items: center;
-          gap: var(--space-2);
+          gap: 8px;
+          font-size: var(--text-xs);
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: oklch(1 0 0 / 0.45);
           margin-bottom: var(--space-6);
         }
-        .hp-hero__dot {
-          width: 7px; height: 7px;
+        .hp-hero__label-dot {
+          width: 6px; height: 6px;
           border-radius: 50%;
           background: var(--primary);
           flex-shrink: 0;
-          animation: pulse 2s ease-in-out infinite;
+          box-shadow: 0 0 0 3px oklch(from var(--primary) l c h / 0.25);
+          animation: dotPulse 2.4s ease-in-out infinite;
         }
-        @keyframes pulse {
-          0%,100% { opacity: 1; transform: scale(1); }
-          50% { opacity: .6; transform: scale(1.3); }
+        @keyframes dotPulse {
+          0%, 100% { box-shadow: 0 0 0 3px oklch(from var(--primary) l c h / 0.25); }
+          50%       { box-shadow: 0 0 0 7px oklch(from var(--primary) l c h / 0.08); }
         }
-        .hp-hero__eyebrow-text {
-          font-family: var(--font-display);
-          font-size: var(--text-xs);
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--text-muted);
-        }
-        .hp-hero__eyebrow-line {
-          flex: 1;
-          max-width: 48px;
-          height: 1px;
-          background: oklch(from var(--text-muted) l c h / 0.35);
-        }
+
         .hp-hero__title {
           font-family: var(--font-display);
-          font-size: clamp(2.6rem, 6.5vw, 5.2rem);
+          font-size: clamp(2.8rem, 7vw, 5.6rem);
           font-weight: 900;
           line-height: 1.0;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.03em;
           color: #fff;
           margin-bottom: var(--space-6);
-          text-shadow: 0 2px 24px oklch(0 0 0 / 0.35);
         }
-        .hp-hero__title-accent { color: var(--primary); }
+        .hp-hero__title-em {
+          font-style: italic;
+          color: var(--primary-light);
+          font-weight: 800;
+        }
         .hp-hero__sub {
           font-size: var(--text-base);
-          color: oklch(1 0 0 / 0.72);
-          max-width: 52ch;
+          color: oklch(1 0 0 / 0.60);
+          max-width: 46ch;
           margin-bottom: var(--space-10);
-          line-height: 1.65;
+          line-height: 1.7;
         }
         .hp-hero__ctas {
           display: flex;
           gap: var(--space-3);
           flex-wrap: wrap;
-          margin-bottom: var(--space-12);
+          margin-bottom: var(--space-14);
         }
-        /* STATS */
+        .hp-hero__bottom-fade {
+          position: absolute; bottom: 0; left: 0; right: 0;
+          height: 160px;
+          background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+          z-index: 1;
+          pointer-events: none;
+        }
+
         .hp-stats {
           display: flex;
           align-items: stretch;
-          gap: 0;
           flex-wrap: wrap;
-          border-top: 1px solid oklch(1 0 0 / 0.12);
-          padding-top: var(--space-6);
-        }
-        .hp-stats__item {
-          display: flex;
-          align-items: center;
           gap: 0;
+          padding-top: var(--space-8);
+          border-top: 1px solid oklch(1 0 0 / 0.10);
         }
-        .hp-stats__divider {
-          width: 1px;
-          height: 2.5rem;
-          background: oklch(1 0 0 / 0.15);
+        .hp-stats__item { display: flex; align-items: center; }
+        .hp-stats__sep {
+          width: 1px; height: 2.2rem;
+          background: oklch(1 0 0 / 0.12);
           margin-inline: var(--space-6);
         }
-        .hp-stats__inner {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
+        .hp-stats__inner { display: flex; flex-direction: column; gap: 3px; }
         .hp-stats__value {
           font-family: var(--font-display);
-          font-size: clamp(1.5rem, 2.5vw, 2rem);
+          font-size: clamp(1.4rem, 2.2vw, 1.85rem);
           font-weight: 800;
           color: #fff;
           line-height: 1;
@@ -420,146 +412,168 @@ export default function HomePage() {
         }
         .hp-stats__label {
           font-size: var(--text-xs);
-          color: oklch(1 0 0 / 0.55);
+          color: oklch(1 0 0 / 0.42);
           text-transform: uppercase;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.09em;
           font-weight: 500;
         }
-        /* SCROLL INDICATOR */
-        .hp-hero__scroll {
-          position: absolute;
-          bottom: var(--space-8);
-          right: var(--space-8);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: var(--space-2);
-          z-index: 1;
+
+        /* ══════════════════════════════════════════════════════
+           ADVANTAGES — asymmetric bento
+        ══════════════════════════════════════════════════════ */
+        .hp-adv-section {
+          padding-block: clamp(var(--space-10), 5vw, var(--space-20));
+          background: var(--bg);
+          border-top: 1px solid var(--border);
         }
-        .hp-hero__scroll-track {
-          width: 2px;
-          height: 48px;
-          background: oklch(1 0 0 / 0.18);
-          border-radius: 2px;
-          overflow: hidden;
+        .hp-adv-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.8fr;
+          gap: var(--space-3);
         }
-        .hp-hero__scroll-thumb {
-          width: 100%;
-          height: 40%;
-          background: var(--primary);
-          border-radius: 2px;
-          animation: scrollThumb 2s ease-in-out infinite;
-        }
-        @keyframes scrollThumb {
-          0% { transform: translateY(0); opacity: 1; }
-          60% { transform: translateY(160%); opacity: 0.4; }
-          100% { transform: translateY(0); opacity: 1; }
-        }
-        .hp-hero__scroll-label {
-          font-size: 9px;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: oklch(1 0 0 / 0.4);
-          font-weight: 600;
-          writing-mode: vertical-rl;
-        }
-        .hp-hero__bottom-fade {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          height: 120px;
-          background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
-          z-index: 1;
-          pointer-events: none;
+        @media (max-width: 860px) {
+          .hp-adv-grid { grid-template-columns: 1fr; }
         }
 
-        /* ═══ ADVANTAGES ══════════════════════════════════════════════ */
-        .hp-adv {
+        .hp-adv-right {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 1px;
-          background: var(--border);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          overflow: hidden;
+          grid-template-columns: repeat(3, 1fr);
+          gap: var(--space-3);
         }
-        .hp-adv__item {
+        @media (max-width: 640px) {
+          .hp-adv-right { grid-template-columns: 1fr; }
+        }
+
+        .hp-adv-card {
           position: relative;
           display: flex;
           flex-direction: column;
-          gap: var(--space-3);
-          padding: var(--space-6) var(--space-5);
+          justify-content: space-between;
           background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: var(--space-6);
           overflow: hidden;
-          transition: background 0.2s ease;
+          transition:
+            border-color 0.22s ease,
+            box-shadow 0.22s ease;
         }
-        .hp-adv__item:hover { background: var(--surface-2); }
-        .hp-adv__tag {
+        .hp-adv-card:hover {
+          border-color: var(--border-accent);
+          box-shadow: var(--shadow-md);
+        }
+
+        .hp-adv-card--featured {
+          padding: var(--space-8);
+          min-height: 260px;
+        }
+        .hp-adv-card__corner {
+          position: absolute;
+          bottom: -20px; right: -20px;
+          width: 100px; height: 100px;
+          border-radius: 50%;
+          background: oklch(from var(--primary) l c h / 0.07);
+          border: 1px solid oklch(from var(--primary) l c h / 0.12);
+          pointer-events: none;
+          transition: transform 0.4s ease;
+        }
+        .hp-adv-card--featured:hover .hp-adv-card__corner {
+          transform: scale(1.3);
+        }
+
+        .hp-adv-card__num {
           font-family: var(--font-display);
           font-size: var(--text-xs);
           font-weight: 700;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.14em;
           color: var(--primary);
-          opacity: 0.8;
+          opacity: 0.75;
+          margin-bottom: var(--space-8);
+          display: block;
         }
-        .hp-adv__title {
+        .hp-adv-card--sm .hp-adv-card__num {
+          margin-bottom: var(--space-5);
+        }
+        .hp-adv-card__body { display: flex; flex-direction: column; gap: var(--space-2); }
+        .hp-adv-card__title {
           font-family: var(--font-display);
-          font-size: var(--text-base);
+          font-size: var(--text-lg);
           font-weight: 700;
           color: var(--text);
-          line-height: 1.3;
-          max-width: none;
+          line-height: 1.2;
+          letter-spacing: -0.01em;
         }
-        .hp-adv__desc {
+        .hp-adv-card--sm .hp-adv-card__title {
+          font-size: var(--text-base);
+        }
+        .hp-adv-card__desc {
           font-size: var(--text-sm);
           color: var(--text-muted);
-          line-height: 1.55;
+          line-height: 1.6;
           max-width: none;
         }
-        .hp-adv__accent {
-          position: absolute;
-          bottom: 0; left: 0;
-          width: 100%; height: 2px;
-          background: var(--primary);
-          transform: scaleX(0);
-          transform-origin: left;
-          transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
-        }
-        .hp-adv__item:hover .hp-adv__accent { transform: scaleX(1); }
-        @media (max-width: 900px) { .hp-adv { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 540px) { .hp-adv { grid-template-columns: 1fr; } }
 
-        /* ═══ SECTION HEAD ════════════════════════════════════════════ */
-        .hp-section-head {
+        /* ══════════════════════════════════════════════════════
+           SHARED TYPOGRAPHY
+        ══════════════════════════════════════════════════════ */
+        .hp-label {
+          font-size: var(--text-xs);
+          font-weight: 700;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+          color: var(--text-faint);
+          margin-bottom: var(--space-2);
+        }
+        .hp-h2 {
+          font-family: var(--font-display);
+          font-size: var(--text-xl);
+          font-weight: 800;
+          color: var(--text);
+          line-height: 1.1;
+          letter-spacing: -0.02em;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           SERVICES
+        ══════════════════════════════════════════════════════ */
+        .hp-svc-head {
           display: flex;
           align-items: flex-end;
           justify-content: space-between;
           gap: var(--space-4);
-          margin-bottom: var(--space-10);
+          margin-bottom: var(--space-8);
           flex-wrap: wrap;
         }
-        .hp-section-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 800; color: var(--text); margin-top: var(--space-1); line-height: 1.15; }
-        .hp-section-sub { font-size: var(--text-sm); color: var(--text-muted); margin-top: var(--space-2); }
+        .hp-svc-head__left { display: flex; flex-direction: column; gap: 4px; }
+
         .hp-all-link {
           display: inline-flex;
           align-items: center;
           gap: var(--space-1);
           font-size: var(--text-sm);
           font-weight: 600;
-          color: var(--primary);
+          color: var(--text-muted);
           text-decoration: none;
           white-space: nowrap;
-          transition: gap 0.2s ease, color 0.2s ease;
           padding-bottom: 2px;
+          border-bottom: 1px solid var(--border);
+          transition: color 0.18s ease, border-color 0.18s ease, gap 0.18s ease;
           flex-shrink: 0;
         }
-        .hp-all-link:hover { gap: var(--space-2); color: var(--primary-hover); }
+        .hp-all-link:hover {
+          color: var(--primary);
+          border-color: var(--border-accent);
+          gap: var(--space-2);
+        }
 
-        /* ═══ SERVICE CARDS ═══════════════════════════════════════════ */
         .hp-services {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: var(--space-4);
         }
+        @media (max-width: 900px) { .hp-services { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px) { .hp-services { grid-template-columns: 1fr; } }
+
         .hp-svc-card {
           display: flex;
           flex-direction: column;
@@ -568,40 +582,72 @@ export default function HomePage() {
           border-radius: var(--radius-lg);
           overflow: hidden;
           text-decoration: none;
-          transition: transform 0.25s cubic-bezier(0.22,1,0.36,1),
-                      box-shadow 0.25s ease,
-                      border-color 0.2s ease;
+          transition:
+            transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.26s ease,
+            border-color 0.2s ease;
         }
         .hp-svc-card:hover {
-          transform: translateY(-3px);
+          transform: translateY(-4px);
           box-shadow: var(--shadow-lg);
           border-color: var(--border-strong);
         }
-        .hp-svc-card__img { position: relative; aspect-ratio: 16/7; overflow: hidden; }
+
+        .hp-svc-card__img {
+          position: relative;
+          aspect-ratio: 16 / 7;
+          overflow: hidden;
+          background: var(--surface2);
+        }
         .hp-svc-card__img img {
           width: 100%; height: 100%;
           object-fit: cover;
-          transition: transform 0.5s ease;
+          filter: saturate(0.85);
+          transition: transform 0.5s ease, filter 0.3s ease;
         }
-        .hp-svc-card:hover .hp-svc-card__img img { transform: scale(1.04); }
-        .hp-svc-card__img-overlay {
+        .hp-svc-card:hover .hp-svc-card__img img {
+          transform: scale(1.05);
+          filter: saturate(1);
+        }
+        .hp-svc-card__img-fade {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, oklch(from var(--bg) l c h / 0.6) 0%, transparent 60%);
+          background: linear-gradient(to top,
+            oklch(from var(--bg) l c h / 0.55) 0%,
+            transparent 65%
+          );
         }
-        .hp-svc-card__line {
+
+        .hp-svc-card::before {
+          content: '';
+          display: block;
           height: 2px;
           background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
           opacity: 0;
           transition: opacity 0.25s ease;
+          flex-shrink: 0;
         }
-        .hp-svc-card:hover .hp-svc-card__line { opacity: 1; }
+        .hp-svc-card:hover::before { opacity: 1; }
+
         .hp-svc-card__body {
           flex: 1;
-          padding: var(--space-5) var(--space-5) var(--space-3);
+          padding: var(--space-5);
         }
-        .hp-svc-card__title { font-family: var(--font-display); font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2); line-height: 1.3; max-width: none; }
-        .hp-svc-card__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.55; max-width: none; }
-        .hp-svc-card__footer {
+        .hp-svc-card__title {
+          font-family: var(--font-display);
+          font-size: var(--text-base);
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: var(--space-2);
+          line-height: 1.25;
+          max-width: none;
+        }
+        .hp-svc-card__desc {
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          line-height: 1.6;
+          max-width: none;
+        }
+        .hp-svc-card__foot {
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -609,94 +655,132 @@ export default function HomePage() {
           border-top: 1px solid var(--border);
           margin-top: auto;
         }
-        .hp-svc-card__price { font-size: var(--text-xs); color: var(--text-muted); font-weight: 500; }
-        .hp-svc-card__arrow { color: var(--primary); opacity: 0; transform: translateX(-4px); transition: opacity 0.2s, transform 0.2s; }
-        .hp-svc-card:hover .hp-svc-card__arrow { opacity: 1; transform: translateX(0); }
-        @media (max-width: 900px) { .hp-services { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 560px) { .hp-services { grid-template-columns: 1fr; } }
+        .hp-svc-card__price {
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+          font-weight: 500;
+          font-variant-numeric: tabular-nums;
+        }
+        .hp-svc-card__arr {
+          color: var(--primary);
+          opacity: 0;
+          transform: translateX(-6px);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          display: flex;
+        }
+        .hp-svc-card:hover .hp-svc-card__arr {
+          opacity: 1;
+          transform: translateX(0);
+        }
 
-        /* ═══ PROCESS ═════════════════════════════════════════════════ */
-        .hp-process-section { background: var(--surface); }
-        .hp-process {
+        /* ══════════════════════════════════════════════════════
+           PROCESS — numbered timeline
+        ══════════════════════════════════════════════════════ */
+        .hp-proc-section {
+          background: var(--surface);
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+        }
+        .hp-proc-head {
+          margin-bottom: clamp(var(--space-8), 4vw, var(--space-12));
+        }
+        .hp-proc {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: var(--space-2);
+          position: relative;
         }
-        .hp-process__step {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-4);
-          padding: var(--space-6);
-          border-radius: var(--radius-lg);
-          border: 1px solid transparent;
-          transition: border-color 0.2s ease, background 0.2s ease;
+        @media (max-width: 860px) {
+          .hp-proc { grid-template-columns: repeat(2, 1fr); }
         }
-        .hp-process__step:hover {
-          background: var(--surface-2);
-          border-color: var(--border);
+        @media (max-width: 480px) {
+          .hp-proc { grid-template-columns: 1fr; }
         }
-        .hp-process__num-row {
+
+        .hp-proc__step {
+          position: relative;
+          padding: var(--space-6) var(--space-8) var(--space-6) 0;
+          border-right: 1px solid var(--border);
+        }
+        .hp-proc__step:last-child { border-right: none; }
+
+        .hp-proc__top {
           display: flex;
           align-items: center;
-          gap: var(--space-3);
+          justify-content: space-between;
+          margin-bottom: var(--space-5);
         }
-        .hp-process__num {
+        .hp-proc__num {
           font-family: var(--font-display);
-          font-size: var(--text-xs);
-          font-weight: 800;
-          letter-spacing: 0.1em;
-          color: var(--primary);
+          font-size: clamp(2rem, 3vw, 2.6rem);
+          font-weight: 900;
+          color: var(--border-strong);
+          line-height: 1;
+          letter-spacing: -0.04em;
+          transition: color 0.22s ease;
         }
-        .hp-process__connector {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          gap: var(--space-1);
-        }
-        .hp-process__connector-line {
-          flex: 1;
-          height: 1px;
-          background: var(--border);
-        }
-        .hp-process__connector-dot {
-          width: 4px; height: 4px;
-          border-radius: 50%;
-          background: var(--border-strong);
-          flex-shrink: 0;
-        }
-        .hp-process__icon {
+        .hp-proc__step:hover .hp-proc__num { color: var(--primary); }
+
+        .hp-proc__icon {
           width: 36px; height: 36px;
           display: flex; align-items: center; justify-content: center;
           border-radius: var(--radius-md);
-          background: oklch(from var(--primary) l c h / 0.1);
-          color: var(--primary);
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+          background: var(--surface2);
           flex-shrink: 0;
+          transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease;
         }
-        .hp-process__title { font-family: var(--font-display); font-size: var(--text-base); font-weight: 700; color: var(--text); line-height: 1.2; }
-        .hp-process__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; max-width: none; }
-        @media (max-width: 900px) { .hp-process { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 540px) { .hp-process { grid-template-columns: 1fr; gap: var(--space-1); } }
+        .hp-proc__step:hover .hp-proc__icon {
+          border-color: var(--border-accent);
+          color: var(--primary);
+          background: var(--primary-subtle);
+        }
+        .hp-proc__title {
+          font-family: var(--font-display);
+          font-size: var(--text-base);
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: var(--space-2);
+          line-height: 1.2;
+        }
+        .hp-proc__desc {
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          line-height: 1.65;
+          max-width: none;
+        }
 
-        /* ═══ ANIMATIONS ══════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════
+           ANIMATIONS
+        ══════════════════════════════════════════════════════ */
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         .fade-in {
           opacity: 0;
-          animation: fadeInUp 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+          animation: fadeInUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        .anim-d1 { animation-delay: 0.05s; }
-        .anim-d2 { animation-delay: 0.15s; }
-        .anim-d3 { animation-delay: 0.25s; }
-        .anim-d4 { animation-delay: 0.38s; }
+        .anim-d1 { animation-delay: 0.06s; }
+        .anim-d2 { animation-delay: 0.16s; }
+        .anim-d3 { animation-delay: 0.28s; }
+        .anim-d4 { animation-delay: 0.42s; }
 
-        /* ═══ RESPONSIVE HERO ═════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════════════════════ */
         @media (max-width: 640px) {
           .hp-hero__content { padding-block: 7rem 5rem; }
-          .hp-hero__scroll { display: none; }
           .hp-stats { gap: var(--space-4); }
-          .hp-stats__divider { display: none; }
+          .hp-stats__sep { display: none; }
+          .hp-hero__ctas { gap: var(--space-2); }
+          .hp-proc__step {
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding-right: 0;
+            padding-bottom: var(--space-6);
+          }
+          .hp-proc__step:last-child { border-bottom: none; }
         }
       `}</style>
     </main>
