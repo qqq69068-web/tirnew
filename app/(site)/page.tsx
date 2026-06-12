@@ -118,101 +118,172 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
   );
 }
 
-// Animated truck SVG — drives in from the right, parks
+// ─── Clean side-view truck SVG ──────────────────────────────────────────────
+// viewBox: 800 × 200
+// Ground line: y=170
+// Wheel radius: 24px
+// Trailer: x=10..490, cab: x=500..790
+// ─────────────────────────────────────────────────────────────────────────────
 function TruckSVG() {
   return (
     <div className="hp-truck" aria-hidden>
       <svg
         className="hp-truck__svg truck-entrance"
-        viewBox="0 0 520 160"
+        viewBox="0 0 800 200"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* === TRAILER === */}
-        {/* Trailer body */}
-        <rect x="8" y="28" width="310" height="98" rx="4" fill="#2a2826" stroke="#3d3b38" strokeWidth="1.5" />
-        {/* Trailer roof stripe */}
-        <rect x="8" y="28" width="310" height="8" rx="4" fill="#333130" />
-        {/* Tirnew branding on trailer */}
-        <rect x="30" y="52" width="140" height="36" rx="3" fill="#1e1d1b" />
-        <text x="100" y="75" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700" fill="#d4991f" letterSpacing="2">TIRNEW</text>
-        <text x="100" y="86" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="7" fontWeight="500" fill="#6b6864" letterSpacing="3">TRUCK SERVICE</text>
-        {/* Trailer ribbing lines */}
-        <line x1="200" y1="36" x2="200" y2="118" stroke="#323028" strokeWidth="1" />
-        <line x1="230" y1="36" x2="230" y2="118" stroke="#323028" strokeWidth="1" />
-        <line x1="260" y1="36" x2="260" y2="118" stroke="#323028" strokeWidth="1" />
-        <line x1="290" y1="36" x2="290" y2="118" stroke="#323028" strokeWidth="1" />
-        {/* Trailer bottom rail */}
-        <rect x="8" y="118" width="310" height="8" rx="0" fill="#1e1d1b" />
-        {/* Trailer rear door handle */}
-        <rect x="314" y="65" width="4" height="30" rx="2" fill="#444240" />
-        {/* Trailer wheels — rear axle */}
-        <circle cx="60" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="60" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="60" cy="130" r="3" fill="#4a4846" />
-        <circle cx="100" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="100" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="100" cy="130" r="3" fill="#4a4846" />
-        {/* Trailer wheels — front axle */}
-        <circle cx="240" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="240" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="240" cy="130" r="3" fill="#4a4846" />
-        <circle cx="280" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="280" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="280" cy="130" r="3" fill="#4a4846" />
+        {/* ═══ TRAILER BODY ══════════════════════════════════════════════ */}
+        {/* Main box — sits on chassis rail, top y=40, bottom y=156 */}
+        <rect x="10" y="40" width="480" height="116" rx="3" fill="#26241f" stroke="#3c3a35" strokeWidth="1.5" />
 
-        {/* === FIFTH WHEEL / COUPLING === */}
-        <rect x="310" y="118" width="30" height="6" rx="2" fill="#2e2c2a" />
+        {/* Roof strip */}
+        <rect x="10" y="40" width="480" height="9" rx="3" fill="#2e2c27" />
 
-        {/* === CAB (TRACTOR) === */}
-        {/* Cab body */}
-        <rect x="330" y="42" width="140" height="84" rx="6" fill="#252321" stroke="#3a3836" strokeWidth="1.5" />
-        {/* Cab roof */}
-        <path d="M338 42 Q345 18 380 14 L460 14 Q490 14 466 42 Z" fill="#1e1d1b" stroke="#3a3836" strokeWidth="1.5" />
-        {/* Sleeper roof fairing */}
-        <rect x="330" y="42" width="30" height="10" rx="3" fill="#1e1d1b" />
-        {/* Windshield */}
-        <path d="M368 42 Q372 22 392 18 L448 18 Q462 18 458 42 Z" fill="#1a2535" stroke="#243448" strokeWidth="1" />
-        {/* Windshield glare */}
-        <path d="M380 22 Q385 20 400 20 L420 20 Q428 20 424 28 L408 28 Q395 28 380 22 Z" fill="white" opacity="0.06" />
-        {/* Side window */}
-        <rect x="332" y="50" width="28" height="30" rx="3" fill="#1a2535" stroke="#243448" strokeWidth="1" />
+        {/* Vertical ribs */}
+        {[80, 150, 220, 290, 360, 420].map(x => (
+          <line key={x} x1={x} y1="50" x2={x} y2="156" stroke="#2e2c27" strokeWidth="1.2" />
+        ))}
+
+        {/* Branding panel */}
+        <rect x="34" y="68" width="180" height="44" rx="3" fill="#1a1917" stroke="#2e2c27" strokeWidth="1" />
+        <text x="124" y="94" textAnchor="middle" fontFamily="system-ui,sans-serif" fontSize="14" fontWeight="700" fill="#d4991f" letterSpacing="3">TIRNEW</text>
+        <text x="124" y="106" textAnchor="middle" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="500" fill="#5a5852" letterSpacing="4">TRUCK SERVICE</text>
+
+        {/* Bottom chassis rail */}
+        <rect x="10" y="156" width="480" height="8" rx="0" fill="#1e1c18" />
+
+        {/* Rear doors — two vertical panels with handles */}
+        <rect x="482" y="40" width="8" height="116" rx="2" fill="#2a2825" stroke="#3c3a35" strokeWidth="1" />
+        <rect x="484" y="90" width="4" height="20" rx="2" fill="#48453f" />
+
+        {/* ═══ FIFTH WHEEL / KING PIN PLATE ═══════════════════════════ */}
+        <rect x="455" y="156" width="54" height="7" rx="2" fill="#302e29" />
+
+        {/* ═══ TRAILER WHEELS ══════════════════════════════════════════ */}
+        {/* Rear bogie (tandem axle) */}
+        {[80, 130].map(cx => (
+          <g key={cx}>
+            <circle cx={cx} cy={170} r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
+            <circle cx={cx} cy={170} r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
+            {/* lug bolts */}
+            {[0,60,120,180,240,300].map(deg => {
+              const rad = deg * Math.PI / 180;
+              return <circle key={deg} cx={cx + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
+            })}
+            <circle cx={cx} cy={170} r="4" fill="#2a2825" />
+          </g>
+        ))}
+        {/* Front bogie (tandem axle) */}
+        {[340, 390].map(cx => (
+          <g key={cx}>
+            <circle cx={cx} cy={170} r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
+            <circle cx={cx} cy={170} r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
+            {[0,60,120,180,240,300].map(deg => {
+              const rad = deg * Math.PI / 180;
+              return <circle key={deg} cx={cx + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
+            })}
+            <circle cx={cx} cy={170} r="4" fill="#2a2825" />
+          </g>
+        ))}
+
+        {/* ═══ CAB (TRACTOR) ═══════════════════════════════════════════ */}
+        {/* Cab back wall / sleeper box */}
+        <rect x="496" y="58" width="36" height="98" rx="0" fill="#222018" stroke="#3c3a35" strokeWidth="1.5" />
+        {/* Sleeper side window */}
+        <rect x="500" y="68" width="28" height="22" rx="2" fill="#0e1a28" stroke="#1e2f44" strokeWidth="1" />
+
+        {/* Main cab body */}
+        <rect x="528" y="58" width="210" height="98" rx="3" fill="#252320" stroke="#3c3a35" strokeWidth="1.5" />
+
+        {/* Cab roof — tapers forward */}
+        <path d="M528 58 L532 28 L720 22 L738 58 Z" fill="#1e1c18" stroke="#3a3835" strokeWidth="1.5" />
+
+        {/* Roof fairing */}
+        <rect x="528" y="58" width="42" height="6" rx="2" fill="#1a1916" />
+
+        {/* Amber clearance lights on roof */}
+        {[558, 576, 594, 612].map(x => (
+          <rect key={x} x={x} y="21" width="10" height="5" rx="1.5" fill="#d4991f" opacity="0.85" />
+        ))}
+
+        {/* Windshield — big, raked */}
+        <path d="M534 58 L540 30 L718 24 L736 58 Z" fill="#0e1a28" stroke="#1e2f44" strokeWidth="1" />
+        {/* Windshield glare streak */}
+        <path d="M560 32 L600 28 L600 34 L560 38 Z" fill="white" opacity="0.04" />
+
+        {/* A-pillar left */}
+        <line x1="534" y1="58" x2="540" y2="30" stroke="#3a3835" strokeWidth="2" />
+
+        {/* Door */}
+        <rect x="530" y="58" width="140" height="98" rx="0" fill="none" stroke="#2e2c27" strokeWidth="1" />
         {/* Door line */}
-        <line x1="395" y1="42" x2="395" y2="122" stroke="#2e2c2a" strokeWidth="1.5" />
+        <line x1="666" y1="58" x2="666" y2="156" stroke="#2e2c27" strokeWidth="1.5" />
         {/* Door handle */}
-        <rect x="385" y="80" width="14" height="3" rx="1.5" fill="#4a4846" />
-        {/* Exhaust stack */}
-        <rect x="458" y="4" width="7" height="38" rx="3.5" fill="#2a2826" stroke="#3a3836" strokeWidth="1" />
-        <rect x="459" y="4" width="5" height="4" rx="2.5" fill="#1e1d1b" />
-        {/* Amber clearance lights on cab roof */}
-        <rect x="370" y="13" width="6" height="4" rx="1" fill="#d4991f" opacity="0.8" />
-        <rect x="382" y="13" width="6" height="4" rx="1" fill="#d4991f" opacity="0.8" />
-        <rect x="394" y="13" width="6" height="4" rx="1" fill="#d4991f" opacity="0.8" />
-        {/* Front grille */}
-        <rect x="456" y="48" width="14" height="50" rx="2" fill="#1a1918" stroke="#2e2c2a" strokeWidth="1" />
-        <line x1="456" y1="58" x2="470" y2="58" stroke="#2e2c2a" strokeWidth="1" />
-        <line x1="456" y1="68" x2="470" y2="68" stroke="#2e2c2a" strokeWidth="1" />
-        <line x1="456" y1="78" x2="470" y2="78" stroke="#2e2c2a" strokeWidth="1" />
-        <line x1="456" y1="88" x2="470" y2="88" stroke="#2e2c2a" strokeWidth="1" />
-        <line x1="463" y1="48" x2="463" y2="98" stroke="#2e2c2a" strokeWidth="1" />
-        {/* Headlights */}
-        <rect x="464" y="44" width="6" height="8" rx="2" fill="#c8d8f0" opacity="0.7" />
-        {/* Bumper */}
-        <rect x="452" y="100" width="20" height="10" rx="3" fill="#1e1d1b" stroke="#2e2c2a" strokeWidth="1" />
-        {/* Cab wheels — steer axle */}
-        <circle cx="390" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="390" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="390" cy="130" r="3" fill="#4a4846" />
-        {/* Cab wheels — drive axle */}
-        <circle cx="448" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="448" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="448" cy="130" r="3" fill="#4a4846" />
-        <circle cx="468" cy="130" r="18" fill="#1a1918" stroke="#2d2c2a" strokeWidth="2" />
-        <circle cx="468" cy="130" r="9" fill="#232220" stroke="#3a3836" strokeWidth="1.5" />
-        <circle cx="468" cy="130" r="3" fill="#4a4846" />
+        <rect x="652" y="102" width="18" height="4" rx="2" fill="#48453f" />
 
-        {/* === GROUND SHADOW === */}
-        <ellipse cx="260" cy="150" rx="240" ry="7" fill="black" opacity="0.18" />
+        {/* Vertical grab bar */}
+        <rect x="534" y="80" width="4" height="38" rx="2" fill="#302e29" />
+
+        {/* Step / running board */}
+        <rect x="528" y="148" width="60" height="6" rx="2" fill="#2e2c27" />
+
+        {/* ═══ FRONT FACE ══════════════════════════════════════════════ */}
+        {/* Front panel */}
+        <rect x="730" y="58" width="54" height="98" rx="3" fill="#1e1c18" stroke="#3a3835" strokeWidth="1.5" />
+
+        {/* Grille opening */}
+        <rect x="736" y="70" width="30" height="52" rx="2" fill="#141310" stroke="#2e2c27" strokeWidth="1" />
+        {/* Grille bars */}
+        {[78,86,94,102,110].map(y => (
+          <line key={y} x1="737" y1={y} x2="765" y2={y} stroke="#2a2825" strokeWidth="1.2" />
+        ))}
+        <line x1="750" y1="71" x2="750" y2="121" stroke="#2a2825" strokeWidth="1.2" />
+
+        {/* Headlight housing */}
+        <rect x="733" y="58" width="18" height="14" rx="2" fill="#0e1420" stroke="#1e2f44" strokeWidth="1" />
+        {/* Headlight lens glow */}
+        <rect x="735" y="60" width="14" height="10" rx="1.5" fill="#b8c8e0" opacity="0.5" />
+
+        {/* Fog light */}
+        <circle cx="744" cy="140" r="5" fill="#1e2f44" stroke="#243448" strokeWidth="1" />
+        <circle cx="744" cy="140" r="3" fill="#8090a8" opacity="0.4" />
+
+        {/* Bumper */}
+        <rect x="730" y="148" width="54" height="10" rx="3" fill="#1a1916" stroke="#2e2c27" strokeWidth="1" />
+        {/* Bumper lower step */}
+        <rect x="740" y="155" width="34" height="4" rx="1" fill="#2a2825" />
+
+        {/* Exhaust stack — behind cab */}
+        <rect x="722" y="8" width="8" height="50" rx="4" fill="#252320" stroke="#3a3835" strokeWidth="1" />
+        <ellipse cx="726" cy="8" rx="4" ry="2.5" fill="#1a1916" />
+
+        {/* ═══ CAB WHEELS ══════════════════════════════════════════════ */}
+        {/* Steer axle (front) */}
+        <g>
+          <circle cx="700" cy="170" r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
+          <circle cx="700" cy="170" r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
+          {[0,60,120,180,240,300].map(deg => {
+            const rad = deg * Math.PI / 180;
+            return <circle key={deg} cx={700 + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
+          })}
+          <circle cx="700" cy="170" r="4" fill="#2a2825" />
+        </g>
+        {/* Drive axle (tandem) */}
+        {[570, 610].map(cx => (
+          <g key={cx}>
+            <circle cx={cx} cy={170} r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
+            <circle cx={cx} cy={170} r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
+            {[0,60,120,180,240,300].map(deg => {
+              const rad = deg * Math.PI / 180;
+              return <circle key={deg} cx={cx + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
+            })}
+            <circle cx={cx} cy={170} r="4" fill="#2a2825" />
+          </g>
+        ))}
+
+        {/* ═══ GROUND SHADOW ═══════════════════════════════════════════ */}
+        <ellipse cx="400" cy="196" rx="370" ry="6" fill="black" opacity="0.22" />
       </svg>
     </div>
   );
@@ -489,15 +560,15 @@ export default function HomePage() {
         }
 
         /* ══════════════════════════════════════════════════════
-           TRUCK ANIMATION
+           TRUCK
         ══════════════════════════════════════════════════════ */
         .hp-truck {
           position: absolute;
-          bottom: 60px;
-          right: 0;
+          bottom: 52px;
+          right: -12px;
           z-index: 2;
           pointer-events: none;
-          width: clamp(320px, 42vw, 580px);
+          width: clamp(340px, 50vw, 660px);
         }
         .hp-truck__svg {
           width: 100%;
@@ -506,53 +577,39 @@ export default function HomePage() {
           overflow: visible;
         }
 
-        /* Truck drive-in: fast from right, slow down, micro-bounce, park */
+        /* Drive in from right, decelerate, micro-bounce, park */
         @keyframes truckDrive {
           0%   { transform: translateX(110%); }
-          60%  { transform: translateX(4%); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-          78%  { transform: translateX(-1.5%); }
-          88%  { transform: translateX(0.6%); }
-          94%  { transform: translateX(-0.3%); }
-          100% { transform: translateX(0%); }
-        }
-
-        /* Wheels spin while driving (stops when parked) */
-        @keyframes wheelSpin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+          55%  { transform: translateX(3%);   animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94); }
+          72%  { transform: translateX(-1.2%); }
+          84%  { transform: translateX(0.5%); }
+          92%  { transform: translateX(-0.2%); }
+          100% { transform: translateX(0); }
         }
 
         .truck-entrance {
-          animation: truckDrive 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
-        }
-
-        /* Wheel spin — target wheel hub groups via CSS transforms on circles */
-        .truck-entrance circle:nth-child(odd) {
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: wheelSpin 0.6s linear 0.5s 3;
+          animation: truckDrive 2.4s cubic-bezier(0.16,1,0.3,1) 0.4s both;
         }
 
         /* Exhaust puff after parking */
         @keyframes exhaustPuff {
-          0%   { opacity: 0; transform: translateY(0) scale(0.6); }
-          30%  { opacity: 0.5; }
-          100% { opacity: 0; transform: translateY(-18px) scale(1.8); }
+          0%   { opacity: 0;   transform: translateY(0)    scale(0.5); }
+          25%  { opacity: 0.4; transform: translateY(-6px) scale(0.9); }
+          100% { opacity: 0;   transform: translateY(-22px) scale(2); }
         }
         .hp-truck::after {
           content: '';
           position: absolute;
-          top: 6px;
-          right: 60px;
+          top: 4px;
+          right: 82px;
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          background: oklch(0.6 0 0 / 0.35);
-          animation: exhaustPuff 1.2s ease-out 2.4s 3;
+          background: oklch(0.55 0 0 / 0.3);
+          animation: exhaustPuff 1.4s ease-out 2.5s 3;
         }
 
-        /* Hide truck on very small screens — text is priority */
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
           .hp-truck { display: none; }
         }
 
