@@ -118,172 +118,30 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
   );
 }
 
-// ─── Clean side-view truck SVG ──────────────────────────────────────────────
-// viewBox: 800 × 200
-// Ground line: y=170
-// Wheel radius: 24px
-// Trailer: x=10..490, cab: x=500..790
+// ─── Truck illustration (flat PNG, left-facing) ───────────────────────────────
+// Source: OpenClipart public domain semi-truck, flipped left via scaleX(-1)
+// Animated: drives in from right, decelerates, micro-bounce, parks
 // ─────────────────────────────────────────────────────────────────────────────
-function TruckSVG() {
+function TruckImg() {
   return (
     <div className="hp-truck" aria-hidden>
-      <svg
-        className="hp-truck__svg truck-entrance"
-        viewBox="0 0 800 200"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* ═══ TRAILER BODY ══════════════════════════════════════════════ */}
-        {/* Main box — sits on chassis rail, top y=40, bottom y=156 */}
-        <rect x="10" y="40" width="480" height="116" rx="3" fill="#26241f" stroke="#3c3a35" strokeWidth="1.5" />
-
-        {/* Roof strip */}
-        <rect x="10" y="40" width="480" height="9" rx="3" fill="#2e2c27" />
-
-        {/* Vertical ribs */}
-        {[80, 150, 220, 290, 360, 420].map(x => (
-          <line key={x} x1={x} y1="50" x2={x} y2="156" stroke="#2e2c27" strokeWidth="1.2" />
-        ))}
-
-        {/* Branding panel */}
-        <rect x="34" y="68" width="180" height="44" rx="3" fill="#1a1917" stroke="#2e2c27" strokeWidth="1" />
-        <text x="124" y="94" textAnchor="middle" fontFamily="system-ui,sans-serif" fontSize="14" fontWeight="700" fill="#d4991f" letterSpacing="3">TIRNEW</text>
-        <text x="124" y="106" textAnchor="middle" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="500" fill="#5a5852" letterSpacing="4">TRUCK SERVICE</text>
-
-        {/* Bottom chassis rail */}
-        <rect x="10" y="156" width="480" height="8" rx="0" fill="#1e1c18" />
-
-        {/* Rear doors — two vertical panels with handles */}
-        <rect x="482" y="40" width="8" height="116" rx="2" fill="#2a2825" stroke="#3c3a35" strokeWidth="1" />
-        <rect x="484" y="90" width="4" height="20" rx="2" fill="#48453f" />
-
-        {/* ═══ FIFTH WHEEL / KING PIN PLATE ═══════════════════════════ */}
-        <rect x="455" y="156" width="54" height="7" rx="2" fill="#302e29" />
-
-        {/* ═══ TRAILER WHEELS ══════════════════════════════════════════ */}
-        {/* Rear bogie (tandem axle) */}
-        {[80, 130].map(cx => (
-          <g key={cx}>
-            <circle cx={cx} cy={170} r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
-            <circle cx={cx} cy={170} r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
-            {/* lug bolts */}
-            {[0,60,120,180,240,300].map(deg => {
-              const rad = deg * Math.PI / 180;
-              return <circle key={deg} cx={cx + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
-            })}
-            <circle cx={cx} cy={170} r="4" fill="#2a2825" />
-          </g>
-        ))}
-        {/* Front bogie (tandem axle) */}
-        {[340, 390].map(cx => (
-          <g key={cx}>
-            <circle cx={cx} cy={170} r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
-            <circle cx={cx} cy={170} r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
-            {[0,60,120,180,240,300].map(deg => {
-              const rad = deg * Math.PI / 180;
-              return <circle key={deg} cx={cx + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
-            })}
-            <circle cx={cx} cy={170} r="4" fill="#2a2825" />
-          </g>
-        ))}
-
-        {/* ═══ CAB (TRACTOR) ═══════════════════════════════════════════ */}
-        {/* Cab back wall / sleeper box */}
-        <rect x="496" y="58" width="36" height="98" rx="0" fill="#222018" stroke="#3c3a35" strokeWidth="1.5" />
-        {/* Sleeper side window */}
-        <rect x="500" y="68" width="28" height="22" rx="2" fill="#0e1a28" stroke="#1e2f44" strokeWidth="1" />
-
-        {/* Main cab body */}
-        <rect x="528" y="58" width="210" height="98" rx="3" fill="#252320" stroke="#3c3a35" strokeWidth="1.5" />
-
-        {/* Cab roof — tapers forward */}
-        <path d="M528 58 L532 28 L720 22 L738 58 Z" fill="#1e1c18" stroke="#3a3835" strokeWidth="1.5" />
-
-        {/* Roof fairing */}
-        <rect x="528" y="58" width="42" height="6" rx="2" fill="#1a1916" />
-
-        {/* Amber clearance lights on roof */}
-        {[558, 576, 594, 612].map(x => (
-          <rect key={x} x={x} y="21" width="10" height="5" rx="1.5" fill="#d4991f" opacity="0.85" />
-        ))}
-
-        {/* Windshield — big, raked */}
-        <path d="M534 58 L540 30 L718 24 L736 58 Z" fill="#0e1a28" stroke="#1e2f44" strokeWidth="1" />
-        {/* Windshield glare streak */}
-        <path d="M560 32 L600 28 L600 34 L560 38 Z" fill="white" opacity="0.04" />
-
-        {/* A-pillar left */}
-        <line x1="534" y1="58" x2="540" y2="30" stroke="#3a3835" strokeWidth="2" />
-
-        {/* Door */}
-        <rect x="530" y="58" width="140" height="98" rx="0" fill="none" stroke="#2e2c27" strokeWidth="1" />
-        {/* Door line */}
-        <line x1="666" y1="58" x2="666" y2="156" stroke="#2e2c27" strokeWidth="1.5" />
-        {/* Door handle */}
-        <rect x="652" y="102" width="18" height="4" rx="2" fill="#48453f" />
-
-        {/* Vertical grab bar */}
-        <rect x="534" y="80" width="4" height="38" rx="2" fill="#302e29" />
-
-        {/* Step / running board */}
-        <rect x="528" y="148" width="60" height="6" rx="2" fill="#2e2c27" />
-
-        {/* ═══ FRONT FACE ══════════════════════════════════════════════ */}
-        {/* Front panel */}
-        <rect x="730" y="58" width="54" height="98" rx="3" fill="#1e1c18" stroke="#3a3835" strokeWidth="1.5" />
-
-        {/* Grille opening */}
-        <rect x="736" y="70" width="30" height="52" rx="2" fill="#141310" stroke="#2e2c27" strokeWidth="1" />
-        {/* Grille bars */}
-        {[78,86,94,102,110].map(y => (
-          <line key={y} x1="737" y1={y} x2="765" y2={y} stroke="#2a2825" strokeWidth="1.2" />
-        ))}
-        <line x1="750" y1="71" x2="750" y2="121" stroke="#2a2825" strokeWidth="1.2" />
-
-        {/* Headlight housing */}
-        <rect x="733" y="58" width="18" height="14" rx="2" fill="#0e1420" stroke="#1e2f44" strokeWidth="1" />
-        {/* Headlight lens glow */}
-        <rect x="735" y="60" width="14" height="10" rx="1.5" fill="#b8c8e0" opacity="0.5" />
-
-        {/* Fog light */}
-        <circle cx="744" cy="140" r="5" fill="#1e2f44" stroke="#243448" strokeWidth="1" />
-        <circle cx="744" cy="140" r="3" fill="#8090a8" opacity="0.4" />
-
-        {/* Bumper */}
-        <rect x="730" y="148" width="54" height="10" rx="3" fill="#1a1916" stroke="#2e2c27" strokeWidth="1" />
-        {/* Bumper lower step */}
-        <rect x="740" y="155" width="34" height="4" rx="1" fill="#2a2825" />
-
-        {/* Exhaust stack — behind cab */}
-        <rect x="722" y="8" width="8" height="50" rx="4" fill="#252320" stroke="#3a3835" strokeWidth="1" />
-        <ellipse cx="726" cy="8" rx="4" ry="2.5" fill="#1a1916" />
-
-        {/* ═══ CAB WHEELS ══════════════════════════════════════════════ */}
-        {/* Steer axle (front) */}
-        <g>
-          <circle cx="700" cy="170" r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
-          <circle cx="700" cy="170" r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
-          {[0,60,120,180,240,300].map(deg => {
-            const rad = deg * Math.PI / 180;
-            return <circle key={deg} cx={700 + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
-          })}
-          <circle cx="700" cy="170" r="4" fill="#2a2825" />
-        </g>
-        {/* Drive axle (tandem) */}
-        {[570, 610].map(cx => (
-          <g key={cx}>
-            <circle cx={cx} cy={170} r="24" fill="#161513" stroke="#2e2c27" strokeWidth="2" />
-            <circle cx={cx} cy={170} r="14" fill="#1e1c18" stroke="#38362f" strokeWidth="1.5" />
-            {[0,60,120,180,240,300].map(deg => {
-              const rad = deg * Math.PI / 180;
-              return <circle key={deg} cx={cx + 8*Math.cos(rad)} cy={170 + 8*Math.sin(rad)} r="2" fill="#3a3830" />;
-            })}
-            <circle cx={cx} cy={170} r="4" fill="#2a2825" />
-          </g>
-        ))}
-
-        {/* ═══ GROUND SHADOW ═══════════════════════════════════════════ */}
-        <ellipse cx="400" cy="196" rx="370" ry="6" fill="black" opacity="0.22" />
+      {/* Public domain flat truck illustration — openclipart.org */}
+      {/* scaleX(-1) flips it to face left (towards the text) */}
+      <img
+        className="hp-truck__img truck-entrance"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Truck_silhouette.svg/1200px-Truck_silhouette.svg.png"
+        alt=""
+        width={900}
+        height={320}
+        loading="eager"
+        decoding="async"
+        style={{ transform: "scaleX(-1)" }}
+      />
+      {/* Exhaust puffs — 3 SVG circles that animate after parking */}
+      <svg className="hp-truck__exhaust" viewBox="0 0 60 60" aria-hidden>
+        <circle className="puff puff-1" cx="30" cy="50" r="6" fill="oklch(0.6 0 0 / 0.28)" />
+        <circle className="puff puff-2" cx="22" cy="44" r="4" fill="oklch(0.6 0 0 / 0.20)" />
+        <circle className="puff puff-3" cx="36" cy="40" r="5" fill="oklch(0.6 0 0 / 0.16)" />
       </svg>
     </div>
   );
@@ -348,8 +206,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Animated truck — bottom right of hero */}
-        <TruckSVG />
+        {/* Animated truck illustration */}
+        <TruckImg />
 
         <div className="hp-hero__bottom-fade" aria-hidden />
       </section>
@@ -364,7 +222,6 @@ export default function HomePage() {
           </div>
 
           <div className="hp-adv-grid">
-            {/* Featured large card */}
             <div className="reveal hp-adv-card hp-adv-card--featured">
               <span className="hp-adv-card__num">01</span>
               <div className="hp-adv-card__body">
@@ -376,7 +233,6 @@ export default function HomePage() {
               <div className="hp-adv-card__glyph" aria-hidden>✶</div>
             </div>
 
-            {/* 3 smaller cards */}
             {advantages.slice(1).map((a, i) => (
               <div key={a.tag} className={`reveal hp-adv-card hp-adv-card--sm d-${i + 1}`}>
                 <span className="hp-adv-card__num">{a.tag}</span>
@@ -461,14 +317,9 @@ export default function HomePage() {
       </section>
 
       <style>{`
-        /* ══════════════════════════════════════════════════════
-           HP ROOT
-        ══════════════════════════════════════════════════════ */
         .hp-root { background: var(--bg); }
 
-        /* ══════════════════════════════════════════════════════
-           HERO
-        ══════════════════════════════════════════════════════ */
+        /* ══ HERO ══ */
         .hp-hero {
           position: relative;
           min-height: 96vh;
@@ -476,9 +327,7 @@ export default function HomePage() {
           align-items: center;
           overflow: hidden;
         }
-        .hp-hero__bg {
-          position: absolute; inset: 0; z-index: 0;
-        }
+        .hp-hero__bg { position: absolute; inset: 0; z-index: 0; }
         .hp-hero__img {
           width: 100%; height: 100%;
           object-fit: cover;
@@ -488,144 +337,116 @@ export default function HomePage() {
         .hp-hero__overlay {
           position: absolute; inset: 0;
           background:
-            linear-gradient(
-              108deg,
+            linear-gradient(108deg,
               oklch(0.09 0.015 55 / 0.98) 0%,
               oklch(0.09 0.015 55 / 0.72) 42%,
               oklch(0.09 0.015 55 / 0.08) 100%
             ),
-            linear-gradient(
-              to top,
+            linear-gradient(to top,
               oklch(0.09 0.015 55 / 0.98) 0%,
               transparent 52%
             );
         }
-
         .hp-hero__content {
-          position: relative;
-          z-index: 1;
+          position: relative; z-index: 1;
           padding-block: 11rem 8rem;
           max-width: 680px;
         }
-
         .hp-hero__label {
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
-          font-size: var(--text-xs);
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: oklch(1 0 0 / 0.38);
-          margin-bottom: var(--space-7);
+          display: inline-flex; align-items: center; gap: 12px;
+          font-size: var(--text-xs); font-weight: 600;
+          letter-spacing: 0.14em; text-transform: uppercase;
+          color: oklch(1 0 0 / 0.38); margin-bottom: var(--space-7);
         }
         .hp-hero__label-line {
-          display: inline-block;
-          width: 28px;
-          height: 1px;
-          background: var(--primary);
-          flex-shrink: 0;
+          display: inline-block; width: 28px; height: 1px;
+          background: var(--primary); flex-shrink: 0;
         }
-
         .hp-hero__title {
           font-family: var(--font-display);
           font-size: clamp(2.6rem, 6.5vw, 5.2rem);
-          font-weight: 900;
-          line-height: 1.02;
-          letter-spacing: -0.035em;
-          color: #fff;
+          font-weight: 900; line-height: 1.02;
+          letter-spacing: -0.035em; color: #fff;
           margin-bottom: var(--space-6);
         }
-
         .hp-hero__sub {
           font-size: var(--text-base);
           color: oklch(1 0 0 / 0.55);
-          max-width: 44ch;
-          margin-bottom: var(--space-10);
-          line-height: 1.75;
-          font-weight: 400;
+          max-width: 44ch; margin-bottom: var(--space-10);
+          line-height: 1.75; font-weight: 400;
         }
         .hp-hero__ctas {
-          display: flex;
-          gap: var(--space-3);
-          flex-wrap: wrap;
+          display: flex; gap: var(--space-3); flex-wrap: wrap;
           margin-bottom: clamp(var(--space-12), 5vw, var(--space-16));
         }
         .hp-hero__bottom-fade {
           position: absolute; bottom: 0; left: 0; right: 0;
           height: 180px;
           background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
-          z-index: 1;
-          pointer-events: none;
+          z-index: 1; pointer-events: none;
         }
 
-        /* ══════════════════════════════════════════════════════
-           TRUCK
-        ══════════════════════════════════════════════════════ */
+        /* ══ TRUCK ══ */
         .hp-truck {
           position: absolute;
-          bottom: 52px;
-          right: -12px;
-          z-index: 2;
-          pointer-events: none;
-          width: clamp(340px, 50vw, 660px);
+          bottom: 44px; right: -8px;
+          z-index: 2; pointer-events: none;
+          width: clamp(320px, 48vw, 680px);
         }
-        .hp-truck__svg {
-          width: 100%;
-          height: auto;
+        .hp-truck__img {
+          width: 100%; height: auto;
           display: block;
+          /* desaturate + dark tint to match site palette */
+          filter:
+            brightness(0.72)
+            saturate(0.35)
+            drop-shadow(0 8px 24px oklch(0 0 0 / 0.45));
+        }
+
+        /* Exhaust SVG — positioned at exhaust stack location (top-right area when flipped) */
+        .hp-truck__exhaust {
+          position: absolute;
+          top: 2%;
+          left: 8%;
+          width: 60px; height: 60px;
           overflow: visible;
         }
 
-        /* Drive in from right, decelerate, micro-bounce, park */
+        /* Drive in from right */
         @keyframes truckDrive {
-          0%   { transform: translateX(110%); }
-          55%  { transform: translateX(3%);   animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94); }
-          72%  { transform: translateX(-1.2%); }
-          84%  { transform: translateX(0.5%); }
+          0%   { transform: translateX(115%); }
+          52%  { transform: translateX(2.5%); animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94); }
+          70%  { transform: translateX(-1.4%); }
+          83%  { transform: translateX(0.6%); }
           92%  { transform: translateX(-0.2%); }
           100% { transform: translateX(0); }
         }
 
         .truck-entrance {
-          animation: truckDrive 2.4s cubic-bezier(0.16,1,0.3,1) 0.4s both;
+          animation: truckDrive 2.5s cubic-bezier(0.16,1,0.3,1) 0.3s both;
         }
 
-        /* Exhaust puff after parking */
-        @keyframes exhaustPuff {
-          0%   { opacity: 0;   transform: translateY(0)    scale(0.5); }
-          25%  { opacity: 0.4; transform: translateY(-6px) scale(0.9); }
-          100% { opacity: 0;   transform: translateY(-22px) scale(2); }
+        /* Exhaust puffs — appear after truck parks */
+        @keyframes puffRise {
+          0%   { opacity: 0; transform: translateY(0) scale(0.4); }
+          20%  { opacity: 1; }
+          100% { opacity: 0; transform: translateY(-28px) scale(2.2); }
         }
-        .hp-truck::after {
-          content: '';
-          position: absolute;
-          top: 4px;
-          right: 82px;
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: oklch(0.55 0 0 / 0.3);
-          animation: exhaustPuff 1.4s ease-out 2.5s 3;
-        }
+        .puff-1 { animation: puffRise 1.6s ease-out 2.6s 3; }
+        .puff-2 { animation: puffRise 1.6s ease-out 2.9s 3; }
+        .puff-3 { animation: puffRise 1.6s ease-out 3.1s 3; }
 
-        @media (max-width: 640px) {
-          .hp-truck { display: none; }
-        }
+        @media (max-width: 640px) { .hp-truck { display: none; } }
 
-        /* Stats row */
+        /* ══ STATS ══ */
         .hp-stats {
-          display: flex;
-          align-items: stretch;
-          flex-wrap: wrap;
-          gap: 0;
+          display: flex; align-items: stretch; flex-wrap: wrap; gap: 0;
           padding-top: var(--space-8);
           border-top: 1px solid oklch(1 0 0 / 0.08);
         }
         .hp-stats__item { display: flex; align-items: center; }
         .hp-stats__sep {
-          width: 1px;
-          height: 2rem;
+          width: 1px; height: 2rem;
           background: oklch(1 0 0 / 0.10);
           margin-inline: var(--space-6);
         }
@@ -633,387 +454,175 @@ export default function HomePage() {
         .hp-stats__value {
           font-family: var(--font-display);
           font-size: clamp(1.5rem, 2.4vw, 2rem);
-          font-weight: 900;
-          color: #fff;
-          line-height: 1;
-          letter-spacing: -0.04em;
-          font-variant-numeric: tabular-nums;
+          font-weight: 900; color: #fff; line-height: 1;
+          letter-spacing: -0.04em; font-variant-numeric: tabular-nums;
         }
         .hp-stats__label {
-          font-size: 0.65rem;
-          color: oklch(1 0 0 / 0.38);
-          text-transform: uppercase;
-          letter-spacing: 0.10em;
-          font-weight: 600;
+          font-size: 0.65rem; color: oklch(1 0 0 / 0.38);
+          text-transform: uppercase; letter-spacing: 0.10em; font-weight: 600;
         }
 
-        /* ══════════════════════════════════════════════════════
-           ADVANTAGES
-        ══════════════════════════════════════════════════════ */
+        /* ══ ADVANTAGES ══ */
         .hp-adv-section {
           padding-block: clamp(var(--space-12), 6vw, var(--space-24));
           background: var(--bg);
           border-top: 1px solid var(--border);
         }
-
-        .hp-adv-header {
-          margin-bottom: clamp(var(--space-8), 4vw, var(--space-12));
-        }
-
+        .hp-adv-header { margin-bottom: clamp(var(--space-8), 4vw, var(--space-12)); }
         .hp-adv-grid {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
           grid-template-rows: auto auto;
           gap: var(--space-3);
         }
-        @media (max-width: 860px) {
-          .hp-adv-grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 560px) {
-          .hp-adv-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 860px) { .hp-adv-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 560px) { .hp-adv-grid { grid-template-columns: 1fr; } }
 
         .hp-adv-card {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-xl);
-          padding: var(--space-7);
-          overflow: hidden;
-          transition:
-            border-color 0.20s ease,
-            box-shadow 0.20s ease,
-            transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+          position: relative; display: flex; flex-direction: column;
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: var(--radius-xl); padding: var(--space-7); overflow: hidden;
+          transition: border-color 0.20s ease, box-shadow 0.20s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1);
         }
-        .hp-adv-card:hover {
-          border-color: var(--border-accent);
-          box-shadow: var(--shadow-md);
-          transform: translateY(-2px);
-        }
-
+        .hp-adv-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
         .hp-adv-card--featured {
-          grid-column: 1 / 2;
-          grid-row: 1 / 3;
-          padding: var(--space-8);
-          background: var(--surface2);
-          min-height: 280px;
-          justify-content: space-between;
+          grid-column: 1/2; grid-row: 1/3;
+          padding: var(--space-8); background: var(--surface2);
+          min-height: 280px; justify-content: space-between;
         }
-
         .hp-adv-card__glyph {
-          font-size: 3.5rem;
-          line-height: 1;
+          font-size: 3.5rem; line-height: 1;
           color: oklch(from var(--primary) l c h / 0.12);
-          font-family: serif;
-          user-select: none;
-          pointer-events: none;
-          margin-top: auto;
-          align-self: flex-end;
+          font-family: serif; user-select: none; pointer-events: none;
+          margin-top: auto; align-self: flex-end;
           transition: color 0.3s ease, transform 0.4s ease;
         }
-        .hp-adv-card--featured:hover .hp-adv-card__glyph {
-          color: oklch(from var(--primary) l c h / 0.22);
-          transform: scale(1.1) rotate(-8deg);
-        }
-
+        .hp-adv-card--featured:hover .hp-adv-card__glyph { color: oklch(from var(--primary) l c h / 0.22); transform: scale(1.1) rotate(-8deg); }
         .hp-adv-card__num {
-          font-family: var(--font-display);
-          font-size: var(--text-xs);
-          font-weight: 700;
-          letter-spacing: 0.14em;
-          color: var(--primary);
-          margin-bottom: var(--space-6);
-          display: block;
-          opacity: 0.7;
+          font-family: var(--font-display); font-size: var(--text-xs); font-weight: 700;
+          letter-spacing: 0.14em; color: var(--primary); margin-bottom: var(--space-6);
+          display: block; opacity: 0.7;
         }
         .hp-adv-card--sm .hp-adv-card__num { margin-bottom: var(--space-4); }
-
         .hp-adv-card__body { display: flex; flex-direction: column; gap: var(--space-2); }
         .hp-adv-card__title {
-          font-family: var(--font-display);
-          font-size: var(--text-lg);
-          font-weight: 700;
-          color: var(--text);
-          line-height: 1.18;
-          letter-spacing: -0.015em;
+          font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700;
+          color: var(--text); line-height: 1.18; letter-spacing: -0.015em;
         }
-        .hp-adv-card--sm .hp-adv-card__title {
-          font-size: var(--text-base);
-          font-weight: 700;
-        }
-        .hp-adv-card__desc {
-          font-size: var(--text-sm);
-          color: var(--text-muted);
-          line-height: 1.65;
-          max-width: none;
-        }
+        .hp-adv-card--sm .hp-adv-card__title { font-size: var(--text-base); font-weight: 700; }
+        .hp-adv-card__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.65; max-width: none; }
 
-        /* ══════════════════════════════════════════════════════
-           SHARED TYPOGRAPHY
-        ══════════════════════════════════════════════════════ */
+        /* ══ SHARED TYPOGRAPHY ══ */
         .hp-label {
-          font-size: var(--text-xs);
-          font-weight: 700;
-          letter-spacing: 0.13em;
-          text-transform: uppercase;
-          color: var(--primary);
-          margin-bottom: var(--space-2);
-          display: flex;
-          align-items: center;
-          gap: var(--space-2);
+          font-size: var(--text-xs); font-weight: 700;
+          letter-spacing: 0.13em; text-transform: uppercase;
+          color: var(--primary); margin-bottom: var(--space-2);
+          display: flex; align-items: center; gap: var(--space-2);
         }
         .hp-label::before {
-          content: '';
-          display: inline-block;
-          width: 16px;
-          height: 1.5px;
-          background: currentColor;
-          border-radius: 2px;
-          flex-shrink: 0;
+          content: ''; display: inline-block;
+          width: 16px; height: 1.5px; background: currentColor;
+          border-radius: 2px; flex-shrink: 0;
         }
         .hp-h2 {
           font-family: var(--font-display);
           font-size: clamp(1.6rem, 2.8vw, 2.2rem);
-          font-weight: 800;
-          color: var(--text);
-          line-height: 1.08;
-          letter-spacing: -0.025em;
+          font-weight: 800; color: var(--text);
+          line-height: 1.08; letter-spacing: -0.025em;
         }
 
-        /* ══════════════════════════════════════════════════════
-           SERVICES
-        ══════════════════════════════════════════════════════ */
+        /* ══ SERVICES ══ */
         .hp-svc-section { border-top: 1px solid var(--border); }
         .hp-svc-head {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: var(--space-4);
-          margin-bottom: var(--space-8);
-          flex-wrap: wrap;
+          display: flex; align-items: flex-end; justify-content: space-between;
+          gap: var(--space-4); margin-bottom: var(--space-8); flex-wrap: wrap;
         }
         .hp-svc-head__left { display: flex; flex-direction: column; gap: 4px; }
-
         .hp-all-link {
-          display: inline-flex;
-          align-items: center;
-          gap: var(--space-2);
-          font-size: var(--text-sm);
-          font-weight: 600;
-          color: var(--text-muted);
-          text-decoration: none;
-          white-space: nowrap;
-          transition: color 0.18s ease, gap 0.18s ease;
-          flex-shrink: 0;
+          display: inline-flex; align-items: center; gap: var(--space-2);
+          font-size: var(--text-sm); font-weight: 600;
+          color: var(--text-muted); text-decoration: none; white-space: nowrap;
+          transition: color 0.18s ease, gap 0.18s ease; flex-shrink: 0;
         }
         .hp-all-link:hover { color: var(--primary); gap: var(--space-3); }
-
         .hp-services {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: var(--space-4);
+          display: grid; grid-template-columns: repeat(3,1fr); gap: var(--space-4);
         }
-        @media (max-width: 900px) { .hp-services { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px) { .hp-services { grid-template-columns: repeat(2,1fr); } }
         @media (max-width: 560px) { .hp-services { grid-template-columns: 1fr; } }
-
         .hp-svc-card {
-          display: flex;
-          flex-direction: column;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          overflow: hidden;
-          text-decoration: none;
-          transition:
-            transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 0.26s ease,
-            border-color 0.20s ease;
+          display: flex; flex-direction: column;
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: var(--radius-lg); overflow: hidden; text-decoration: none;
+          transition: transform 0.26s cubic-bezier(0.22,1,0.36,1), box-shadow 0.26s ease, border-color 0.20s ease;
         }
-        .hp-svc-card:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-lg);
-          border-color: var(--border-strong);
-        }
-
-        .hp-svc-card__img {
-          position: relative;
-          aspect-ratio: 16 / 7;
-          overflow: hidden;
-          background: var(--surface2);
-        }
+        .hp-svc-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
+        .hp-svc-card__img { position: relative; aspect-ratio: 16/7; overflow: hidden; background: var(--surface2); }
         .hp-svc-card__img img {
-          width: 100%; height: 100%;
-          object-fit: cover;
+          width: 100%; height: 100%; object-fit: cover;
           filter: saturate(0.80) brightness(0.95);
           transition: transform 0.55s ease, filter 0.35s ease;
         }
-        .hp-svc-card:hover .hp-svc-card__img img {
-          transform: scale(1.06);
-          filter: saturate(1) brightness(1);
-        }
+        .hp-svc-card:hover .hp-svc-card__img img { transform: scale(1.06); filter: saturate(1) brightness(1); }
         .hp-svc-card__img-fade {
           position: absolute; inset: 0;
-          background: linear-gradient(to top,
-            oklch(from var(--surface) l c h / 0.6) 0%,
-            transparent 60%
-          );
+          background: linear-gradient(to top, oklch(from var(--surface) l c h / 0.6) 0%, transparent 60%);
         }
-
-        .hp-svc-card__body {
-          flex: 1;
-          padding: var(--space-5) var(--space-5) var(--space-3);
-        }
+        .hp-svc-card__body { flex: 1; padding: var(--space-5) var(--space-5) var(--space-3); }
         .hp-svc-card__title {
-          font-family: var(--font-display);
-          font-size: var(--text-base);
-          font-weight: 700;
-          color: var(--text);
-          margin-bottom: var(--space-2);
-          line-height: 1.25;
-          max-width: none;
-          letter-spacing: -0.01em;
+          font-family: var(--font-display); font-size: var(--text-base); font-weight: 700;
+          color: var(--text); margin-bottom: var(--space-2); line-height: 1.25;
+          max-width: none; letter-spacing: -0.01em;
         }
-        .hp-svc-card__desc {
-          font-size: var(--text-sm);
-          color: var(--text-muted);
-          line-height: 1.6;
-          max-width: none;
-        }
+        .hp-svc-card__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; max-width: none; }
         .hp-svc-card__foot {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+          display: flex; align-items: center; justify-content: space-between;
           padding: var(--space-3) var(--space-5) var(--space-4);
-          border-top: 1px solid var(--border);
-          margin-top: auto;
+          border-top: 1px solid var(--border); margin-top: auto;
         }
-        .hp-svc-card__price {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          font-weight: 500;
-          font-variant-numeric: tabular-nums;
-        }
+        .hp-svc-card__price { font-size: var(--text-xs); color: var(--text-faint); font-weight: 500; font-variant-numeric: tabular-nums; }
         .hp-svc-card__arr {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          background: var(--primary-subtle);
-          color: var(--primary);
-          opacity: 0;
-          transform: scale(0.8);
-          transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+          display: flex; align-items: center; justify-content: center;
+          width: 26px; height: 26px; border-radius: 50%;
+          background: var(--primary-subtle); color: var(--primary);
+          opacity: 0; transform: scale(0.8);
+          transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
         }
         .hp-svc-card:hover .hp-svc-card__arr { opacity: 1; transform: scale(1); }
 
-        /* ══════════════════════════════════════════════════════
-           PROCESS
-        ══════════════════════════════════════════════════════ */
-        .hp-proc-section {
-          background: var(--surface);
-          border-top: 1px solid var(--border);
-          border-bottom: 1px solid var(--border);
-        }
+        /* ══ PROCESS ══ */
+        .hp-proc-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
         .hp-proc-head { margin-bottom: clamp(var(--space-10), 5vw, var(--space-14)); }
-        .hp-proc {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: var(--space-8);
-        }
-        @media (max-width: 860px) {
-          .hp-proc { grid-template-columns: repeat(2, 1fr); gap: var(--space-8) var(--space-6); }
-        }
-        @media (max-width: 480px) {
-          .hp-proc { grid-template-columns: 1fr; gap: var(--space-6); }
-        }
-
+        .hp-proc { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-8); }
+        @media (max-width: 860px) { .hp-proc { grid-template-columns: repeat(2,1fr); gap: var(--space-8) var(--space-6); } }
+        @media (max-width: 480px) { .hp-proc { grid-template-columns: 1fr; gap: var(--space-6); } }
         .hp-proc__step { position: relative; }
-        .hp-proc__num-wrap {
-          display: flex;
-          align-items: center;
-          gap: 0;
-          margin-bottom: var(--space-5);
-        }
+        .hp-proc__num-wrap { display: flex; align-items: center; gap: 0; margin-bottom: var(--space-5); }
         .hp-proc__num {
-          font-family: var(--font-display);
-          font-size: var(--text-xl);
-          font-weight: 900;
-          color: var(--text);
-          line-height: 1;
-          letter-spacing: -0.04em;
-          opacity: 0.15;
-          flex-shrink: 0;
-          transition: opacity 0.22s ease, color 0.22s ease;
+          font-family: var(--font-display); font-size: var(--text-xl); font-weight: 900;
+          color: var(--text); line-height: 1; letter-spacing: -0.04em; opacity: 0.15;
+          flex-shrink: 0; transition: opacity 0.22s ease, color 0.22s ease;
         }
         .hp-proc__step:hover .hp-proc__num { opacity: 1; color: var(--primary); }
-        .hp-proc__connector {
-          flex: 1;
-          height: 1px;
-          background: var(--border);
-          margin-left: var(--space-4);
-        }
+        .hp-proc__connector { flex: 1; height: 1px; background: var(--border); margin-left: var(--space-4); }
         .hp-proc__icon {
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: var(--radius-md);
-          border: 1px solid var(--border-strong);
-          color: var(--text-muted);
-          background: var(--surface2);
-          margin-bottom: var(--space-4);
-          transition:
-            border-color 0.22s ease,
-            color 0.22s ease,
-            background 0.22s ease,
-            transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+          width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+          border-radius: var(--radius-md); border: 1px solid var(--border-strong);
+          color: var(--text-muted); background: var(--surface2); margin-bottom: var(--space-4);
+          transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .hp-proc__step:hover .hp-proc__icon {
-          border-color: var(--border-accent);
-          color: var(--primary);
-          background: var(--primary-subtle);
-          transform: scale(1.08);
-        }
-        .hp-proc__title {
-          font-family: var(--font-display);
-          font-size: var(--text-base);
-          font-weight: 700;
-          color: var(--text);
-          margin-bottom: var(--space-2);
-          line-height: 1.2;
-          letter-spacing: -0.01em;
-        }
-        .hp-proc__desc {
-          font-size: var(--text-sm);
-          color: var(--text-muted);
-          line-height: 1.65;
-          max-width: none;
-        }
+        .hp-proc__step:hover .hp-proc__icon { border-color: var(--border-accent); color: var(--primary); background: var(--primary-subtle); transform: scale(1.08); }
+        .hp-proc__title { font-family: var(--font-display); font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2); line-height: 1.2; letter-spacing: -0.01em; }
+        .hp-proc__desc { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.65; max-width: none; }
 
-        /* ══════════════════════════════════════════════════════
-           ANIMATIONS
-        ══════════════════════════════════════════════════════ */
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(18px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-          opacity: 0;
-          animation: fadeInUp 0.60s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
+        /* ══ ANIMATIONS ══ */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { opacity: 0; animation: fadeInUp 0.60s cubic-bezier(0.22,1,0.36,1) forwards; }
         .anim-d1 { animation-delay: 0.06s; }
         .anim-d2 { animation-delay: 0.18s; }
         .anim-d3 { animation-delay: 0.30s; }
         .anim-d4 { animation-delay: 0.44s; }
 
-        /* ══════════════════════════════════════════════════════
-           RESPONSIVE
-        ══════════════════════════════════════════════════════ */
         @media (max-width: 640px) {
           .hp-hero__content { padding-block: 7rem 4rem; }
           .hp-stats { gap: var(--space-4); }
