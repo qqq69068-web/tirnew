@@ -1,15 +1,18 @@
+'use client';
 import Link from "next/link";
+import { useState } from "react";
 import { services, HOUR_RATE_MIN, HOUR_RATE_MAX } from "@/lib/services";
 import { Clock, Wrench, ChevronRight, Info } from "lucide-react";
 
-export const metadata = {
-  title: "Прайс на роботи — Tirnew Truck Service",
-  description: "Вартість ремонтних робіт для вантажних автомобілів і причепів.",
-};
-
-const categories = Array.from(new Set(services.map((s) => s.category)));
-
 export default function PricePage() {
+  const categories = Array.from(new Set(services.map((s) => s.category)));
+  const [active, setActive] = useState<string>("all");
+
+  const filtered =
+    active === "all"
+      ? categories
+      : categories.filter((c) => c === active);
+
   return (
     <>
       <div className="price-page">
@@ -56,8 +59,31 @@ export default function PricePage() {
             </p>
           </div>
 
+          {/* ─── FILTER TABS ─── */}
+          <div className="price-filter" role="tablist" aria-label="Фільтр категорій">
+            <button
+              role="tab"
+              aria-selected={active === "all"}
+              className={`price-filter__tab${active === "all" ? " price-filter__tab--active" : ""}`}
+              onClick={() => setActive("all")}
+            >
+              Всі
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                role="tab"
+                aria-selected={active === cat}
+                className={`price-filter__tab${active === cat ? " price-filter__tab--active" : ""}`}
+                onClick={() => setActive(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <div className="price-tables">
-            {categories.map((cat) => {
+            {filtered.map((cat) => {
               const items = services.filter((s) => s.category === cat);
               return (
                 <div key={cat} className="price-group">
@@ -168,10 +194,12 @@ export default function PricePage() {
         .price-hero__title {
           font-family: var(--font-display);
           font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
-          color: var(--text); line-height: 1.08; letter-spacing: -0.02em;
+          color: #ffffff;
+          line-height: 1.08; letter-spacing: -0.02em;
+          text-shadow: 0 2px 12px rgba(0,0,0,0.35);
         }
         .price-hero__sub {
-          font-size: var(--text-base); color: var(--text-muted); max-width: 52ch; line-height: 1.7;
+          font-size: var(--text-base); color: rgba(255,255,255,0.72); max-width: 52ch; line-height: 1.7;
         }
         .price-rate-card {
           display: inline-flex; align-items: center; gap: var(--space-4);
@@ -202,6 +230,46 @@ export default function PricePage() {
         }
         .price-note__icon { color: #d97706; flex-shrink: 0; margin-top: 2px; }
         .price-note__text { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; }
+
+        /* ─── FILTER TABS ─────────────────────────── */
+        .price-filter {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--space-2);
+          padding-bottom: var(--space-2);
+        }
+        .price-filter__tab {
+          display: inline-flex;
+          align-items: center;
+          height: 36px;
+          padding: 0 var(--space-4);
+          border-radius: var(--radius-pill);
+          font-size: var(--text-xs);
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          background: var(--surface);
+          border: 1px solid var(--border-strong);
+          color: var(--text-muted);
+          cursor: pointer;
+          transition: background var(--transition-fast), color var(--transition-fast),
+                      border-color var(--transition-fast), box-shadow var(--transition-fast);
+          white-space: nowrap;
+        }
+        .price-filter__tab:hover {
+          background: var(--surface2);
+          color: var(--text);
+          border-color: var(--border-accent);
+        }
+        .price-filter__tab--active {
+          background: var(--primary);
+          color: var(--text-inverse);
+          border-color: var(--primary);
+          box-shadow: var(--shadow-primary);
+        }
+        .price-filter__tab--active:hover {
+          background: var(--primary-h);
+          border-color: var(--primary-h);
+        }
 
         /* ─── TABLES ──────────────────────────────── */
         .price-tables { display: flex; flex-direction: column; gap: var(--space-4); }
