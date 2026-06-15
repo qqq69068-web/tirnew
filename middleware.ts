@@ -19,10 +19,15 @@ function verifyJWT(token: string, secret: string): boolean {
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
+  const pathname = req.nextUrl.pathname;
 
-  // /admin/login завжди доступна — не перевіряємо
-  if (req.nextUrl.pathname === "/admin/login") {
-    return NextResponse.next();
+  // Завжди передаємо pathname у хедері для layout
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-pathname", pathname);
+
+  // /admin/login завжди доступна
+  if (pathname === "/admin/login") {
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   if (!token || !verifyJWT(token, process.env.JWT_SECRET!)) {
@@ -31,10 +36,9 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
-  // Матчимо всі /admin/* крім /admin/login
-  matcher: ["/admin/((?!login).*)" ],
+  matcher: ["/admin/:path*"],
 };
