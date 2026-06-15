@@ -113,7 +113,11 @@ export default function PricePage() {
                       </div>
                       <div className="price-row-item__price">
                         <p className="price-row-item__price-main">{s.price}</p>
-                        <p className="price-row-item__price-max">до {s.priceMax.toLocaleString("uk-UA")} грн</p>
+                        {s.priceMax > 0 ? (
+                          <p className="price-row-item__price-max">до {s.priceMax.toLocaleString("uk-UA")} грн</p>
+                        ) : (
+                          <p className="price-row-item__price-max">від 0 грн</p>
+                        )}
                       </div>
                       <div className="price-row-item__arrow">
                         <ChevronRight size={16} aria-hidden />
@@ -288,7 +292,7 @@ export default function PricePage() {
           text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted);
         }
         .price-table-head {
-          display: grid; grid-template-columns: 1fr 80px 130px 28px;
+          display: grid; grid-template-columns: 1fr 100px 130px 28px;
           padding: var(--space-2) var(--space-5);
           border-bottom: 1px solid var(--border);
           background: var(--surface);
@@ -300,7 +304,7 @@ export default function PricePage() {
         .price-th--hours { text-align: center; }
         .price-th--price { text-align: right; }
         .price-row-item {
-          display: grid; grid-template-columns: 1fr 80px 130px 28px; align-items: center;
+          display: grid; grid-template-columns: 1fr 100px 130px 28px; align-items: center;
           padding: var(--space-4) var(--space-5);
           border-bottom: 1px solid var(--border);
           text-decoration: none; color: var(--text);
@@ -311,12 +315,13 @@ export default function PricePage() {
         .price-row-item__service { min-width: 0; }
         .price-row-item__title { font-size: var(--text-base); font-weight: 600; color: var(--text); line-height: 1.4; }
         .price-row-item__sub { font-size: var(--text-xs); color: var(--text-faint); margin-top: 3px; line-height: 1.5; }
-        .price-row-item__hours { display: flex; justify-content: center; }
+        .price-row-item__hours { display: flex; justify-content: center; align-items: center; }
         .price-hours-badge {
           display: inline-flex; align-items: center; gap: 3px; font-size: var(--text-xs);
           color: var(--text-muted); background: var(--surface2);
           border: 1px solid var(--border); border-radius: var(--radius-sm);
           padding: 2px var(--space-2);
+          white-space: nowrap;
         }
         .price-row-item__price { text-align: right; }
         .price-row-item__price-main { font-size: var(--text-sm); font-weight: 700; color: var(--text); }
