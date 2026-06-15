@@ -143,7 +143,7 @@ export default function HomePage() {
               <Link href="/contacts" className="btn btn-primary btn-lg">
                 Зв&apos;язатись <ChevronRight size={16} aria-hidden />
               </Link>
-              <Link href="/services" className="btn btn-outline btn-lg">
+              <Link href="/services" className="btn btn-outline-light btn-lg">
                 Послуги
               </Link>
             </div>
@@ -288,6 +288,43 @@ export default function HomePage() {
         .hp-hero__ctas {
           display: flex; gap: var(--space-3); flex-wrap: wrap;
           margin-bottom: clamp(var(--space-12), 5vw, var(--space-16));
+        }
+
+        /* ── Light outline button for dark hero background ── */
+        .btn-outline-light {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-2);
+          font-family: var(--font-body);
+          font-size: var(--text-base);
+          font-weight: 600;
+          line-height: 1;
+          border-radius: var(--radius-pill);
+          border: 1.5px solid rgba(255, 255, 255, 0.55);
+          padding: 0 2rem;
+          height: 52px;
+          cursor: pointer;
+          text-decoration: none;
+          white-space: nowrap;
+          background: rgba(255, 255, 255, 0.12);
+          color: #fff;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          transition: background var(--transition-base), border-color var(--transition-base),
+                      color var(--transition-base), box-shadow var(--transition-base),
+                      transform var(--transition-spring);
+          will-change: transform;
+        }
+        .btn-outline-light:hover {
+          background: rgba(255, 255, 255, 0.22);
+          border-color: rgba(255, 255, 255, 0.80);
+          color: #fff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 18px rgba(255,255,255,0.10);
+        }
+        .btn-outline-light:active {
+          transform: translateY(0) scale(0.97);
         }
 
         .hp-hero__bottom-fade {
