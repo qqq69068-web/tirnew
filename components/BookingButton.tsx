@@ -7,12 +7,14 @@ import { getAvailableDates } from "@/lib/scheduling";
 import { CheckCircle, ChevronLeft, Clock, Calendar, Car, Truck, Phone as PhoneIcon } from "lucide-react";
 
 interface Props {
-  serviceSlug: string;
-  serviceTitle: string;
+  serviceSlug?: string;
+  serviceTitle?: string;
   priceCar?: number | null;
   priceTruck?: number | null;
   priceTrailer?: number | null;
   priceMin?: number | null;
+  fullWidth?: boolean;
+  size?: "sm" | "md";
 }
 
 type CarCategory = "car" | "truck" | "trailer" | "";
@@ -132,11 +134,13 @@ function SlotSkeleton() {
    MAIN COMPONENT
    ════════════════════════════════════════════════════════════ */
 export default function BookingButton({
-  serviceSlug,
-  serviceTitle,
+  serviceSlug = "",
+  serviceTitle = "Запис на сервіс",
   priceCar,
   priceTruck,
   priceTrailer,
+  fullWidth,
+  size,
 }: Props) {
   const [status, setStatus]       = useState<"loading" | "guest" | "auth">("loading");
   const [client, setClient]       = useState<{ email: string; name: string | null; phone?: string | null } | null>(null);
@@ -174,6 +178,8 @@ export default function BookingButton({
     carCategory === "car"     ? (priceCar     ?? null) :
     carCategory === "truck"   ? (priceTruck   ?? null) :
     carCategory === "trailer" ? (priceTrailer ?? null) : null;
+
+  const btnClass = `btn btn-primary${fullWidth ? " bk-btn-full" : ""}${size === "sm" ? " btn-sm" : ""}`;
 
   /* Auth check */
   useEffect(() => {
@@ -251,18 +257,15 @@ export default function BookingButton({
 
   /* ── LOADING ─────────────────────────────────────────── */
   if (status === "loading") {
-    return <div className="bk-skeleton" style={{ height: 48, borderRadius: "var(--radius)" }} />;
+    return <div className="bk-skeleton" style={{ height: 36, width: 100, borderRadius: "var(--radius)" }} />;
   }
 
   /* ── GUEST ───────────────────────────────────────────── */
   if (status === "guest") {
     return (
-      <div className="bk-guest">
-        <Link href="/cabinet" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
-          Увійти для запису
-        </Link>
-        <p className="bk-guest-hint">Потрібен акаунт для онлайн-запису</p>
-      </div>
+      <Link href="/cabinet" className={btnClass}>
+        Зв&apos;язатись
+      </Link>
     );
   }
 
@@ -287,11 +290,7 @@ export default function BookingButton({
   /* ── CLOSED TRIGGER BUTTON ───────────────────────────── */
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="btn btn-primary"
-        style={{ width: "100%", justifyContent: "center" }}
-      >
+      <button onClick={() => setOpen(true)} className={btnClass}>
         Записатись
       </button>
     );
@@ -941,14 +940,6 @@ export default function BookingButton({
           20%, 80% { transform: translateX(3px); }
           30%, 50%, 70% { transform: translateX(-3px); }
           40%, 60% { transform: translateX(3px); }
-        }
-
-        /* ─ guest ────────────────────────────────────── */
-        .bk-guest { display: flex; flex-direction: column; gap: var(--space-2); }
-        .bk-guest-hint {
-          text-align: center;
-          font-size: var(--text-xs);
-          color: var(--text-faint);
         }
 
         /* ─ success ──────────────────────────────────── */
