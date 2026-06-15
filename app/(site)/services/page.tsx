@@ -126,9 +126,9 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        {/* Category chips */}
+        {/* Category chips — full-width scroll, no container wrapper */}
         <div className="svc-chips-bar">
-          <div className="container svc-chips-scroll">
+          <div className="svc-chips-scroll">
             <button
               className={`svc-chip${!activeCategory ? " svc-chip--active" : ""}`}
               onClick={() => setActiveCategory(null)}
@@ -377,7 +377,9 @@ export default function ServicesPage() {
           overflow-x: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding-bottom: 2px;
+          /* Full viewport width with page-aligned left start and right breathing room */
+          padding-inline: max(var(--space-4), calc((100vw - var(--content-max, 1200px)) / 2 + var(--space-4)));
+          padding-block: 2px;
         }
         .svc-chips-scroll::-webkit-scrollbar { display: none; }
         .svc-chip {
@@ -523,6 +525,7 @@ export default function ServicesPage() {
           .svc-hero__divider { display: none; }
           .svc-grid { grid-template-columns: 1fr; }
           .svc-intro { flex-direction: column; align-items: flex-start; }
+          .svc-chips-scroll { padding-inline: var(--space-4); }
         }
       `}</style>
     </>
