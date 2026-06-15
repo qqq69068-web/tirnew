@@ -61,6 +61,20 @@ export default function ContactsPage() {
 
         {/* ═══ HERO ════════════════════════════════ */}
         <section className="ct-hero">
+          {/* background photo */}
+          <div className="ct-hero__bg" aria-hidden>
+            <img
+              src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1600&q=80"
+              alt=""
+              width={1600}
+              height={900}
+              loading="eager"
+              decoding="async"
+              className="ct-hero__bg-img"
+            />
+            <div className="ct-hero__bg-overlay" />
+          </div>
+
           <div className="container ct-hero__inner">
             <div>
               <p className="ct-label">Зв&apos;язок</p>
@@ -211,10 +225,39 @@ export default function ContactsPage() {
 
         /* ══ HERO ═══════════════════════════════════ */
         .ct-hero {
+          position: relative;
           padding-block: clamp(3.5rem, 7vw, 5.5rem) clamp(2rem, 4vw, 3rem);
           border-bottom: 1px solid var(--border);
+          overflow: hidden;
         }
+
+        /* background photo */
+        .ct-hero__bg {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+        }
+        .ct-hero__bg-img {
+          width: 100%; height: 100%;
+          object-fit: cover;
+          object-position: center 38%;
+          filter: brightness(0.28) contrast(1.05) saturate(0.6);
+        }
+        .ct-hero__bg-overlay {
+          position: absolute; inset: 0;
+          background:
+            linear-gradient(
+              108deg,
+              oklch(0.09 0.015 55 / 0.88) 0%,
+              oklch(0.09 0.015 55 / 0.45) 55%,
+              oklch(0.09 0.015 55 / 0.05) 100%
+            );
+        }
+
         .ct-hero__inner {
+          position: relative;
+          z-index: 2;
           display: grid;
           grid-template-columns: 1fr 1fr;
           align-items: end;
@@ -243,12 +286,13 @@ export default function ContactsPage() {
           font-size: clamp(2.2rem, 6vw, 4rem);
           font-weight: 900;
           line-height: 1.0;
-          color: var(--text);
+          color: #fff;
           letter-spacing: -0.035em;
+          text-shadow: 0 2px 16px rgba(0,0,0,0.4);
         }
         .ct-hero__sub {
           font-size: var(--text-sm);
-          color: var(--text-muted);
+          color: oklch(1 0 0 / 0.52);
           line-height: 1.75;
           max-width: 34ch;
           align-self: end;
