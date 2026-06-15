@@ -3,55 +3,60 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { ChevronRight, Wrench, Car, ArrowRight, Search, X } from "lucide-react";
+import { ChevronRight, Wrench, Car, ArrowRight } from "lucide-react";
 
 const tirServices = services.filter((s) => s.vehicleType !== "car");
 const carServices = services.filter((s) => s.vehicleType !== "truck");
 
 export default function ServicesPage() {
   const [activeTab, setActiveTab] = useState<"tir" | "car">("tir");
-  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleItems((prev) => new Set([...prev, entry.target.id]));
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
-    );
-
-    document.querySelectorAll("[data-observe]").forEach((el) => {
-      observerRef.current?.observe(el);
-    });
-
-    return () => observerRef.current?.disconnect();
-  }, [activeTab, query]);
 
   const baseServices = activeTab === "tir" ? tirServices : carServices;
+  const categories = Array.from(new Set(baseServices.map((s) => s.category)));
 
-  const q = query.trim().toLowerCase();
-  const displayedServices = q
-    ? baseServices.filter(
-        (s) =>
-          s.title.toLowerCase().includes(q) ||
-          (s.short ?? "").toLowerCase().includes(q) ||
-          s.category.toLowerCase().includes(q)
-      )
+  const displayedServices = activeCategory
+    ? baseServices.filter((s) => s.category === activeCategory)
     : baseServices;
 
-  const categories = Array.from(new Set(baseServices.map((s) => s.category)));
+  useEffect(() => {
+    setVisibleItems(new Set());
+    setTimeout(() => {
+      observerRef.current?.disconnect();
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleItems((prev) => new Set([...prev, entry.target.id]));
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+      );
+      document.querySelectorAll("[data-observe]").forEach((el) => {
+        observerRef.current?.observe(el);
+      });
+    }, 50);
+    return () => observerRef.current?.disconnect();
+  }, [activeTab, activeCategory]);
 
   function handleTabChange(tab: "tir" | "car") {
     setActiveTab(tab);
-    setQuery("");
+    setActiveCategory(null);
   }
+
+  function handleCategoryClick(cat: string) {
+    setActiveCategory((prev) => (prev === cat ? null : cat));
+  }
+
+  const groupedServices = activeCategory
+    ? [{ cat: activeCategory, items: displayedServices }]
+    : categories.map((cat) => ({
+        cat,
+        items: baseServices.filter((s) => s.category === cat),
+      }));
 
   return (
     <>
@@ -97,101 +102,97 @@ export default function ServicesPage() {
           </div>
         </section>
 
+        {/* Tabs bar */}
         <div className="svc-tabs-bar">
           <div className="container svc-tabs-inner">
-            <div className="svc-tabs-left">
-              <button
-                className={`svc-tab${activeTab === "tir" ? " svc-tab--active" : ""}`}
-                onClick={() => handleTabChange("tir")}
-                aria-pressed={activeTab === "tir"}
-              >
-                <Wrench size={15} aria-hidden />
-                Вантажні / ТІР
-                <span className="svc-tab__count">{tirServices.length}</span>
-              </button>
-              <button
-                className={`svc-tab${activeTab === "car" ? " svc-tab--active" : ""}`}
-                onClick={() => handleTabChange("car")}
-                aria-pressed={activeTab === "car"}
-              >
-                <Car size={15} aria-hidden />
-                Легкові
-                <span className="svc-tab__count">{carServices.length}</span>
-              </button>
-            </div>
-            <div className="svc-search-wrap">
-              <Search size={15} className="svc-search-icon" aria-hidden />
-              <input
-                ref={inputRef}
-                type="search"
-                className="svc-search"
-                placeholder="Пошук послуги…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                aria-label="Пошук послуг"
-              />
-              {query && (
+            <button
+              className={`svc-tab${activeTab === "tir" ? " svc-tab--active" : ""}`}
+              onClick={() => handleTabChange("tir")}
+              aria-pressed={activeTab === "tir"}
+            >
+              <Wrench size={15} aria-hidden />
+              Вантажні / ТІР
+              <span className="svc-tab__count">{tirServices.length}</span>
+            </button>
+            <button
+              className={`svc-tab${activeTab === "car" ? " svc-tab--active" : ""}`}
+              onClick={() => handleTabChange("car")}
+              aria-pressed={activeTab === "car"}
+            >
+              <Car size={15} aria-hidden />
+              Легкові
+              <span className="svc-tab__count">{carServices.length}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Category chips */}
+        <div className="svc-chips-bar">
+          <div className="container svc-chips-scroll">
+            <button
+              className={`svc-chip${!activeCategory ? " svc-chip--active" : ""}`}
+              onClick={() => setActiveCategory(null)}
+            >
+              Всі
+              <span className="svc-chip__count">{baseServices.length}</span>
+            </button>
+            {categories.map((cat) => {
+              const count = baseServices.filter((s) => s.category === cat).length;
+              return (
                 <button
-                  className="svc-search-clear"
-                  onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-                  aria-label="Очистити пошук"
+                  key={cat}
+                  className={`svc-chip${activeCategory === cat ? " svc-chip--active" : ""}`}
+                  onClick={() => handleCategoryClick(cat)}
                 >
-                  <X size={14} />
+                  {cat}
+                  <span className="svc-chip__count">{count}</span>
                 </button>
-              )}
-            </div>
+              );
+            })}
           </div>
         </div>
 
         <div className="svc-content container">
 
-          {!q && (
-            <>
-              {activeTab === "tir" && (
-                <div className="svc-intro">
-                  <div className="svc-intro__text">
-                    <p className="svc-section-eyebrow">— Вантажні автомобілі і ТІР</p>
-                    <h2 className="svc-intro__title">Повний перелік послуг для вантажного транспорту</h2>
-                  </div>
-                  <Link href="/contacts" className="btn btn-ghost svc-intro__cta">
-                    Записатись <ArrowRight size={16} aria-hidden />
-                  </Link>
+          <div className="svc-intro">
+            <div className="svc-intro__text">
+              <p className="svc-section-eyebrow">
+                {activeCategory ? `— ${activeCategory}` : activeTab === "tir" ? "— Вантажні автомобілі і ТІР" : "— Легкові автомобілі"}
+              </p>
+              <h2 className="svc-intro__title">
+                {activeCategory
+                  ? `Послуги: ${activeCategory}`
+                  : activeTab === "tir"
+                  ? "Повний перелік послуг для вантажного транспорту"
+                  : "Послуги для легкового транспорту"}
+              </h2>
+            </div>
+            <Link href="/contacts" className="btn btn-ghost svc-intro__cta">
+              Записатись <ArrowRight size={16} aria-hidden />
+            </Link>
+          </div>
+
+          {groupedServices.map(({ cat, items }) => (
+            <div key={cat} className="svc-group">
+              {!activeCategory && (
+                <div className="svc-group__header">
+                  <h3 className="svc-group__title">{cat}</h3>
+                  <span className="svc-group__count">{items.length} послуг</span>
                 </div>
               )}
-              {activeTab === "car" && (
-                <div className="svc-intro">
-                  <div className="svc-intro__text">
-                    <p className="svc-section-eyebrow">— Легкові автомобілі</p>
-                    <h2 className="svc-intro__title">Послуги для легкового транспорту</h2>
-                  </div>
-                  <Link href="/contacts" className="btn btn-ghost svc-intro__cta">
-                    Записатись <ArrowRight size={16} aria-hidden />
-                  </Link>
-                </div>
-              )}
-            </>
-          )}
-
-          {q && (
-            <p className="svc-search-result-label">
-              {displayedServices.length > 0
-                ? <><span>Знайдено: </span><strong>{displayedServices.length}</strong><span> {displayedServices.length === 1 ? "послуга" : displayedServices.length < 5 ? "послуги" : "послуг"} за запитом «{query}»</span></>
-                : <span>Нічого не знайдено за запитом «{query}»</span>}
-            </p>
-          )}
-
-          {q ? (
-            displayedServices.length > 0 ? (
               <div className="svc-grid">
-                {displayedServices.map((svc) => (
+                {items.map((svc) => (
                   <Link
                     key={svc.slug}
                     href={`/services/${svc.slug}`}
-                    id={`svc-search-${svc.slug}`}
+                    id={`svc-${svc.slug}`}
                     data-observe
-                    className={`svc-card${visibleItems.has(`svc-search-${svc.slug}`) ? " svc-card--visible" : ""}`}
+                    className={`svc-card${visibleItems.has(`svc-${svc.slug}`) ? " svc-card--visible" : ""}`}
                   >
                     <div className="svc-card__body">
+                      {!activeCategory && (
+                        <span className="svc-card__cat">{svc.category}</span>
+                      )}
                       <p className="svc-card__title">{svc.title}</p>
                       {svc.short && <p className="svc-card__desc">{svc.short}</p>}
                     </div>
@@ -202,42 +203,8 @@ export default function ServicesPage() {
                   </Link>
                 ))}
               </div>
-            ) : (
-              <div className="svc-empty">
-                <Search size={32} className="svc-empty__icon" />
-                <p className="svc-empty__text">Спробуйте інший запит або <button className="svc-empty__reset" onClick={() => setQuery("")}>очистіть пошук</button></p>
-              </div>
-            )
-          ) : (
-            categories.map((cat) => {
-              const catItems = displayedServices.filter((s) => s.category === cat);
-              return (
-                <div key={cat} className="svc-group">
-                  <h3 className="svc-group__title">{cat}</h3>
-                  <div className="svc-grid">
-                    {catItems.map((svc) => (
-                      <Link
-                        key={svc.slug}
-                        href={`/services/${svc.slug}`}
-                        id={`svc-${svc.slug}`}
-                        data-observe
-                        className={`svc-card${visibleItems.has(`svc-${svc.slug}`) ? " svc-card--visible" : ""}`}
-                      >
-                        <div className="svc-card__body">
-                          <p className="svc-card__title">{svc.title}</p>
-                          {svc.short && <p className="svc-card__desc">{svc.short}</p>}
-                        </div>
-                        <div className="svc-card__footer">
-                          <span className="svc-card__price">{svc.price}</span>
-                          <span className="svc-card__arrow"><ChevronRight size={16} aria-hidden /></span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              );
-            })
-          )}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -345,6 +312,7 @@ export default function ServicesPage() {
           background: oklch(1 0 0 / 0.15);
           flex-shrink: 0;
         }
+        /* Tabs */
         .svc-tabs-bar {
           position: sticky;
           top: 0;
@@ -356,10 +324,8 @@ export default function ServicesPage() {
         .svc-tabs-inner {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: var(--space-4);
+          gap: 0;
         }
-        .svc-tabs-left { display: flex; align-items: center; }
         .svc-tab {
           display: inline-flex;
           align-items: center;
@@ -398,81 +364,67 @@ export default function ServicesPage() {
           border-color: oklch(from var(--primary) l c h / 0.25);
           color: var(--primary);
         }
-        .svc-search-wrap {
-          position: relative;
+        /* Category chips */
+        .svc-chips-bar {
+          background: var(--bg);
+          border-bottom: 1px solid var(--border);
+          padding-block: var(--space-3);
+        }
+        .svc-chips-scroll {
           display: flex;
           align-items: center;
-          flex-shrink: 0;
+          gap: var(--space-2);
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          padding-bottom: 2px;
         }
-        .svc-search-icon {
-          position: absolute;
-          left: 0.75rem;
-          color: var(--text-faint);
-          pointer-events: none;
-          flex-shrink: 0;
-        }
-        .svc-search {
-          height: 36px;
-          width: 220px;
-          padding: 0 2.4rem 0 2.2rem;
-          font-size: var(--text-sm);
-          background: var(--surface2);
+        .svc-chips-scroll::-webkit-scrollbar { display: none; }
+        .svc-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          height: 34px;
+          padding: 0 var(--space-4);
+          font-size: var(--text-xs);
+          font-weight: 600;
+          white-space: nowrap;
+          border-radius: var(--radius-full);
           border: 1px solid var(--border);
-          border-radius: var(--radius-full);
+          background: var(--surface);
+          color: var(--text-muted);
+          cursor: pointer;
+          transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+          flex-shrink: 0;
+        }
+        .svc-chip:hover {
+          background: var(--surface2);
           color: var(--text);
-          outline: none;
-          transition: border-color var(--transition-fast), box-shadow var(--transition-fast), width 0.2s ease;
-          appearance: none;
+          border-color: oklch(from var(--primary) l c h / 0.3);
         }
-        .svc-search::-webkit-search-cancel-button { display: none; }
-        .svc-search::placeholder { color: var(--text-faint); }
-        .svc-search:focus {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px oklch(from var(--primary) l c h / 0.15);
-          width: 280px;
-        }
-        .svc-search-clear {
-          position: absolute;
-          right: 0.75rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 20px; height: 20px;
-          border-radius: var(--radius-full);
-          background: var(--border);
-          color: var(--text-muted);
-          border: none;
-          cursor: pointer;
-          padding: 0;
-          transition: background var(--transition-fast), color var(--transition-fast);
-        }
-        .svc-search-clear:hover { background: var(--text-faint); color: var(--text); }
-        .svc-search-result-label {
-          font-size: var(--text-sm);
-          color: var(--text-muted);
-        }
-        .svc-search-result-label strong { color: var(--text); font-weight: 700; }
-        .svc-empty {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: var(--space-4);
-          padding: var(--space-16) var(--space-8);
-          text-align: center;
-          color: var(--text-muted);
-        }
-        .svc-empty__icon { color: var(--text-faint); }
-        .svc-empty__text { font-size: var(--text-base); }
-        .svc-empty__reset {
+        .svc-chip--active {
+          background: oklch(from var(--primary) l c h / 0.12);
+          border-color: oklch(from var(--primary) l c h / 0.4);
           color: var(--primary);
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-size: inherit;
-          text-decoration: underline;
-          padding: 0;
         }
+        .svc-chip__count {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          font-size: 10px;
+          font-weight: 700;
+          border-radius: var(--radius-full);
+          background: oklch(from var(--text-faint) l c h / 0.15);
+          color: var(--text-faint);
+        }
+        .svc-chip--active .svc-chip__count {
+          background: oklch(from var(--primary) l c h / 0.2);
+          color: var(--primary);
+        }
+        /* Content */
         .svc-content {
           padding-block: clamp(var(--space-6), 4vw, var(--space-10));
           display: flex;
@@ -505,14 +457,25 @@ export default function ServicesPage() {
         }
         .svc-intro__cta { white-space: nowrap; flex-shrink: 0; }
         .svc-group { display: flex; flex-direction: column; gap: var(--space-4); }
+        .svc-group__header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: var(--space-4);
+          padding-bottom: var(--space-3);
+          border-bottom: 1px solid var(--border);
+        }
         .svc-group__title {
           font-size: var(--text-xs);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           color: var(--text-faint);
-          padding-bottom: var(--space-3);
-          border-bottom: 1px solid var(--border);
+        }
+        .svc-group__count {
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+          font-weight: 500;
         }
         .svc-grid {
           display: grid;
@@ -538,6 +501,15 @@ export default function ServicesPage() {
         .svc-card--visible { opacity: 1; transform: translateY(0); }
         .svc-card:hover { background: var(--surface2); box-shadow: var(--shadow-md); }
         .svc-card__body { display: flex; flex-direction: column; gap: var(--space-1); }
+        .svc-card__cat {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: var(--primary);
+          margin-bottom: var(--space-1);
+        }
         .svc-card__title { font-size: var(--text-base); font-weight: 600; color: var(--text); line-height: 1.4; }
         .svc-card__desc { font-size: var(--text-xs); color: var(--text-faint); line-height: 1.55; }
         .svc-card__footer { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-2); }
@@ -545,19 +517,12 @@ export default function ServicesPage() {
         .svc-card__arrow { color: var(--text-faint); }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeUp 0.5s ease forwards; }
-        @media (max-width: 768px) {
-          .svc-search { width: 160px; }
-          .svc-search:focus { width: 190px; }
-        }
         @media (max-width: 640px) {
           .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .svc-hero__meta { gap: var(--space-4); }
           .svc-hero__divider { display: none; }
           .svc-grid { grid-template-columns: 1fr; }
           .svc-intro { flex-direction: column; align-items: flex-start; }
-          .svc-tabs-inner { gap: var(--space-2); }
-          .svc-search { width: 120px; }
-          .svc-search:focus { width: 145px; }
         }
       `}</style>
     </>
