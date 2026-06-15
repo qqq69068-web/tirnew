@@ -1,36 +1,37 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { services } from "@/lib/services";
+import { prisma } from "@/lib/prisma";
 import { ArrowLeft, Package, Clock, Tag, ChevronRight } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
 
 interface Props { params: Promise<{ slug: string }> }
 
-export async function generateStaticParams() {
-  return services.map((s) => ({ slug: s.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = await prisma.service.findUnique({ where: { slug } });
   if (!service) return {};
   return { title: `${service.title} | Тірнью Truck Service`, description: service.short };
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+
+  const service = await prisma.service.findUnique({ where: { slug } });
   if (!service) notFound();
 
-  const related = services
-    .filter((s) => s.category === service.category && s.slug !== service.slug)
-    .slice(0, 3);
+  const related = await prisma.service.findMany({
+    where: { category: service.category, slug: { not: service.slug }, active: true },
+    orderBy: { order: "asc" },
+    take: 3,
+  });
 
   return (
     <>
       <main className="sd">
 
-        {/* ─── HERO ─────────────────────────────────────── */}
+        {/* ─── HERO ──────────────────────────────────────────────────── */}
         <div className="sd__hero">
           <img
             src={service.image}
@@ -55,7 +56,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ─── BREADCRUMB ─────────────────────────────── */}
+        {/* ─── BREADCRUMB ────────────────────────────────────────────── */}
         <div className="sd__breadcrumb">
           <div className="container">
             <nav className="sd__bread-nav" aria-label="breadcrumb">
@@ -68,7 +69,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ─── BODY ────────────────────────────────────────── */}
+        {/* ─── BODY ─────────────────────────────────────────────────────── */}
         <div className="sd__body container">
           <div className="sd__grid">
 
@@ -130,7 +131,31 @@ export default async function ServiceDetailPage({ params }: Props) {
                   <span>Вартість</span>
                 </div>
 
-                <div className="sd-price__value">{service.price}</div>
+                {/* Per-vehicle pricing */}
+                {(service.priceCar != null || service.priceTruck != null || service.priceTrailer != null) ? (
+                  <div className="sd-price__vehicle">
+                    {service.priceCar != null && (
+                      <div className="sd-price__row">
+                        <span>Легкове</span>
+                        <strong>{service.priceCar} ₴</strong>
+                      </div>
+                    )}
+                    {service.priceTruck != null && (
+                      <div className="sd-price__row">
+                        <span>Вантажне / Тягач</span>
+                        <strong>{service.priceTruck} ₴</strong>
+                      </div>
+                    )}
+                    {service.priceTrailer != null && (
+                      <div className="sd-price__row">
+                        <span>Причіп</span>
+                        <strong>{service.priceTrailer} ₴</strong>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="sd-price__value">{service.price}</div>
+                )}
 
                 {service.hours && (
                   <div className="sd-price__hours">
@@ -142,14 +167,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 <hr className="sd-price__hr" />
 
                 <div className="sd-price__actions">
-                  {service.isPartsOrder ? (
-                    <Link href="/parts-order" className="btn btn-primary btn-block">
-                      <Package size={14} aria-hidden />
-                      Замовити запчастини
-                    </Link>
-                  ) : (
-                    <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
-                  )}
+                  <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
                   <Link href="/services" className="btn btn-outline btn-block">
                     ← Усі послуги
                   </Link>
@@ -174,7 +192,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           color: var(--text);
         }
 
-        /* ──── HERO ────────────────────────────────────── */
+        /* ──── HERO ────────────────────────────────────────────── */
         .sd__hero {
           position: relative;
           height: clamp(280px, 36vw, 460px);
@@ -226,7 +244,6 @@ export default async function ServiceDetailPage({ params }: Props) {
         }
         .sd__back:hover { color: oklch(1 0 0 / 0.85); }
 
-        /* Category tag — text only, no colored pill */
         .sd__category-tag {
           font-size: 10px;
           font-weight: 700;
@@ -261,7 +278,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           line-height: 1.65;
         }
 
-        /* ──── BREADCRUMB ────────────────────────────── */
+        /* ──── BREADCRUMB ─────────────────────────────────────────── */
         .sd__breadcrumb {
           border-bottom: 1px solid var(--border);
           background: var(--surface);
@@ -290,7 +307,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           max-width: 28ch;
         }
 
-        /* ──── BODY LAYOUT ────────────────────────────── */
+        /* ──── BODY LAYOUT ───────────────────────────────────────────── */
         .sd__body {
           padding-block: clamp(2rem, 5vw, 3.5rem);
         }
@@ -301,7 +318,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           align-items: start;
         }
 
-        /* ──── CONTENT (left) ──────────────────────────── */
+        /* ──── CONTENT (left) ────────────────────────────────────────── */
         .sd__content {
           display: flex;
           flex-direction: column;
@@ -328,7 +345,6 @@ export default async function ServiceDetailPage({ params }: Props) {
           max-width: 68ch;
         }
 
-        /* Checklist — dot instead of CheckCircle2-in-circle */
         .sd__checklist {
           display: flex;
           flex-direction: column;
@@ -362,7 +378,6 @@ export default async function ServiceDetailPage({ params }: Props) {
           opacity: 0.7;
         }
 
-        /* Related */
         .sd__section--related { gap: 1.25rem; }
         .sd__related {
           display: grid;
@@ -420,7 +435,7 @@ export default async function ServiceDetailPage({ params }: Props) {
         }
         .sd-rel:hover .sd-rel__arr { color: var(--primary); transform: translateX(3px); }
 
-        /* ──── PRICE SIDEBAR ───────────────────────────── */
+        /* ──── PRICE SIDEBAR ─────────────────────────────────────────── */
         .sd__sidebar {
           position: sticky;
           top: 78px;
@@ -455,6 +470,23 @@ export default async function ServiceDetailPage({ params }: Props) {
           letter-spacing: -0.025em;
           font-variant-numeric: tabular-nums;
         }
+        .sd-price__vehicle {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+          padding: 0.25rem 0;
+        }
+        .sd-price__row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: var(--text-sm);
+          padding: 0.35rem 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .sd-price__row:last-child { border-bottom: none; }
+        .sd-price__row span { color: var(--text-muted); }
+        .sd-price__row strong { color: var(--primary); font-weight: 700; font-variant-numeric: tabular-nums; }
         .sd-price__hours {
           display: flex;
           align-items: center;
@@ -477,8 +509,6 @@ export default async function ServiceDetailPage({ params }: Props) {
           width: 100%;
           justify-content: center;
         }
-
-        /* Trust list — dots instead of checkmark emoji */
         .sd-price__trust {
           list-style: none;
           padding: 0.25rem 0 0;
@@ -508,7 +538,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           margin-top: 0.42em;
         }
 
-        /* ──── RESPONSIVE ─────────────────────────────── */
+        /* ──── RESPONSIVE ─────────────────────────────────────────────── */
         @media (max-width: 768px) {
           .sd__grid {
             grid-template-columns: 1fr;
