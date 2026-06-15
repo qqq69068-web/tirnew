@@ -250,6 +250,7 @@ export default function HomePage() {
       <style>{`
         .hp-root { background: var(--bg); }
 
+        /* ══ HERO — intentionally dark for contrast with white text & truck ══ */
         .hp-hero {
           position: relative; min-height: 96vh;
           display: flex; align-items: center; overflow: hidden;
@@ -478,7 +479,7 @@ export default function HomePage() {
           border-radius: var(--radius-xl); overflow: hidden; text-decoration: none;
           transition: transform .26s cubic-bezier(.22,1,.36,1), box-shadow .26s ease, border-color .20s ease;
         }
-        .hp-svc-card:hover { transform: translateY(-3px); box-shadow: 0 6px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,214,0,0.10); border-color: var(--border-accent); }
+        .hp-svc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-accent); }
         .hp-svc-card__img { position: relative; aspect-ratio: 16/7; overflow: hidden; background: var(--surface2); }
         .hp-svc-card__img img {
           width: 100%; height: 100%; object-fit: cover;
@@ -529,7 +530,7 @@ export default function HomePage() {
         }
         .hp-proc__step:hover {
           border-color: var(--border-accent);
-          box-shadow: 0 6px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,214,0,0.10);
+          box-shadow: var(--shadow-md);
           transform: translateY(-3px);
         }
         .hp-proc__num-wrap {
