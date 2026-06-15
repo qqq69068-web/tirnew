@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { services, HOUR_RATE_MIN, HOUR_RATE_MAX } from "@/lib/services";
-import { Clock, Wrench, ChevronRight, Info } from "lucide-react";
+import { Clock, Wrench, ChevronRight, Info, CheckCircle, Gauge, ShieldCheck } from "lucide-react";
 
 export default function PricePage() {
   const categories = Array.from(new Set(services.map((s) => s.category)));
@@ -43,6 +43,20 @@ export default function PricePage() {
                 <p className="price-rate-card__value">
                   {HOUR_RATE_MIN}–{HOUR_RATE_MAX} <span className="price-rate-card__unit">грн</span>
                 </p>
+              </div>
+            </div>
+            <div className="price-hero-facts">
+              <div className="price-hero-fact">
+                <CheckCircle size={16} className="price-hero-fact__icon" aria-hidden />
+                <span>Прозоре ціноутворення — платите лише за виконані роботи</span>
+              </div>
+              <div className="price-hero-fact">
+                <Gauge size={16} className="price-hero-fact__icon" aria-hidden />
+                <span>Кінцева вартість — після діагностики та дефектації</span>
+              </div>
+              <div className="price-hero-fact">
+                <ShieldCheck size={16} className="price-hero-fact__icon" aria-hidden />
+                <span>Гарантія на всі виконані роботи</span>
               </div>
             </div>
           </div>
@@ -232,6 +246,23 @@ export default function PricePage() {
           color: var(--text); line-height: 1;
         }
         .price-rate-card__unit { font-size: var(--text-sm); font-weight: 400; color: var(--text-muted); }
+        .price-hero-facts {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-2);
+          margin-top: var(--space-5);
+          padding-top: var(--space-5);
+          border-top: 1px solid oklch(1 0 0 / 0.1);
+        }
+        .price-hero-fact {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          font-size: var(--text-sm);
+          color: oklch(1 0 0 / 0.55);
+          line-height: 1.5;
+        }
+        .price-hero-fact__icon { color: var(--primary); flex-shrink: 0; }
         .price-content {
           padding-block: clamp(var(--space-6), 4vw, var(--space-10));
           display: flex; flex-direction: column; gap: var(--space-6);
