@@ -7,7 +7,7 @@ import {
   ReceiptText, Timer, Mail, Package, ChevronRight, ArrowRight,
 } from "lucide-react";
 
-/* ─── Types (unchanged) ─── */
+/* ─── Types ─── */
 interface Booking {
   id: string; service: string | null; carBrand: string | null; carModel: string | null;
   progress: string; price: number | null; partsCost: number | null;
@@ -15,7 +15,7 @@ interface Booking {
 }
 interface Client { email: string; name: string | null; phone: string | null; bookings: Booking[]; }
 
-/* ─── Constants (unchanged) ─── */
+/* ─── Constants ─── */
 const PROGRESS_STEPS = [
   { key: "received",    label: "Прийнято",    icon: <Clock    size={12} /> },
   { key: "diagnostics", label: "Діагностика", icon: <Search   size={12} /> },
@@ -120,7 +120,6 @@ function BookingCard({ b, index }: { b: Booking; index: number }) {
 
   return (
     <div ref={ref} className="cb-card">
-      {/* Header row */}
       <div className="cb-card-header">
         <div className="cb-card-header-left">
           <p className="cb-card-car">
@@ -142,7 +141,6 @@ function BookingCard({ b, index }: { b: Booking; index: number }) {
         </div>
       </div>
 
-      {/* Cost breakdown */}
       {(b.price || b.partsCost) && (
         <div className="cb-cost-row">
           {b.price    && <CostPill icon={<Wrench  size={10} />} label="Робота"  amount={b.price} />}
@@ -150,7 +148,6 @@ function BookingCard({ b, index }: { b: Booking; index: number }) {
         </div>
       )}
 
-      {/* Work items */}
       {b.workItems && b.workItems.length > 0 && (
         <div className="cb-work-items">
           <p className="cb-section-eyebrow">Виконані роботи</p>
@@ -163,7 +160,6 @@ function BookingCard({ b, index }: { b: Booking; index: number }) {
         </div>
       )}
 
-      {/* Progress */}
       <ProgressTrack current={b.progress} />
     </div>
   );
@@ -216,7 +212,7 @@ function AuthForm() {
   if (sent) return (
     <div className="cb-auth-wrap cb-auth-sent">
       <div className="cb-auth-icon-wrap">
-        <Mail size={26} style={{ color: "var(--primary)" }} />
+        <Mail size={26} style={{ color: "var(--cb-green)" }} />
       </div>
       <h2 className="cb-auth-title">Перевірте пошту</h2>
       <p className="cb-auth-sub">
@@ -232,7 +228,7 @@ function AuthForm() {
   return (
     <div className="cb-auth-wrap">
       <div className="cb-auth-icon-wrap">
-        <User size={22} style={{ color: "var(--primary)" }} />
+        <User size={22} style={{ color: "var(--cb-green)" }} />
       </div>
       <h2 className="cb-auth-title">Увійти / зареєструватись</h2>
       <p className="cb-auth-sub">Введіть email — надішлемо посилання для входу. Без пароля.</p>
@@ -240,14 +236,14 @@ function AuthForm() {
       <form onSubmit={submit} className="cb-auth-form">
         <div className="cb-field">
           <label className="cb-label">
-            Email <span style={{ color: "var(--primary)" }}>*</span>
+            Email <span style={{ color: "var(--cb-green)" }}>*</span>
           </label>
           <div className="cb-input-wrap">
             <Mail size={14} className="cb-input-icon" />
             <input
               type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com" required className="cb-input"
-              onFocus={(e) => (e.currentTarget.style.borderColor = "var(--primary)")}
+              onFocus={(e) => (e.currentTarget.style.borderColor = "var(--cb-green)")}
               onBlur={(e)  => (e.currentTarget.style.borderColor = "var(--border)")}
             />
           </div>
@@ -290,7 +286,6 @@ function CabinetContent() {
 
   return (
     <div className="cb-content">
-      {/* Header */}
       <div className="cb-user-header">
         <div>
           <h1 className="cb-user-name">
@@ -303,10 +298,8 @@ function CabinetContent() {
         </button>
       </div>
 
-      {/* Stats */}
       {client.bookings.length > 0 && <StatsBar bookings={client.bookings} />}
 
-      {/* Bookings */}
       {client.bookings.length === 0 ? (
         <div className="cb-empty">
           <Wrench size={34} className="cb-empty-icon" />
@@ -332,6 +325,15 @@ export default function CabinetPage() {
   return (
     <>
       <style>{`
+        /* ── Sage green palette (scoped to cabinet only) ── */
+        .cb-root, .cb-root * {
+          --cb-green:        #4a9e6b;
+          --cb-green-hover:  #3a8459;
+          --cb-green-subtle: rgba(74,158,107,0.10);
+          --cb-green-border: rgba(74,158,107,0.30);
+          --cb-green-text:   #ffffff;
+        }
+
         /* ── Layout ── */
         .cb-page-hero {
           background: var(--surface);
@@ -344,12 +346,12 @@ export default function CabinetPage() {
         .cb-page-hero::before {
           content: "";
           position: absolute; inset: 0;
-          background: radial-gradient(ellipse 60% 80% at 50% 120%, var(--primary-glow) 0%, transparent 70%);
+          background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(74,158,107,0.08) 0%, transparent 70%);
           pointer-events: none;
         }
         .cb-eyebrow {
           font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
-          text-transform: uppercase; color: var(--primary); margin-bottom: 10px;
+          text-transform: uppercase; color: #4a9e6b; margin-bottom: 10px;
         }
         .cb-page-title {
           font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 800;
@@ -381,8 +383,8 @@ export default function CabinetPage() {
           border-radius: 12px; padding: 16px 12px; text-align: center;
           transition: box-shadow 0.22s, transform 0.22s;
         }
-        .cb-stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
-        .cb-stat-icon { display: flex; justify-content: center; color: var(--primary); margin-bottom: 8px; }
+        .cb-stat-card:hover { box-shadow: 0 4px 16px rgba(74,158,107,0.12); transform: translateY(-2px); }
+        .cb-stat-icon { display: flex; justify-content: center; color: #4a9e6b; margin-bottom: 8px; }
         .cb-stat-value { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
         .cb-stat-label { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
 
@@ -397,14 +399,14 @@ export default function CabinetPage() {
           border-radius: 14px; padding: 18px 20px;
           transition: box-shadow 0.22s, transform 0.22s;
         }
-        .cb-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); transform: translateY(-2px); }
+        .cb-card:hover { box-shadow: 0 6px 24px rgba(74,158,107,0.10); transform: translateY(-2px); }
         .cb-cards-list { display: flex; flex-direction: column; gap: 12px; }
 
         .cb-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
         .cb-card-header-right { text-align: right; flex-shrink: 0; margin-left: 12px; }
         .cb-card-car  { font-size: 14px; font-weight: 700; color: var(--text); }
         .cb-card-service { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
-        .cb-card-price { font-size: 17px; font-weight: 800; color: var(--primary); }
+        .cb-card-price { font-size: 17px; font-weight: 800; color: #4a9e6b; }
         .cb-card-price-tbd { font-size: 12px; color: var(--text-faint); }
         .cb-card-date { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
 
@@ -420,7 +422,7 @@ export default function CabinetPage() {
         /* ── Work items ── */
         .cb-work-items { margin-top: 14px; }
         .cb-work-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
-        .cb-work-check { color: var(--primary); flex-shrink: 0; }
+        .cb-work-check { color: #4a9e6b; flex-shrink: 0; }
 
         /* ── Progress track ── */
         .cb-progress-track { display: flex; align-items: center; gap: 4px; margin-top: 16px; flex-wrap: wrap; }
@@ -436,14 +438,14 @@ export default function CabinetPage() {
           border-color: var(--border);
         }
         .cb-progress-step--active {
-          background: var(--primary-subtle);
-          color: var(--primary); border-color: var(--border-accent);
+          background: rgba(74,158,107,0.10);
+          color: #4a9e6b; border-color: rgba(74,158,107,0.30);
         }
         .cb-progress-step--done {
-          background: var(--primary); color: var(--text-inverse); border-color: var(--primary);
+          background: #4a9e6b; color: #fff; border-color: #4a9e6b;
         }
         .cb-progress-arrow { color: var(--text-faint); flex-shrink: 0; }
-        .cb-progress-arrow--done { color: var(--primary); }
+        .cb-progress-arrow--done { color: #4a9e6b; }
 
         /* ── Section eyebrow ── */
         .cb-section-eyebrow {
@@ -457,11 +459,11 @@ export default function CabinetPage() {
         .cb-empty-text { font-size: 14px; color: var(--text-muted); margin-bottom: 14px; }
         .cb-empty-link {
           display: inline-flex; align-items: center; gap: 5px;
-          font-size: 13px; font-weight: 600; color: var(--primary);
-          text-decoration: none; border-bottom: 1px solid var(--border-accent);
+          font-size: 13px; font-weight: 600; color: #4a9e6b;
+          text-decoration: none; border-bottom: 1px solid rgba(74,158,107,0.30);
           padding-bottom: 1px; transition: border-color 0.18s;
         }
-        .cb-empty-link:hover { border-color: var(--primary); }
+        .cb-empty-link:hover { border-color: #4a9e6b; }
 
         /* ── Auth form ── */
         .cb-auth-wrap {
@@ -471,14 +473,14 @@ export default function CabinetPage() {
         .cb-auth-sent { padding-top: 24px; }
         .cb-auth-icon-wrap {
           width: 56px; height: 56px; border-radius: 14px;
-          background: var(--primary-subtle);
+          background: rgba(74,158,107,0.10);
           display: flex; align-items: center; justify-content: center;
           margin-bottom: 14px;
         }
         .cb-auth-title { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
         .cb-auth-sub   { font-size: 13px; color: var(--text-muted); max-width: 30ch; line-height: 1.55; }
         .cb-auth-back  {
-          margin-top: 18px; font-size: 13px; color: var(--primary);
+          margin-top: 18px; font-size: 13px; color: #4a9e6b;
           background: none; border: none; cursor: pointer;
           text-decoration: underline; text-underline-offset: 3px;
         }
@@ -504,13 +506,13 @@ export default function CabinetPage() {
         /* ── Submit button ── */
         .cb-submit-btn {
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          background: var(--primary); color: var(--text-inverse); font-weight: 700; font-size: 13px;
+          background: #4a9e6b; color: #fff; font-weight: 700; font-size: 13px;
           padding: 12px; border-radius: 10px; border: none; cursor: pointer;
           transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
         }
         .cb-submit-btn:hover:not(:disabled) {
-          opacity: 0.88; transform: translateY(-1px);
-          box-shadow: var(--shadow-primary);
+          background: #3a8459; transform: translateY(-1px);
+          box-shadow: 0 4px 16px rgba(74,158,107,0.30);
         }
         .cb-submit-btn:active:not(:disabled) { transform: translateY(0); }
         .cb-submit-btn--loading { opacity: 0.65; cursor: not-allowed; }
@@ -518,7 +520,7 @@ export default function CabinetPage() {
         /* ── Spinner ── */
         .cb-spinner {
           display: inline-block; width: 16px; height: 16px; border-radius: 50%;
-          border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--text-inverse);
+          border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
           animation: spin 0.65s linear infinite;
         }
 
@@ -534,13 +536,11 @@ export default function CabinetPage() {
       `}</style>
 
       <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-        {/* Hero */}
         <section className="cb-page-hero">
           <p className="cb-eyebrow">Клієнтам</p>
           <h1 className="cb-page-title">Особистий кабінет</h1>
         </section>
 
-        {/* Content */}
         <section className="cb-page-section">
           <Suspense fallback={<CabinetSkeleton />}>
             <CabinetContent />
