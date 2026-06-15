@@ -5,8 +5,8 @@ import Link from "next/link";
 import { services } from "@/lib/services";
 import { ChevronRight, Wrench, Car, ArrowRight } from "lucide-react";
 
-const tirServices = services.filter((s) => s.type === "tir");
-const carServices = services.filter((s) => s.type === "car");
+const tirServices = services.filter((s) => s.vehicleType !== "car");
+const carServices = services.filter((s) => s.vehicleType !== "truck");
 
 export default function ServicesPage() {
   const [activeTab, setActiveTab] = useState<"tir" | "car">("tir");
@@ -125,7 +125,7 @@ export default function ServicesPage() {
             <div className="svc-intro">
               <div className="svc-intro__text">
                 <p className="svc-section-eyebrow">— Легкові автомобілі</p>
-                <h2 className="svc-intro__title">Послуги для легкового транспорту</h2>
+                <h2 className="svc-intro__title">Послуги для легкого транспорту</h2>
               </div>
               <Link href="/contacts" className="btn btn-ghost svc-intro__cta">
                 Записатись <ArrowRight size={16} aria-hidden />
