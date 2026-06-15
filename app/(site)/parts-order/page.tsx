@@ -64,7 +64,6 @@ export default function PartsOrderPage() {
     }
   };
 
-  /* ─── SUCCESS ────────────────────────────────────── */
   if (sent) {
     return (
       <>
@@ -76,19 +75,11 @@ export default function PartsOrderPage() {
               </svg>
             </div>
             <h2 className="po-success__title">Заявку отримано</h2>
-            <p className="po-success__text">
-              Наш менеджер зв'яжеться з вами найближчим часом.
-            </p>
-            {session && (
-              <p className="po-success__cabinet">
-                Замовлення відобразиться в особистому кабінеті
-              </p>
-            )}
+            <p className="po-success__text">Наш менеджер зв'яжеться з вами найближчим часом.</p>
+            {session && <p className="po-success__cabinet">Замовлення відобразиться в особистому кабінеті</p>}
             <div className="po-success__btns">
               <a href="/" className="btn btn-outline">На головну</a>
-              {session && (
-                <a href="/cabinet" className="btn btn-primary">Мій кабінет</a>
-              )}
+              {session && <a href="/cabinet" className="btn btn-primary">Мій кабінет</a>}
             </div>
           </div>
         </main>
@@ -97,12 +88,9 @@ export default function PartsOrderPage() {
     );
   }
 
-  /* ─── MAIN FORM ─────────────────────────────────── */
   return (
     <>
       <main className="po">
-
-        {/* HERO */}
         <section className="po-hero">
           <div className="container po-hero__inner">
             <div>
@@ -116,10 +104,8 @@ export default function PartsOrderPage() {
           </div>
         </section>
 
-        {/* FORM AREA */}
         <section className="po-body">
           <div className="po-body__inner">
-
             {session && (
               <div className="po-session-banner">
                 <Info size={13} className="po-session-banner__ico" aria-hidden />
@@ -131,8 +117,6 @@ export default function PartsOrderPage() {
             )}
 
             <form onSubmit={submit} className="po-form" noValidate>
-
-              {/* ── 01: Що потрібно */}
               <fieldset className="po-fieldset">
                 <legend className="po-legend">
                   <span className="po-legend__num">01</span>
@@ -145,34 +129,19 @@ export default function PartsOrderPage() {
                     </label>
                     <div className="po-input-wrap">
                       <Package size={13} className="po-input-ico" aria-hidden />
-                      <input
-                        id="partName" type="text" required
-                        placeholder="Супорт, підшипник, повітряний ремінь..."
-                        value={form.partName}
-                        onChange={(e) => set("partName", e.target.value)}
-                        className="po-input"
-                      />
+                      <input id="partName" type="text" required placeholder="Супорт, підшипник, повітряний ремінь..." value={form.partName} onChange={(e) => set("partName", e.target.value)} className="po-input" />
                     </div>
                   </div>
                   <div className="po-field">
-                    <label htmlFor="partNumber" className="po-field__label">
-                      Артикул (якщо знаєте)
-                    </label>
+                    <label htmlFor="partNumber" className="po-field__label">Артикул (якщо знаєте)</label>
                     <div className="po-input-wrap">
                       <FileText size={13} className="po-input-ico" aria-hidden />
-                      <input
-                        id="partNumber" type="text"
-                        placeholder="K58351"
-                        value={form.partNumber}
-                        onChange={(e) => set("partNumber", e.target.value)}
-                        className="po-input"
-                      />
+                      <input id="partNumber" type="text" placeholder="K58351" value={form.partNumber} onChange={(e) => set("partNumber", e.target.value)} className="po-input" />
                     </div>
                   </div>
                 </div>
               </fieldset>
 
-              {/* ── 02: Для якого авто */}
               <fieldset className="po-fieldset">
                 <legend className="po-legend">
                   <span className="po-legend__num">02</span>
@@ -183,48 +152,26 @@ export default function PartsOrderPage() {
                     <label htmlFor="carBrand" className="po-field__label">Марка</label>
                     <div className="po-input-wrap">
                       <Car size={13} className="po-input-ico" aria-hidden />
-                      <input
-                        id="carBrand" type="text"
-                        placeholder="Volvo, DAF, MAN..."
-                        value={form.carBrand}
-                        onChange={(e) => set("carBrand", e.target.value)}
-                        className="po-input"
-                      />
+                      <input id="carBrand" type="text" placeholder="Volvo, DAF, MAN..." value={form.carBrand} onChange={(e) => set("carBrand", e.target.value)} className="po-input" />
                     </div>
                   </div>
                   <div className="po-field">
                     <label htmlFor="carModel" className="po-field__label">Модель / рік</label>
                     <div className="po-input-wrap">
                       <Car size={13} className="po-input-ico" aria-hidden />
-                      <input
-                        id="carModel" type="text"
-                        placeholder="FH16, 2018"
-                        value={form.carModel}
-                        onChange={(e) => set("carModel", e.target.value)}
-                        className="po-input"
-                      />
+                      <input id="carModel" type="text" placeholder="FH16, 2018" value={form.carModel} onChange={(e) => set("carModel", e.target.value)} className="po-input" />
                     </div>
                   </div>
                 </div>
                 <div className="po-field">
-                  <label htmlFor="vin" className="po-field__label">
-                    VIN-код (необов'язково)
-                  </label>
+                  <label htmlFor="vin" className="po-field__label">VIN-код (необов'язково)</label>
                   <div className="po-input-wrap">
                     <Hash size={13} className="po-input-ico" aria-hidden />
-                    <input
-                      id="vin" type="text"
-                      placeholder="17 символів"
-                      value={form.vin}
-                      onChange={(e) => set("vin", e.target.value.toUpperCase())}
-                      maxLength={17}
-                      className="po-input po-input--mono"
-                    />
+                    <input id="vin" type="text" placeholder="17 символів" value={form.vin} onChange={(e) => set("vin", e.target.value.toUpperCase())} maxLength={17} className="po-input po-input--mono" />
                   </div>
                 </div>
               </fieldset>
 
-              {/* ── 03: Ваші контакти */}
               <fieldset className="po-fieldset">
                 <legend className="po-legend">
                   <span className="po-legend__num">03</span>
@@ -232,60 +179,29 @@ export default function PartsOrderPage() {
                 </legend>
                 <div className="po-fields po-fields--2col">
                   <div className="po-field">
-                    <label htmlFor="name" className="po-field__label">
-                      Ім'я <span className="po-required" aria-hidden>*</span>
-                    </label>
+                    <label htmlFor="name" className="po-field__label">Ім'я <span className="po-required" aria-hidden>*</span></label>
                     <div className="po-input-wrap">
                       <User size={13} className="po-input-ico" aria-hidden />
-                      <input
-                        id="name" type="text" required
-                        placeholder="Іван"
-                        value={form.name}
-                        onChange={(e) => set("name", e.target.value)}
-                        autoComplete="name"
-                        className="po-input"
-                      />
+                      <input id="name" type="text" required placeholder="Іван" value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" className="po-input" />
                     </div>
                   </div>
                   <div className="po-field">
-                    <label htmlFor="phone" className="po-field__label">
-                      Телефон <span className="po-required" aria-hidden>*</span>
-                    </label>
+                    <label htmlFor="phone" className="po-field__label">Телефон <span className="po-required" aria-hidden>*</span></label>
                     <div className="po-input-wrap">
                       <Phone size={13} className="po-input-ico" aria-hidden />
-                      <input
-                        id="phone" type="tel" required inputMode="tel"
-                        placeholder="+38 050 000 00 00"
-                        value={form.phone}
-                        onChange={(e) => handlePhoneInput(e, (v) => set("phone", v))}
-                        autoComplete="tel"
-                        className="po-input"
-                      />
+                      <input id="phone" type="tel" required inputMode="tel" placeholder="+38 050 000 00 00" value={form.phone} onChange={(e) => handlePhoneInput(e, (v) => set("phone", v))} autoComplete="tel" className="po-input" />
                     </div>
                   </div>
                 </div>
                 <div className="po-field">
                   <label htmlFor="comment" className="po-field__label">Коментар</label>
-                  <textarea
-                    id="comment"
-                    placeholder="Кількість, терміновість, особливості..."
-                    value={form.comment}
-                    onChange={(e) => set("comment", e.target.value)}
-                    className="po-textarea"
-                    rows={3}
-                  />
+                  <textarea id="comment" placeholder="Кількість, терміновість, особливості..." value={form.comment} onChange={(e) => set("comment", e.target.value)} className="po-textarea" rows={3} />
                 </div>
               </fieldset>
 
-              {error && (
-                <p className="po-error" role="alert">{error}</p>
-              )}
+              {error && <p className="po-error" role="alert">{error}</p>}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary po-submit"
-              >
+              <button type="submit" disabled={loading} className="btn btn-primary po-submit">
                 {loading && <span className="po-spinner" aria-hidden />}
                 {loading ? "Надсилаємо..." : "Надіслати заявку"}
               </button>
@@ -293,73 +209,24 @@ export default function PartsOrderPage() {
           </div>
         </section>
       </main>
-
       <style>{pageStyles}</style>
     </>
   );
 }
 
 const successStyles = `
-  .po-success-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-8);
-    background: var(--bg);
-  }
-  .po-success {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 400px;
-    gap: var(--space-3);
-  }
-  .po-success__ico {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    border: 1.5px solid oklch(from var(--primary) l c h / 0.35);
-    color: var(--primary);
-    margin-bottom: var(--space-2);
-  }
-  .po-success__title {
-    font-family: var(--font-display);
-    font-size: clamp(1.4rem, 3vw, 1.9rem);
-    font-weight: 900;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-  .po-success__text {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    line-height: 1.6;
-    max-width: 28ch;
-  }
-  .po-success__cabinet {
-    font-size: var(--text-xs);
-    color: var(--primary);
-    opacity: 0.75;
-  }
-  .po-success__btns {
-    display: flex;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  .po-success-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:var(--space-8); background:var(--bg); }
+  .po-success { display:flex; flex-direction:column; align-items:center; text-align:center; max-width:400px; gap:var(--space-3); }
+  .po-success__ico { display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; border:1.5px solid oklch(from var(--primary) l c h / 0.35); color:var(--primary); margin-bottom:var(--space-2); }
+  .po-success__title { font-family:var(--font-display); font-size:clamp(1.4rem,3vw,1.9rem); font-weight:900; color:var(--text); letter-spacing:-0.02em; }
+  .po-success__text { font-size:var(--text-sm); color:var(--text-muted); line-height:1.6; max-width:28ch; }
+  .po-success__cabinet { font-size:var(--text-xs); color:var(--primary); opacity:0.75; }
+  .po-success__btns { display:flex; gap:var(--space-2); margin-top:var(--space-2); flex-wrap:wrap; justify-content:center; }
 `;
 
 const pageStyles = `
-  .po {
-    min-height: 100vh;
-    background: var(--bg);
-  }
+  .po { min-height:100vh; background:var(--bg); }
 
-  /* ══ HERO ════════════════════════════════ */
   .po-hero {
     padding-block: clamp(3.5rem, 7vw, 5.5rem) clamp(2rem, 4vw, 3rem);
     border-bottom: 1px solid var(--border);
@@ -396,84 +263,39 @@ const pageStyles = `
     color: var(--text);
     letter-spacing: -0.035em;
   }
+  /* Hero description — full color, larger, semi-bold */
   .po-hero__sub {
-    font-size: var(--text-base);
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    font-weight: 500;
     color: var(--text);
-    line-height: 1.75;
+    line-height: 1.7;
     max-width: 34ch;
     align-self: end;
-    opacity: 0.75;
   }
 
-  /* ══ BODY ════════════════════════════════ */
-  .po-body {
-    padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16);
-  }
-  .po-body__inner {
-    max-width: 680px;
-    margin-inline: auto;
-    padding-inline: var(--space-4);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
+  .po-body { padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16); }
+  .po-body__inner { max-width:680px; margin-inline:auto; padding-inline:var(--space-4); display:flex; flex-direction:column; gap:var(--space-4); }
 
-  /* Session banner */
-  .po-session-banner {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    background: oklch(from var(--primary) l c h / 0.06);
-    border: 1px solid oklch(from var(--primary) l c h / 0.20);
-    border-radius: var(--radius-md);
-  }
-  .po-session-banner__ico {
-    color: var(--primary);
-    flex-shrink: 0;
-    margin-top: 1px;
-    opacity: 0.7;
-  }
-  .po-session-banner__text {
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
-  .po-session-banner__text strong {
-    color: var(--text);
-    font-weight: 600;
-  }
+  .po-session-banner { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-3) var(--space-4); background:oklch(from var(--primary) l c h / 0.06); border:1px solid oklch(from var(--primary) l c h / 0.20); border-radius:var(--radius-md); }
+  .po-session-banner__ico { color:var(--primary); flex-shrink:0; margin-top:1px; opacity:0.7; }
+  .po-session-banner__text { font-size:var(--text-xs); color:var(--text-muted); line-height:1.6; }
+  .po-session-banner__text strong { color:var(--text); font-weight:600; }
 
-  /* ══ FORM ════════════════════════════════ */
-  .po-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
+  .po-form { display:flex; flex-direction:column; gap:var(--space-1); }
 
-  /* Fieldset */
-  .po-fieldset {
-    border: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding-block: var(--space-5);
-    border-bottom: 1px solid var(--border);
-  }
-  .po-fieldset:last-of-type {
-    border-bottom: none;
-  }
+  .po-fieldset { border:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--space-3); padding-block:var(--space-5); border-bottom:1px solid var(--border); }
+  .po-fieldset:last-of-type { border-bottom:none; }
+
+  /* Section legend — more visible */
   .po-legend {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.10em;
-    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    color: var(--text);
     margin-bottom: var(--space-1);
     float: left;
     width: 100%;
@@ -481,144 +303,47 @@ const pageStyles = `
   }
   .po-legend__num {
     font-family: var(--font-display);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 900;
     color: var(--primary);
     letter-spacing: 0.04em;
   }
 
-  /* Fields grid */
-  .po-fields {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-  .po-fields--2col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3);
-  }
+  .po-fields { display:flex; flex-direction:column; gap:var(--space-3); }
+  .po-fields--2col { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); }
 
-  /* Field */
-  .po-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
+  .po-field { display:flex; flex-direction:column; gap:var(--space-2); }
+
+  /* Field labels — more visible */
   .po-field__label {
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--text-muted);
-  }
-  .po-required { color: var(--primary); }
-
-  /* Input */
-  .po-input-wrap {
-    position: relative;
-  }
-  .po-input-ico {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-faint);
-    pointer-events: none;
-    flex-shrink: 0;
-  }
-  .po-input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-4) var(--space-3) 2.25rem;
-    font-size: var(--text-sm);
     color: var(--text);
-    outline: none;
-    caret-color: var(--text);
-    font-family: var(--font-body);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  .po-input::placeholder { color: var(--text-faint); }
-  .po-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px oklch(from var(--primary) l c h / 0.12);
-  }
-  .po-input--mono {
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 0.06em;
-  }
+  .po-required { color:var(--primary); }
 
-  /* Autofill */
-  .po-input:-webkit-autofill,
-  .po-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 9999px var(--bg) inset !important;
-    -webkit-text-fill-color: var(--text) !important;
-    caret-color: var(--text);
-  }
+  .po-input-wrap { position:relative; }
+  .po-input-ico { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-faint); pointer-events:none; flex-shrink:0; }
+  .po-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--space-3) var(--space-4) var(--space-3) 2.25rem; font-size:var(--text-sm); color:var(--text); outline:none; caret-color:var(--text); font-family:var(--font-body); transition:border-color 0.15s ease, box-shadow 0.15s ease; }
+  .po-input::placeholder { color:var(--text-faint); }
+  .po-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px oklch(from var(--primary) l c h / 0.12); }
+  .po-input--mono { font-family:'Courier New',Courier,monospace; letter-spacing:0.06em; }
+  .po-input:-webkit-autofill, .po-input:-webkit-autofill:focus { -webkit-box-shadow:0 0 0 9999px var(--bg) inset !important; -webkit-text-fill-color:var(--text) !important; caret-color:var(--text); }
 
-  /* Textarea */
-  .po-textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-4);
-    font-size: var(--text-sm);
-    color: var(--text);
-    outline: none;
-    resize: none;
-    line-height: 1.65;
-    font-family: var(--font-body);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-  .po-textarea::placeholder { color: var(--text-faint); }
-  .po-textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px oklch(from var(--primary) l c h / 0.12);
-  }
+  .po-textarea { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--space-3) var(--space-4); font-size:var(--text-sm); color:var(--text); outline:none; resize:none; line-height:1.65; font-family:var(--font-body); transition:border-color 0.15s ease, box-shadow 0.15s ease; }
+  .po-textarea::placeholder { color:var(--text-faint); }
+  .po-textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px oklch(from var(--primary) l c h / 0.12); }
 
-  /* Error */
-  .po-error {
-    font-size: var(--text-xs);
-    color: oklch(0.55 0.18 15);
-    padding: var(--space-2) var(--space-3);
-    background: oklch(0.55 0.18 15 / 0.06);
-    border: 1px solid oklch(0.55 0.18 15 / 0.18);
-    border-radius: var(--radius-sm);
-  }
+  .po-error { font-size:var(--text-xs); color:oklch(0.55 0.18 15); padding:var(--space-2) var(--space-3); background:oklch(0.55 0.18 15 / 0.06); border:1px solid oklch(0.55 0.18 15 / 0.18); border-radius:var(--radius-sm); }
 
-  /* Submit */
-  .po-submit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    width: 100%;
-    padding-block: var(--space-3);
-    margin-top: var(--space-4);
-  }
-  .po-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .po-spinner {
-    display: inline-block;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    border: 2px solid oklch(1 0 0 / 0.25);
-    border-top-color: #fff;
-    animation: po-spin 0.65s linear infinite;
-    flex-shrink: 0;
-  }
-  @keyframes po-spin { to { transform: rotate(360deg); } }
+  .po-submit { display:inline-flex; align-items:center; justify-content:center; gap:var(--space-2); width:100%; padding-block:var(--space-3); margin-top:var(--space-4); }
+  .po-submit:disabled { opacity:0.6; cursor:not-allowed; }
+  .po-spinner { display:inline-block; width:14px; height:14px; border-radius:50%; border:2px solid oklch(1 0 0 / 0.25); border-top-color:#fff; animation:po-spin 0.65s linear infinite; flex-shrink:0; }
+  @keyframes po-spin { to { transform:rotate(360deg); } }
 
-  /* ══ RESPONSIVE ══════════════════════════════ */
   @media (max-width: 700px) {
-    .po-hero__inner {
-      grid-template-columns: 1fr;
-      gap: var(--space-4);
-    }
-    .po-hero__sub { max-width: 100%; }
-    .po-fields--2col { grid-template-columns: 1fr; }
+    .po-hero__inner { grid-template-columns:1fr; gap:var(--space-4); }
+    .po-hero__sub { max-width:100%; }
+    .po-fields--2col { grid-template-columns:1fr; }
   }
 `;
