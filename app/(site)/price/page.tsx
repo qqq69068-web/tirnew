@@ -18,7 +18,7 @@ export default function PricePage() {
         <section className="price-hero">
           <div className="price-hero__bg" aria-hidden>
             <img
-              src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1600&q=80"
+              src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80"
               alt=""
               width={1600}
               height={900}
@@ -139,7 +139,7 @@ export default function PricePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 50%;
+          object-position: center 40%;
         }
         .price-hero__overlay {
           position: absolute;
