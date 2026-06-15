@@ -21,10 +21,10 @@ export default function PricePage() {
         <section className="page-hero">
           <div className="page-hero__bg" aria-hidden>
             <img
-              src="https://images.unsplash.com/photo-1519003300449-424ad0405076?auto=format&fit=crop&w=1600&q=80"
+              src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/4b7ff1d1e9c7337632543ebc2f5e043734922980.jpg"
               alt=""
-              width={1600}
-              height={900}
+              width={2200}
+              height={1467}
               loading="eager"
               decoding="async"
               className="page-hero__img"
@@ -149,7 +149,6 @@ export default function PricePage() {
           color: var(--text);
         }
 
-        /* SHARED HERO — identical to /services */
         .page-hero {
           position: relative;
           min-height: 56vh;
@@ -168,7 +167,7 @@ export default function PricePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 40%;
+          object-position: center 30%;
           filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
         .page-hero__overlay {
@@ -228,7 +227,6 @@ export default function PricePage() {
           line-height: 1.75;
         }
 
-        /* rate card */
         .price-rate-card {
           display: inline-flex; align-items: center; gap: var(--space-4);
           background: var(--surface); border: 1px solid var(--border-strong);
@@ -246,7 +244,6 @@ export default function PricePage() {
         }
         .price-rate-card__unit { font-size: var(--text-sm); font-weight: 400; color: var(--text-muted); }
 
-        /* CONTENT */
         .price-content {
           padding-block: clamp(var(--space-6), 4vw, var(--space-10));
           display: flex; flex-direction: column; gap: var(--space-6);
@@ -259,7 +256,6 @@ export default function PricePage() {
         .price-note__icon { color: #d97706; flex-shrink: 0; margin-top: 2px; }
         .price-note__text { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; }
 
-        /* FILTER TABS */
         .price-filter {
           display: flex;
           flex-wrap: wrap;
@@ -299,7 +295,6 @@ export default function PricePage() {
           border-color: var(--primary-h);
         }
 
-        /* TABLES */
         .price-tables { display: flex; flex-direction: column; gap: var(--space-4); }
         .price-group {
           background: var(--surface); border: 1px solid var(--border);
@@ -352,7 +347,6 @@ export default function PricePage() {
         .price-row-item__price-max { font-size: var(--text-xs); color: var(--text-faint); margin-top: 2px; }
         .price-row-item__arrow { display: flex; justify-content: center; color: var(--text-faint); }
 
-        /* CTA */
         .price-cta {
           background: var(--surface); border: 1px solid var(--border);
           border-radius: var(--radius-xl); padding: clamp(var(--space-8), 5vw, var(--space-12));
@@ -365,7 +359,6 @@ export default function PricePage() {
         }
         .price-cta__sub { font-size: var(--text-base); color: var(--text-muted); max-width: 44ch; line-height: 1.65; }
 
-        /* RESPONSIVE */
         @media (max-width: 640px) {
           .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .price-table-head { display: none; }
