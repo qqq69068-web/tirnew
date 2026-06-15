@@ -29,7 +29,7 @@ export const services: ServiceItem[] = [
     priceMin: 0,
     priceMax: 0,
     hours: "1–5 днів",
-    image: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop&q=80",
     category: "Запчастини",
     vehicleType: "both",
     details: [
