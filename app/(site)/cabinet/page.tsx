@@ -216,7 +216,7 @@ function AuthForm() {
   if (sent) return (
     <div className="cb-auth-wrap cb-auth-sent">
       <div className="cb-auth-icon-wrap">
-        <Mail size={26} style={{ color: "var(--accent)" }} />
+        <Mail size={26} style={{ color: "var(--primary)" }} />
       </div>
       <h2 className="cb-auth-title">Перевірте пошту</h2>
       <p className="cb-auth-sub">
@@ -232,7 +232,7 @@ function AuthForm() {
   return (
     <div className="cb-auth-wrap">
       <div className="cb-auth-icon-wrap">
-        <User size={22} style={{ color: "var(--accent)" }} />
+        <User size={22} style={{ color: "var(--primary)" }} />
       </div>
       <h2 className="cb-auth-title">Увійти / зареєструватись</h2>
       <p className="cb-auth-sub">Введіть email — надішлемо посилання для входу. Без пароля.</p>
@@ -240,14 +240,14 @@ function AuthForm() {
       <form onSubmit={submit} className="cb-auth-form">
         <div className="cb-field">
           <label className="cb-label">
-            Email <span style={{ color: "var(--accent)" }}>*</span>
+            Email <span style={{ color: "var(--primary)" }}>*</span>
           </label>
           <div className="cb-input-wrap">
             <Mail size={14} className="cb-input-icon" />
             <input
               type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com" required className="cb-input"
-              onFocus={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+              onFocus={(e) => (e.currentTarget.style.borderColor = "var(--primary)")}
               onBlur={(e)  => (e.currentTarget.style.borderColor = "var(--border)")}
             />
           </div>
@@ -344,12 +344,12 @@ export default function CabinetPage() {
         .cb-page-hero::before {
           content: "";
           position: absolute; inset: 0;
-          background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(var(--accent-rgb, 185,28,28), 0.07) 0%, transparent 70%);
+          background: radial-gradient(ellipse 60% 80% at 50% 120%, var(--primary-glow) 0%, transparent 70%);
           pointer-events: none;
         }
         .cb-eyebrow {
           font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
-          text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+          text-transform: uppercase; color: var(--primary); margin-bottom: 10px;
         }
         .cb-page-title {
           font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 800;
@@ -382,7 +382,7 @@ export default function CabinetPage() {
           transition: box-shadow 0.22s, transform 0.22s;
         }
         .cb-stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
-        .cb-stat-icon { display: flex; justify-content: center; color: var(--accent); margin-bottom: 8px; }
+        .cb-stat-icon { display: flex; justify-content: center; color: var(--primary); margin-bottom: 8px; }
         .cb-stat-value { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
         .cb-stat-label { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
 
@@ -404,7 +404,7 @@ export default function CabinetPage() {
         .cb-card-header-right { text-align: right; flex-shrink: 0; margin-left: 12px; }
         .cb-card-car  { font-size: 14px; font-weight: 700; color: var(--text); }
         .cb-card-service { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
-        .cb-card-price { font-size: 17px; font-weight: 800; color: var(--accent); }
+        .cb-card-price { font-size: 17px; font-weight: 800; color: var(--primary); }
         .cb-card-price-tbd { font-size: 12px; color: var(--text-faint); }
         .cb-card-date { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
 
@@ -420,7 +420,7 @@ export default function CabinetPage() {
         /* ── Work items ── */
         .cb-work-items { margin-top: 14px; }
         .cb-work-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
-        .cb-work-check { color: var(--accent); flex-shrink: 0; }
+        .cb-work-check { color: var(--primary); flex-shrink: 0; }
 
         /* ── Progress track ── */
         .cb-progress-track { display: flex; align-items: center; gap: 4px; margin-top: 16px; flex-wrap: wrap; }
@@ -436,14 +436,14 @@ export default function CabinetPage() {
           border-color: var(--border);
         }
         .cb-progress-step--active {
-          background: rgba(var(--accent-rgb, 185,28,28), 0.12);
-          color: var(--accent); border-color: rgba(var(--accent-rgb, 185,28,28), 0.3);
+          background: var(--primary-subtle);
+          color: var(--primary); border-color: var(--border-accent);
         }
         .cb-progress-step--done {
-          background: var(--accent); color: #fff; border-color: var(--accent);
+          background: var(--primary); color: var(--text-inverse); border-color: var(--primary);
         }
         .cb-progress-arrow { color: var(--text-faint); flex-shrink: 0; }
-        .cb-progress-arrow--done { color: var(--accent); }
+        .cb-progress-arrow--done { color: var(--primary); }
 
         /* ── Section eyebrow ── */
         .cb-section-eyebrow {
@@ -457,11 +457,11 @@ export default function CabinetPage() {
         .cb-empty-text { font-size: 14px; color: var(--text-muted); margin-bottom: 14px; }
         .cb-empty-link {
           display: inline-flex; align-items: center; gap: 5px;
-          font-size: 13px; font-weight: 600; color: var(--accent);
-          text-decoration: none; border-bottom: 1px solid rgba(var(--accent-rgb,185,28,28),0.3);
+          font-size: 13px; font-weight: 600; color: var(--primary);
+          text-decoration: none; border-bottom: 1px solid var(--border-accent);
           padding-bottom: 1px; transition: border-color 0.18s;
         }
-        .cb-empty-link:hover { border-color: var(--accent); }
+        .cb-empty-link:hover { border-color: var(--primary); }
 
         /* ── Auth form ── */
         .cb-auth-wrap {
@@ -471,14 +471,14 @@ export default function CabinetPage() {
         .cb-auth-sent { padding-top: 24px; }
         .cb-auth-icon-wrap {
           width: 56px; height: 56px; border-radius: 14px;
-          background: rgba(var(--accent-rgb, 185,28,28), 0.09);
+          background: var(--primary-subtle);
           display: flex; align-items: center; justify-content: center;
           margin-bottom: 14px;
         }
         .cb-auth-title { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
         .cb-auth-sub   { font-size: 13px; color: var(--text-muted); max-width: 30ch; line-height: 1.55; }
         .cb-auth-back  {
-          margin-top: 18px; font-size: 13px; color: var(--accent);
+          margin-top: 18px; font-size: 13px; color: var(--primary);
           background: none; border: none; cursor: pointer;
           text-decoration: underline; text-underline-offset: 3px;
         }
@@ -504,13 +504,13 @@ export default function CabinetPage() {
         /* ── Submit button ── */
         .cb-submit-btn {
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          background: var(--accent); color: #fff; font-weight: 700; font-size: 13px;
+          background: var(--primary); color: var(--text-inverse); font-weight: 700; font-size: 13px;
           padding: 12px; border-radius: 10px; border: none; cursor: pointer;
           transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
         }
         .cb-submit-btn:hover:not(:disabled) {
           opacity: 0.88; transform: translateY(-1px);
-          box-shadow: 0 4px 14px rgba(var(--accent-rgb, 185,28,28), 0.35);
+          box-shadow: var(--shadow-primary);
         }
         .cb-submit-btn:active:not(:disabled) { transform: translateY(0); }
         .cb-submit-btn--loading { opacity: 0.65; cursor: not-allowed; }
@@ -518,7 +518,7 @@ export default function CabinetPage() {
         /* ── Spinner ── */
         .cb-spinner {
           display: inline-block; width: 16px; height: 16px; border-radius: 50%;
-          border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff;
+          border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--text-inverse);
           animation: spin 0.65s linear infinite;
         }
 
