@@ -15,8 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { TirnewLogo } from "@/components/TirnewLogo";
-import { BookingButton } from "@/components/BookingButton";
-import { AiChat } from "@/components/AiChat";
+import BookingButton from "@/components/BookingButton";
+import AiChat from "@/components/AiChat";
 
 const footerServices = [
   { label: "Діагностика двигуна", href: "/services/diahnostyka-dvyhuna" },
