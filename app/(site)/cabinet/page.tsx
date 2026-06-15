@@ -194,10 +194,30 @@ function CabinetSkeleton() {
 }
 
 /* ─── AuthForm ─── */
-function AuthForm() {
+function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Start polling /api/client/me after magic link is sent.
+  // When verify runs in another tab and sets the cookie, this poll catches it.
+  useEffect(() => {
+    if (!sent) return;
+
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch("/api/client/me", { credentials: "include" });
+        if (res.ok) {
+          const data: Client = await res.json();
+          clearInterval(pollRef.current!);
+          onLogin(data);
+        }
+      } catch { /* network error, keep polling */ }
+    }, 2000);
+
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [sent, onLogin]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
@@ -211,7 +231,7 @@ function AuthForm() {
 
   if (sent) return (
     <div className="cb-auth-wrap cb-auth-sent">
-      <div className="cb-auth-icon-wrap">
+      <div className="cb-auth-icon-wrap cb-auth-icon-pulse">
         <Mail size={26} style={{ color: "var(--cb-green)" }} />
       </div>
       <h2 className="cb-auth-title">Перевірте пошту</h2>
@@ -219,6 +239,10 @@ function AuthForm() {
         Надіслали посилання для входу на{" "}
         <strong style={{ color: "var(--text)" }}>{email}</strong>. Воно діє 30 хвилин.
       </p>
+      <div className="cb-auth-waiting">
+        <span className="cb-dot" /><span className="cb-dot" /><span className="cb-dot" />
+        <span>Чекаємо підтвердження…</span>
+      </div>
       <button className="cb-auth-back" onClick={() => { setSent(false); setEmail(""); }}>
         ← Ввести інший email
       </button>
@@ -282,7 +306,7 @@ function CabinetContent() {
   };
 
   if (loading) return <CabinetSkeleton />;
-  if (!client)  return <AuthForm />;
+  if (!client)  return <AuthForm onLogin={(data) => setClient(data)} />;
 
   return (
     <div className="cb-content">
@@ -477,6 +501,14 @@ export default function CabinetPage() {
           display: flex; align-items: center; justify-content: center;
           margin-bottom: 14px;
         }
+        /* Pulse animation on icon when waiting */
+        .cb-auth-icon-pulse {
+          animation: iconPulse 2s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(74,158,107,0.0); }
+          50%       { box-shadow: 0 0 0 10px rgba(74,158,107,0.12); }
+        }
         .cb-auth-title { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
         .cb-auth-sub   { font-size: 13px; color: var(--text-muted); max-width: 30ch; line-height: 1.55; }
         .cb-auth-back  {
@@ -490,6 +522,23 @@ export default function CabinetPage() {
           display: flex; flex-direction: column; gap: 14px; margin-top: 22px;
         }
         .cb-auth-hint { font-size: 11px; color: var(--text-faint); margin-top: 12px; }
+
+        /* ── Waiting indicator ── */
+        .cb-auth-waiting {
+          display: flex; align-items: center; justify-content: center; gap: 6px;
+          margin-top: 18px; font-size: 12px; color: var(--text-faint);
+        }
+        .cb-dot {
+          display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+          background: #4a9e6b; opacity: 0.5;
+          animation: dotBounce 1.3s ease-in-out infinite;
+        }
+        .cb-dot:nth-child(2) { animation-delay: 0.15s; }
+        .cb-dot:nth-child(3) { animation-delay: 0.30s; }
+        @keyframes dotBounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+          40%           { transform: translateY(-5px); opacity: 1; }
+        }
 
         /* ── Field / input ── */
         .cb-field { display: flex; flex-direction: column; gap: 6px; text-align: left; }
