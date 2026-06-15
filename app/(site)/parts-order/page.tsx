@@ -77,7 +77,7 @@ export default function PartsOrderPage() {
             </div>
             <h2 className="po-success__title">Заявку отримано</h2>
             <p className="po-success__text">
-              Наш менеджер зв’яжеться з вами найближчим часом.
+              Наш менеджер зв'яжеться з вами найближчим часом.
             </p>
             {session && (
               <p className="po-success__cabinet">
@@ -124,7 +124,7 @@ export default function PartsOrderPage() {
               <div className="po-session-banner">
                 <Info size={13} className="po-session-banner__ico" aria-hidden />
                 <p className="po-session-banner__text">
-                  Замовлення буде прив’язано до вашого кабінету{" "}
+                  Замовлення буде прив'язано до вашого кабінету{" "}
                   <strong>{session.email}</strong>
                 </p>
               </div>
@@ -208,7 +208,7 @@ export default function PartsOrderPage() {
                 </div>
                 <div className="po-field">
                   <label htmlFor="vin" className="po-field__label">
-                    VIN-код (необов’язково)
+                    VIN-код (необов'язково)
                   </label>
                   <div className="po-input-wrap">
                     <Hash size={13} className="po-input-ico" aria-hidden />
@@ -233,7 +233,7 @@ export default function PartsOrderPage() {
                 <div className="po-fields po-fields--2col">
                   <div className="po-field">
                     <label htmlFor="name" className="po-field__label">
-                      Ім’я <span className="po-required" aria-hidden>*</span>
+                      Ім'я <span className="po-required" aria-hidden>*</span>
                     </label>
                     <div className="po-input-wrap">
                       <User size={13} className="po-input-ico" aria-hidden />
@@ -397,11 +397,12 @@ const pageStyles = `
     letter-spacing: -0.035em;
   }
   .po-hero__sub {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
+    font-size: var(--text-base);
+    color: var(--text);
     line-height: 1.75;
     max-width: 34ch;
     align-self: end;
+    opacity: 0.75;
   }
 
   /* ══ BODY ════════════════════════════════ */
