@@ -54,8 +54,8 @@ export default function ServicesPage() {
       <div ref={ref} className="svc-page">
 
         {/* ═══ HERO ══════════════════════════════════ */}
-        <section className="svc-hero">
-          <div className="svc-hero__bg" aria-hidden>
+        <section className="page-hero">
+          <div className="page-hero__bg" aria-hidden>
             <img
               src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80"
               alt=""
@@ -63,19 +63,18 @@ export default function ServicesPage() {
               height={900}
               loading="eager"
               decoding="async"
-              className="svc-hero__img"
+              className="page-hero__img"
             />
-            <div className="svc-hero__overlay" />
+            <div className="page-hero__overlay" />
           </div>
 
-          <div className="container svc-hero__content fade-in">
-            <div className="svc-hero__label">
-              <span className="svc-hero__label-line" aria-hidden />
+          <div className="container page-hero__inner fade-in">
+            <p className="page-eyebrow">
               <Wrench size={10} aria-hidden />
               Каталог послуг
-            </div>
-            <h1 className="svc-hero__title">Ремонт і обслуговування<br />вантажного транспорту</h1>
-            <p className="svc-hero__sub">
+            </p>
+            <h1 className="page-hero__title">Ремонт і обслуговування<br />вантажного транспорту</h1>
+            <p className="page-hero__sub">
               Повний цикл діагностики, ремонту та обслуговування TIR,<br />
               причіпної техніки та легкових автомобілів.
             </p>
@@ -97,7 +96,6 @@ export default function ServicesPage() {
               </div>
             </div>
           </div>
-          {/* fade removed — sharp photo edge */}
         </section>
 
         {/* ═══ TABS ══════════════════════════════════ */}
@@ -215,26 +213,27 @@ export default function ServicesPage() {
         }
 
         /* ═══════════════════════════════════════════
-           HERO
+           SHARED HERO STYLES (reused from price page)
         ═══════════════════════════════════════════ */
-        .svc-hero {
+        .page-hero {
           position: relative;
-          min-height: 44vh;
+          min-height: 52vh;
           display: flex;
           align-items: flex-end;
           overflow: hidden;
+          border-bottom: 1px solid var(--border);
         }
-        .svc-hero__bg {
+        .page-hero__bg {
           position: absolute; inset: 0; z-index: 0;
           overflow: hidden;
         }
-        .svc-hero__img {
+        .page-hero__img {
           width: 100%; height: 100%;
           object-fit: cover;
           object-position: center 35%;
           filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
-        .svc-hero__overlay {
+        .page-hero__overlay {
           position: absolute; inset: 0;
           background:
             linear-gradient(
@@ -244,15 +243,19 @@ export default function ServicesPage() {
               oklch(0.09 0.015 55 / 0.08) 100%
             );
         }
-        .svc-hero__content {
+        .page-hero__inner {
           position: relative; z-index: 2;
           padding-block: clamp(3rem, 8vw, 5rem) 3.5rem;
           max-width: 700px;
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-3);
           text-align: left;
+          align-items: flex-start;
           margin-left: 0;
           margin-right: auto;
         }
-        .svc-hero__label {
+        .page-eyebrow {
           display: inline-flex;
           align-items: center;
           gap: 10px;
@@ -261,32 +264,32 @@ export default function ServicesPage() {
           letter-spacing: 0.13em;
           text-transform: uppercase;
           color: oklch(1 0 0 / 0.38);
-          margin-bottom: var(--space-5);
         }
-        .svc-hero__label-line {
+        .page-eyebrow::before {
+          content: '';
           display: inline-block;
           width: 22px; height: 1px;
           background: var(--primary);
           flex-shrink: 0;
         }
-        .svc-hero__title {
+        .page-hero__title {
           font-family: var(--font-display);
           font-size: clamp(1.9rem, 4.5vw, 3.6rem);
           font-weight: 900;
           line-height: 1.04;
           letter-spacing: -0.03em;
           color: #fff;
-          margin-bottom: var(--space-4);
           text-align: left;
         }
-        .svc-hero__sub {
+        .page-hero__sub {
           font-size: var(--text-sm);
           color: oklch(1 0 0 / 0.48);
           line-height: 1.75;
-          margin-bottom: var(--space-8);
           max-width: 52ch;
           text-align: left;
         }
+
+        /* stats row */
         .svc-hero__meta {
           display: flex;
           align-items: center;
@@ -320,7 +323,7 @@ export default function ServicesPage() {
         }
 
         /* ═══════════════════════════════════════════
-           TABS — sits directly below hero, no gap
+           TABS
         ═══════════════════════════════════════════ */
         .svc-tabs-bar {
           background: var(--bg);
@@ -380,7 +383,6 @@ export default function ServicesPage() {
           padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16);
           background: var(--bg);
         }
-
         .svc-list-container {
           max-width: 860px;
           margin-inline: auto;
@@ -389,7 +391,6 @@ export default function ServicesPage() {
           flex-direction: column;
           gap: var(--space-6);
         }
-
         .svc-list-head {
           display: flex;
           align-items: flex-end;
@@ -415,7 +416,6 @@ export default function ServicesPage() {
           flex-shrink: 0;
           padding-bottom: 4px;
         }
-
         .svc-list {
           display: flex;
           flex-direction: column;
@@ -423,7 +423,6 @@ export default function ServicesPage() {
           padding: 0;
           margin: 0;
         }
-
         .svc-row {
           display: flex;
           align-items: center;
@@ -603,7 +602,7 @@ export default function ServicesPage() {
           .svc-cta__right { flex-direction: row; flex-wrap: wrap; }
         }
         @media (max-width: 640px) {
-          .svc-hero__content { padding-block: 2.5rem 2.5rem; }
+          .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .svc-hero__divider { margin-inline: var(--space-4); }
           .svc-row__idx   { display: none; }
           .svc-row__price { display: none; }

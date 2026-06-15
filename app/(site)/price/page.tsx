@@ -18,8 +18,8 @@ export default function PricePage() {
       <div className="price-page">
 
         {/* ─── HERO ────────────────────────────────────── */}
-        <section className="price-hero">
-          <div className="price-hero__bg" aria-hidden>
+        <section className="page-hero">
+          <div className="page-hero__bg" aria-hidden>
             <img
               src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=80"
               alt=""
@@ -27,14 +27,14 @@ export default function PricePage() {
               height={900}
               loading="eager"
               decoding="async"
-              className="price-hero__img"
+              className="page-hero__img"
             />
-            <div className="price-hero__overlay" />
+            <div className="page-hero__overlay" />
           </div>
-          <div className="price-hero__inner container">
-            <p className="price-eyebrow">Вартість робіт</p>
-            <h1 className="price-hero__title">Прайс на послуги</h1>
-            <p className="price-hero__sub">
+          <div className="page-hero__inner container">
+            <p className="page-eyebrow">Вартість робіт</p>
+            <h1 className="page-hero__title">Прайс на послуги</h1>
+            <p className="page-hero__sub">
               Вартість розраховується за нормогодинами. Кінцева ціна — після огляду та дефектації.
             </p>
             <div className="price-rate-card">
@@ -149,62 +149,86 @@ export default function PricePage() {
           color: var(--text);
         }
 
-        /* ─── HERO ─────────────────────────────────── */
-        .price-hero {
+        /* ─── SHARED HERO (price + services) ─────── */
+        .page-hero {
           position: relative;
-          min-height: 44vh;
+          min-height: 52vh;
           display: flex;
           align-items: flex-end;
           overflow: hidden;
-          padding: clamp(var(--space-8), 6vw, var(--space-16)) 0 clamp(var(--space-6), 4vw, var(--space-10));
           border-bottom: 1px solid var(--border);
         }
-        .price-hero__bg {
+        .page-hero__bg {
           position: absolute;
           inset: 0;
           z-index: 0;
           overflow: hidden;
         }
-        .price-hero__img {
+        .page-hero__img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 40%;
+          object-position: center 35%;
+          filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
-        .price-hero__overlay {
+        .page-hero__overlay {
           position: absolute;
           inset: 0;
           background:
             linear-gradient(
               108deg,
               oklch(0.09 0.015 55 / 0.92) 0%,
-              oklch(0.09 0.015 55 / 0.55) 55%,
-              oklch(0.09 0.015 55 / 0.15) 100%
+              oklch(0.09 0.015 55 / 0.50) 55%,
+              oklch(0.09 0.015 55 / 0.08) 100%
             );
         }
-        .price-hero__inner {
+        .page-hero__inner {
           position: relative;
           z-index: 2;
+          padding-block: clamp(3rem, 8vw, 5rem) 3.5rem;
+          max-width: 700px;
           display: flex;
           flex-direction: column;
           gap: var(--space-3);
           text-align: left;
           align-items: flex-start;
+          margin-left: 0;
+          margin-right: auto;
         }
-        .price-eyebrow {
-          font-size: var(--text-xs); font-weight: 700;
-          text-transform: uppercase; letter-spacing: 0.14em; color: var(--primary);
+        .page-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: var(--text-xs);
+          font-weight: 600;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+          color: oklch(1 0 0 / 0.38);
         }
-        .price-hero__title {
+        .page-eyebrow::before {
+          content: '';
+          display: inline-block;
+          width: 22px; height: 1px;
+          background: var(--primary);
+          flex-shrink: 0;
+        }
+        .page-hero__title {
           font-family: var(--font-display);
-          font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
-          color: #ffffff;
-          line-height: 1.08; letter-spacing: -0.02em;
+          font-size: clamp(1.9rem, 4.5vw, 3.6rem);
+          font-weight: 900;
+          line-height: 1.04;
+          letter-spacing: -0.03em;
+          color: #fff;
           text-shadow: 0 2px 12px rgba(0,0,0,0.35);
         }
-        .price-hero__sub {
-          font-size: var(--text-base); color: rgba(255,255,255,0.72); max-width: 52ch; line-height: 1.7;
+        .page-hero__sub {
+          font-size: var(--text-sm);
+          color: oklch(1 0 0 / 0.48);
+          max-width: 52ch;
+          line-height: 1.75;
         }
+
+        /* rate card */
         .price-rate-card {
           display: inline-flex; align-items: center; gap: var(--space-4);
           background: var(--surface); border: 1px solid var(--border-strong);
@@ -343,6 +367,7 @@ export default function PricePage() {
 
         /* ─── RESPONSIVE ─────────────────────────── */
         @media (max-width: 640px) {
+          .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .price-table-head { display: none; }
           .price-row-item {
             grid-template-columns: 1fr auto;
