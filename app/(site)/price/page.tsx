@@ -149,10 +149,10 @@ export default function PricePage() {
           color: var(--text);
         }
 
-        /* ─── SHARED HERO (price + services) ─────── */
+        /* SHARED HERO — identical to /services */
         .page-hero {
           position: relative;
-          min-height: 52vh;
+          min-height: 56vh;
           display: flex;
           align-items: flex-end;
           overflow: hidden;
@@ -168,7 +168,7 @@ export default function PricePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 35%;
+          object-position: center 38%;
           filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
         .page-hero__overlay {
@@ -246,7 +246,7 @@ export default function PricePage() {
         }
         .price-rate-card__unit { font-size: var(--text-sm); font-weight: 400; color: var(--text-muted); }
 
-        /* ─── CONTENT ────────────────────────────── */
+        /* CONTENT */
         .price-content {
           padding-block: clamp(var(--space-6), 4vw, var(--space-10));
           display: flex; flex-direction: column; gap: var(--space-6);
@@ -259,7 +259,7 @@ export default function PricePage() {
         .price-note__icon { color: #d97706; flex-shrink: 0; margin-top: 2px; }
         .price-note__text { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; }
 
-        /* ─── FILTER TABS ─────────────────────────── */
+        /* FILTER TABS */
         .price-filter {
           display: flex;
           flex-wrap: wrap;
@@ -299,7 +299,7 @@ export default function PricePage() {
           border-color: var(--primary-h);
         }
 
-        /* ─── TABLES ──────────────────────────────── */
+        /* TABLES */
         .price-tables { display: flex; flex-direction: column; gap: var(--space-4); }
         .price-group {
           background: var(--surface); border: 1px solid var(--border);
@@ -352,7 +352,7 @@ export default function PricePage() {
         .price-row-item__price-max { font-size: var(--text-xs); color: var(--text-faint); margin-top: 2px; }
         .price-row-item__arrow { display: flex; justify-content: center; color: var(--text-faint); }
 
-        /* ─── CTA ────────────────────────────────── */
+        /* CTA */
         .price-cta {
           background: var(--surface); border: 1px solid var(--border);
           border-radius: var(--radius-xl); padding: clamp(var(--space-8), 5vw, var(--space-12));
@@ -365,7 +365,7 @@ export default function PricePage() {
         }
         .price-cta__sub { font-size: var(--text-base); color: var(--text-muted); max-width: 44ch; line-height: 1.65; }
 
-        /* ─── RESPONSIVE ─────────────────────────── */
+        /* RESPONSIVE */
         @media (max-width: 640px) {
           .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .price-table-head { display: none; }

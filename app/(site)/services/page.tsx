@@ -73,10 +73,9 @@ export default function ServicesPage() {
               <Wrench size={10} aria-hidden />
               Каталог послуг
             </p>
-            <h1 className="page-hero__title">Ремонт і обслуговування<br />вантажного транспорту</h1>
+            <h1 className="page-hero__title">Ремонт і обслуговування вантажного транспорту</h1>
             <p className="page-hero__sub">
-              Повний цикл діагностики, ремонту та обслуговування TIR,<br />
-              причіпної техніки та легкових автомобілів.
+              Повний цикл діагностики, ремонту та обслуговування TIR, причіпної техніки та легкових автомобілів.
             </p>
 
             <div className="svc-hero__meta">
@@ -180,7 +179,7 @@ export default function ServicesPage() {
             <div className="svc-cta reveal">
               <div className="svc-cta__left">
                 <p className="hp-label">Консультація</p>
-                <h2 className="svc-cta__title">Не знаєте,<br />яка послуга потрібна?</h2>
+                <h2 className="svc-cta__title">Не знаєте, яка послуга потрібна?</h2>
                 <p className="svc-cta__text">
                   Зателефонуйте — опишемо проблему і запишемо на зручний час.
                   Або задайте питання AI‑асистенту прямо на сайті.
@@ -212,12 +211,10 @@ export default function ServicesPage() {
           background: var(--bg);
         }
 
-        /* ═══════════════════════════════════════════
-           SHARED HERO STYLES (reused from price page)
-        ═══════════════════════════════════════════ */
+        /* SHARED HERO — identical to /price */
         .page-hero {
           position: relative;
-          min-height: 52vh;
+          min-height: 56vh;
           display: flex;
           align-items: flex-end;
           overflow: hidden;
@@ -230,7 +227,7 @@ export default function ServicesPage() {
         .page-hero__img {
           width: 100%; height: 100%;
           object-fit: cover;
-          object-position: center 35%;
+          object-position: center 38%;
           filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
         .page-hero__overlay {
@@ -322,9 +319,7 @@ export default function ServicesPage() {
           font-weight: 600;
         }
 
-        /* ═══════════════════════════════════════════
-           TABS
-        ═══════════════════════════════════════════ */
+        /* TABS */
         .svc-tabs-bar {
           background: var(--bg);
           border-bottom: 1px solid var(--border);
@@ -376,9 +371,7 @@ export default function ServicesPage() {
           color: var(--primary);
         }
 
-        /* ═══════════════════════════════════════════
-           LIST SECTION
-        ═══════════════════════════════════════════ */
+        /* LIST SECTION */
         .svc-list-section {
           padding-block: clamp(var(--space-8), 4vw, var(--space-12)) var(--space-16);
           background: var(--bg);
@@ -533,9 +526,7 @@ export default function ServicesPage() {
         }
         .parts-banner:hover .parts-banner__cta { opacity: 1; gap: var(--space-2); }
 
-        /* ═══════════════════════════════════════════
-           CTA
-        ═══════════════════════════════════════════ */
+        /* CTA */
         .svc-cta {
           display: grid;
           grid-template-columns: 1fr auto;
@@ -594,9 +585,7 @@ export default function ServicesPage() {
           flex-shrink: 0;
         }
 
-        /* ═══════════════════════════════════════════
-           RESPONSIVE
-        ═══════════════════════════════════════════ */
+        /* RESPONSIVE */
         @media (max-width: 860px) {
           .svc-cta { grid-template-columns: 1fr; }
           .svc-cta__right { flex-direction: row; flex-wrap: wrap; }
