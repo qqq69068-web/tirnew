@@ -126,9 +126,9 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        {/* Category chips — full-width scroll, no container wrapper */}
+        {/* Category chips — 2-row wrap layout */}
         <div className="svc-chips-bar">
-          <div className="svc-chips-scroll">
+          <div className="container svc-chips-wrap">
             <button
               className={`svc-chip${!activeCategory ? " svc-chip--active" : ""}`}
               onClick={() => setActiveCategory(null)}
@@ -364,24 +364,21 @@ export default function ServicesPage() {
           border-color: oklch(from var(--primary) l c h / 0.25);
           color: var(--primary);
         }
-        /* Category chips */
+        /* Category chips — 2-row wrap */
         .svc-chips-bar {
           background: var(--bg);
           border-bottom: 1px solid var(--border);
           padding-block: var(--space-3);
         }
-        .svc-chips-scroll {
+        .svc-chips-wrap {
           display: flex;
+          flex-wrap: wrap;
           align-items: center;
           gap: var(--space-2);
-          overflow-x: auto;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-          /* Full viewport width with page-aligned left start and right breathing room */
-          padding-inline: max(var(--space-4), calc((100vw - var(--content-max, 1200px)) / 2 + var(--space-4)));
-          padding-block: 2px;
+          /* limit to 2 rows by capping height — each chip is 34px, 2 rows + gap */
+          max-height: calc(34px * 2 + var(--space-2));
+          overflow: hidden;
         }
-        .svc-chips-scroll::-webkit-scrollbar { display: none; }
         .svc-chip {
           display: inline-flex;
           align-items: center;
@@ -525,7 +522,7 @@ export default function ServicesPage() {
           .svc-hero__divider { display: none; }
           .svc-grid { grid-template-columns: 1fr; }
           .svc-intro { flex-direction: column; align-items: flex-start; }
-          .svc-chips-scroll { padding-inline: var(--space-4); }
+          .svc-chips-wrap { max-height: none; }
         }
       `}</style>
     </>
