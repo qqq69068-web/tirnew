@@ -20,7 +20,7 @@ export default function PricePage() {
         <section className="page-hero">
           <div className="page-hero__bg" aria-hidden>
             <img
-              src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/4b7ff1d1e9c7337632543ebc2f5e043734922980.jpg"
+              src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=2200&auto=format&fit=crop&q=80"
               alt=""
               width={2200}
               height={1467}
@@ -177,7 +177,7 @@ export default function PricePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 30%;
+          object-position: center 40%;
           filter: brightness(0.38) contrast(1.05) saturate(0.7);
         }
         .page-hero__overlay {
