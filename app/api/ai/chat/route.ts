@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { jwtVerify } from "jose";
-import { services } from "@/lib/services";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
@@ -21,7 +20,7 @@ type ClientLite = {
   bookings: ClientBookingLite[];
 };
 
-const SYSTEM_INFO = `
+const BASE_INFO = `
 Ти — AI-помічник сервісного центру Tirnew Truck Service. Відповідай тільки українською мовою.
 Ти — професійний адміністратор сервісу. Ніколи не вигадуй дані.
 
@@ -31,9 +30,6 @@ const SYSTEM_INFO = `
 - Телефон: +38 (066) 418-88-26
 - Графік роботи: Понеділок–Субота, 08:00–18:00, неділя — вихідний
 - Спеціалізація: ремонт і обслуговування вантажних автомобілів, причепів, напівпричепів, легкових авто
-
-Послуги сервісу (список):
-${services.map((s) => `- ${s.title} (${s.vehicleType === "truck" ? "вантажні/ТІР" : "легкові"}): ${s.price || "уточнюйте"}`).join("\n")}
 
 ФУНКЦІЯ ЗАПИСУ:
 Ти МОЖЕШ безпосередньо записати клієнта на послугу — не тільки перенаправляти на /booking.
@@ -62,6 +58,49 @@ ${services.map((s) => `- ${s.title} (${s.vehicleType === "truck" ? "вантаж
 3. Якщо не знаєш точної відповіді — чесно скажи і запропонуй зателефонувати.
 4. Остаточний діагноз можливий лише після огляду.
 `;
+
+async function buildSystemPrompt(): Promise<string> {
+  try {
+    const dbServices = await prisma.service.findMany({
+      where: { active: true },
+      orderBy: { order: "asc" },
+      select: {
+        title: true,
+        category: true,
+        price: true,
+        priceMin: true,
+        priceMax: true,
+        priceCar: true,
+        priceTruck: true,
+        priceTrailer: true,
+        short: true,
+        hours: true,
+      },
+    });
+
+    const serviceLines = dbServices.map((s) => {
+      let priceStr = s.price || "";
+      const parts: string[] = [];
+      if (s.priceCar != null)     parts.push(`легкове: ${s.priceCar} ₴`);
+      if (s.priceTruck != null)   parts.push(`вантажне/тягач: ${s.priceTruck} ₴`);
+      if (s.priceTrailer != null) parts.push(`причіп: ${s.priceTrailer} ₴`);
+      if (parts.length > 0) priceStr = parts.join(", ");
+      else if (s.priceMin > 0)    priceStr = `від ${s.priceMin} ₴`;
+
+      const hours = s.hours ? `, ~${s.hours}` : "";
+      return `- ${s.title} [${s.category}]: ${priceStr}${hours}`;
+    });
+
+    return (
+      BASE_INFO +
+      `\nПослуги сервісу (актуальний список з бази даних):\n` +
+      serviceLines.join("\n") +
+      "\n"
+    );
+  } catch {
+    return BASE_INFO + "\n(список послуг тимчасово недоступний)\n";
+  }
+}
 
 async function getClientFromRequest(req: NextRequest): Promise<ClientLite | null> {
   const token = req.cookies.get("client_token")?.value;
@@ -101,7 +140,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "messages required" }, { status: 400 });
     }
 
-    const client = await getClientFromRequest(req);
+    const [client, systemPrompt] = await Promise.all([
+      getClientFromRequest(req),
+      buildSystemPrompt(),
+    ]);
 
     let userContext = "";
     if (client) {
@@ -133,7 +175,7 @@ BEZ email-а не створюй запис!
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: SYSTEM_INFO + userContext },
+          { role: "system", content: systemPrompt + userContext },
           ...messages.slice(-14),
         ],
         max_tokens: 700,
@@ -182,7 +224,7 @@ function getRuleBasedReply(msg: string, client: ClientLite | null): string {
     return "⏰ Ми працюємо:\nПонеділок–Субота: 08:00–18:00\nНеділя: вихідний";
   }
   if (msg.includes("історія") || msg.includes("ремонтів")) {
-    if (!client) return "Для перегляду історії ремонтів надішлеміть ваш email — ми відправимо посилання для входу.";
+    if (!client) return "Для перегляду історії ремонтів надішліть ваш email — ми відправимо посилання для входу.";
     const done = client.bookings.filter((b) => b.status === "done");
     if (done.length === 0) return "У вас поки немає завершених ремонтів в системі.";
     return `Ваші останні ремонти:\n${done.slice(0, 5).map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"}`).join("\n")}`;
