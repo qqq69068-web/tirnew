@@ -311,6 +311,26 @@ const services = [
     details: ["Гальмівні вали S-подібного типу", "Кронштейни ресорної підвіски", "Відновлення посадкових місць", "Дешевша альтернатива заміні"],
     order: 22,
   },
+  // ── Запчастини для вантажних ──────────────────────────────────────────────
+  {
+    slug: "truck-zapchastyny",
+    title: "Замовлення запчастин через нашу фірму",
+    short: "Підбір та доставка оригінальних і якісних аналогів запчастин для вантажного транспорту без зайвих клопотів.",
+    description: "Допомагаємо підібрати та замовити потрібні запчастини для вантажних автомобілів і причіпної техніки. Підбір за VIN-кодом, каталогом або артикулом. Оригінали та якісні аналоги з гарантією.",
+    price: "За запитом",
+    priceMin: 0,
+    priceMax: 0,
+    hours: "1–3 дні",
+    image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&auto=format&fit=crop",
+    category: "Запчастини",
+    details: [
+      "Підбір за VIN або артикулом",
+      "Оригінали та перевірені аналоги",
+      "Доставка в день замовлення",
+      "Гарантія на деталі",
+    ],
+    order: 23,
+  },
   // ── Легкові авто ──────────────────────────────────────────────────────────
   {
     slug: "car-diagnostyka",
@@ -321,7 +341,6 @@ const services = [
     priceMin: 150,
     priceMax: 400,
     hours: "1–2 год",
-    // OBD2 scanner connected to car port
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/8acfd22d2ad739075bf6f247cd5c780b04484f15.jpg",
     category: "Діагностика",
     details: ["Усі марки легкових авто", "Зчитування та скидання помилок", "Перевірка датчиків і сенсорів", "Детальний звіт після діагностики"],
@@ -350,7 +369,6 @@ const services = [
     priceMin: 300,
     priceMax: 3000,
     hours: "2–8 год",
-    // Suspension strut replacement
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/04c049a09aa7dc21d7452753fd451bc3ad27a7fa.jpg",
     category: "Ходова частина",
     details: ["Стійки та амортизатори", "Кульові опори та тяги", "Стабілізатори поперечної стійкості", "Перевірка розвалу після ремонту"],
@@ -393,7 +411,6 @@ const services = [
     priceMin: 1500,
     priceMax: 12000,
     hours: "10–40 год",
-    // Mechanic working on car engine under open hood
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/81f698ef495625139620141ebed149493294dc34.jpg",
     category: "Двигун",
     details: ["Капітальний і частковий ремонт", "Заміна прокладки ГБЦ", "Ремонт ГРМ і фазорегулятора", "Діагностика компресії та витоків"],
@@ -408,7 +425,6 @@ const services = [
     priceMin: 800,
     priceMax: 8000,
     hours: "6–25 год",
-    // Auto repair workshop with cars on lifts
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/28b236bc722d6b3135745336c4cd0dd50493ff0a.jpg",
     category: "Трансмісія",
     details: ["Механічна та автоматична КПП", "Варіатор CVT", "Роботизована КПП DSG", "Заміна масла та фільтрів КПП"],
@@ -423,7 +439,6 @@ const services = [
     priceMin: 600,
     priceMax: 4000,
     hours: "4–10 год",
-    // Clutch disc replacement - hands holding clutch plate
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/25152ad2b6a118e9a0209d0f1aa43ed503d3ddf6.jpg",
     category: "Трансмісія",
     details: ["Диск, корзина, вижимний підшипник", "Перевірка та шліфування маховика", "Регулювання педалі зчеплення", "Усі марки легкових авто"],
@@ -438,7 +453,6 @@ const services = [
     priceMin: 350,
     priceMax: 3000,
     hours: "1–6 год",
-    // Timing belt/chain - engine internals (repurposed from GRM)
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/31ff2786487fd6e2b9d1a90cdd4c344cdecdac7c.jpg",
     category: "Технічне обслуговування",
     details: ["Промивання системи охолодження", "Заміна антифризу", "Ремонт або заміна радіатора", "Термостат та помпа охолодження"],
@@ -453,13 +467,11 @@ const services = [
     priceMin: 200,
     priceMax: 800,
     hours: "1–2 год",
-    // Jumper cables on car battery in engine bay
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/0aea1626c7bb5ee38c334f296b2f97785f22869e.jpg",
     category: "Електрика",
     details: ["Перевірка ємності та стану АКБ", "Заміна акумулятора", "Перевірка зарядки генератора", "Утилізація старого АКБ"],
     order: 110,
   },
-  // ── Партія 2 (нові 4 послуги для легкових) ────────────────────────────────
   {
     slug: "car-palna-systema",
     title: "Ремонт паливної системи легкового авто",
@@ -497,7 +509,6 @@ const services = [
     priceMin: 600,
     priceMax: 4000,
     hours: "1–6 год",
-    // AC refrigerant recharge - hose connected to AC port
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/951425997fd82f4c4c61929d409f334349d5b436.jpg",
     category: "Технічне обслуговування",
     details: ["Заправка фреоном", "Діагностика витоків", "Заміна компресора кондиціонера", "Перевірка ефективності охолодження"],
@@ -526,7 +537,6 @@ const services = [
     priceMin: 800,
     priceMax: 5000,
     hours: "4–12 год",
-    // Timing belt and sprocket close-up
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/31ff2786487fd6e2b9d1a90cdd4c344cdecdac7c.jpg",
     category: "Двигун",
     details: ["Ремінь або ланцюг ГРМ", "Ролики та натяжник", "Заміна помпи охолодження", "Точне налаштування фаз ГРМ"],
@@ -541,7 +551,6 @@ const services = [
     priceMin: 0,
     priceMax: 0,
     hours: "1–2 год",
-    // Mechanic working on engine - parts selection
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/81f698ef495625139620141ebed149493294dc34.jpg",
     category: "Додаткові послуги",
     details: ["Підбір за VIN-кодом", "Оригінальні та аналогові запчастини", "Усі марки легкових авто", "Швидкий пошук і замовлення"],
@@ -556,7 +565,6 @@ const services = [
     priceMin: 300,
     priceMax: 1200,
     hours: "1–2 год",
-    // Oil drain plug with oil draining
     image: "https://pplx-res.cloudinary.com/image/upload/pplx_search_images/e34c2eae97b73894ffe1ac451b8cabfa544ad150.jpg",
     category: "Технічне обслуговування",
     details: ["Моторне та трансмісійне мастило", "Заміна масляного фільтра", "Підбір мастила за специфікацією", "Контроль рівня після заміни"],
