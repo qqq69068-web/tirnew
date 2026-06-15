@@ -17,7 +17,6 @@ export default function PricePage() {
     <>
       <div className="price-page">
 
-        {/* ─── HERO ────────────────────────────────────── */}
         <section className="page-hero">
           <div className="page-hero__bg" aria-hidden>
             <img
@@ -49,7 +48,6 @@ export default function PricePage() {
           </div>
         </section>
 
-        {/* ─── CONTENT ───────────────────────────────── */}
         <div className="price-content container">
 
           <div className="price-note">
@@ -59,7 +57,6 @@ export default function PricePage() {
             </p>
           </div>
 
-          {/* ─── FILTER TABS ─── */}
           <div className="price-filter" role="tablist" aria-label="Фільтр категорій">
             <button
               role="tab"
@@ -148,10 +145,9 @@ export default function PricePage() {
           background: var(--bg);
           color: var(--text);
         }
-
         .page-hero {
           position: relative;
-          min-height: 56vh;
+          min-height: 72vh;
           display: flex;
           align-items: flex-end;
           overflow: hidden;
@@ -173,13 +169,7 @@ export default function PricePage() {
         .page-hero__overlay {
           position: absolute;
           inset: 0;
-          background:
-            linear-gradient(
-              108deg,
-              oklch(0.09 0.015 55 / 0.92) 0%,
-              oklch(0.09 0.015 55 / 0.50) 55%,
-              oklch(0.09 0.015 55 / 0.08) 100%
-            );
+          background: linear-gradient(108deg, oklch(0.09 0.015 55 / 0.92) 0%, oklch(0.09 0.015 55 / 0.50) 55%, oklch(0.09 0.015 55 / 0.08) 100%);
         }
         .page-hero__inner {
           position: relative;
@@ -226,7 +216,6 @@ export default function PricePage() {
           max-width: 52ch;
           line-height: 1.75;
         }
-
         .price-rate-card {
           display: inline-flex; align-items: center; gap: var(--space-4);
           background: var(--surface); border: 1px solid var(--border-strong);
@@ -243,7 +232,6 @@ export default function PricePage() {
           color: var(--text); line-height: 1;
         }
         .price-rate-card__unit { font-size: var(--text-sm); font-weight: 400; color: var(--text-muted); }
-
         .price-content {
           padding-block: clamp(var(--space-6), 4vw, var(--space-10));
           display: flex; flex-direction: column; gap: var(--space-6);
@@ -255,46 +243,20 @@ export default function PricePage() {
         }
         .price-note__icon { color: #d97706; flex-shrink: 0; margin-top: 2px; }
         .price-note__text { font-size: var(--text-sm); color: var(--text-muted); line-height: 1.6; }
-
         .price-filter {
-          display: flex;
-          flex-wrap: wrap;
-          gap: var(--space-2);
-          padding-bottom: var(--space-2);
+          display: flex; flex-wrap: wrap; gap: var(--space-2); padding-bottom: var(--space-2);
         }
         .price-filter__tab {
-          display: inline-flex;
-          align-items: center;
-          height: 36px;
-          padding: 0 var(--space-4);
-          border-radius: var(--radius-pill);
-          font-size: var(--text-xs);
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          background: var(--surface);
-          border: 1px solid var(--border-strong);
-          color: var(--text-muted);
-          cursor: pointer;
-          transition: background var(--transition-fast), color var(--transition-fast),
-                      border-color var(--transition-fast), box-shadow var(--transition-fast);
+          display: inline-flex; align-items: center; height: 36px;
+          padding: 0 var(--space-4); border-radius: var(--radius-pill);
+          font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em;
+          background: var(--surface); border: 1px solid var(--border-strong);
+          color: var(--text-muted); cursor: pointer;
+          transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
           white-space: nowrap;
         }
-        .price-filter__tab:hover {
-          background: var(--surface2);
-          color: var(--text);
-          border-color: var(--border-accent);
-        }
-        .price-filter__tab--active {
-          background: var(--primary);
-          color: var(--text-inverse);
-          border-color: var(--primary);
-          box-shadow: var(--shadow-primary);
-        }
-        .price-filter__tab--active:hover {
-          background: var(--primary-h);
-          border-color: var(--primary-h);
-        }
-
+        .price-filter__tab:hover { background: var(--surface2); color: var(--text); }
+        .price-filter__tab--active { background: var(--primary); color: var(--text-inverse); border-color: var(--primary); }
         .price-tables { display: flex; flex-direction: column; gap: var(--space-4); }
         .price-group {
           background: var(--surface); border: 1px solid var(--border);
@@ -327,46 +289,37 @@ export default function PricePage() {
           padding: var(--space-4) var(--space-5);
           border-bottom: 1px solid var(--border);
           text-decoration: none; color: var(--text);
-          transition: background var(--transition-fast); cursor: pointer;
+          transition: background var(--transition-fast);
         }
         .price-row-item:last-child { border-bottom: none; }
         .price-row-item:hover { background: var(--surface2); }
-        .price-row-item__service { min-width: 0; }
         .price-row-item__title { font-size: var(--text-base); font-weight: 600; color: var(--text); line-height: 1.4; }
-        .price-row-item__sub { font-size: var(--text-xs); color: var(--text-faint); margin-top: 3px; line-height: 1.5; }
+        .price-row-item__sub { font-size: var(--text-xs); color: var(--text-faint); margin-top: 3px; }
         .price-row-item__hours { display: flex; justify-content: center; align-items: center; }
         .price-hours-badge {
           display: inline-flex; align-items: center; gap: 3px; font-size: var(--text-xs);
           color: var(--text-muted); background: var(--surface2);
           border: 1px solid var(--border); border-radius: var(--radius-sm);
-          padding: 2px var(--space-2);
-          white-space: nowrap;
+          padding: 2px var(--space-2); white-space: nowrap;
         }
         .price-row-item__price { text-align: right; }
         .price-row-item__price-main { font-size: var(--text-sm); font-weight: 700; color: var(--text); }
         .price-row-item__price-max { font-size: var(--text-xs); color: var(--text-faint); margin-top: 2px; }
         .price-row-item__arrow { display: flex; justify-content: center; color: var(--text-faint); }
-
         .price-cta {
           background: var(--surface); border: 1px solid var(--border);
           border-radius: var(--radius-xl); padding: clamp(var(--space-8), 5vw, var(--space-12));
-          text-align: center; display: flex; flex-direction: column;
-          align-items: center; gap: var(--space-3);
+          text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
         }
         .price-cta__title {
           font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 2rem);
           font-weight: 800; color: var(--text); letter-spacing: -0.02em;
         }
         .price-cta__sub { font-size: var(--text-base); color: var(--text-muted); max-width: 44ch; line-height: 1.65; }
-
         @media (max-width: 640px) {
           .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .price-table-head { display: none; }
-          .price-row-item {
-            grid-template-columns: 1fr auto;
-            grid-template-rows: auto auto;
-            gap: var(--space-1) var(--space-2);
-          }
+          .price-row-item { grid-template-columns: 1fr auto; grid-template-rows: auto auto; gap: var(--space-1) var(--space-2); }
           .price-row-item__service { grid-row: 1; grid-column: 1; }
           .price-row-item__price { grid-row: 1; grid-column: 2; text-align: right; }
           .price-row-item__hours { grid-row: 2; grid-column: 1; justify-content: flex-start; }

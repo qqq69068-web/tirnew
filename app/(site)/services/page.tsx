@@ -42,7 +42,6 @@ export default function ServicesPage() {
     <>
       <div className="svc-page">
 
-        {/* ─── HERO ────────────────────────────────────────── */}
         <section className="page-hero">
           <div className="page-hero__bg" aria-hidden>
             <img
@@ -83,7 +82,6 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* ─── TAB SWITCHER ─────────────────────────────── */}
         <div className="svc-tabs-bar">
           <div className="container svc-tabs-inner">
             <button
@@ -107,7 +105,6 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        {/* ─── SERVICE LIST ─────────────────────────────── */}
         <div className="svc-content container">
 
           {activeTab === "tir" && (
@@ -125,7 +122,7 @@ export default function ServicesPage() {
             <div className="svc-intro">
               <div className="svc-intro__text">
                 <p className="svc-section-eyebrow">— Легкові автомобілі</p>
-                <h2 className="svc-intro__title">Послуги для легкого транспорту</h2>
+                <h2 className="svc-intro__title">Послуги для легкового транспорту</h2>
               </div>
               <Link href="/contacts" className="btn btn-ghost svc-intro__cta">
                 Записатись <ArrowRight size={16} aria-hidden />
@@ -174,8 +171,6 @@ export default function ServicesPage() {
           background: var(--bg);
           color: var(--text);
         }
-
-        /* ── HERO ───────────────────────────────────────── */
         .page-hero {
           position: relative;
           min-height: 72vh;
@@ -200,13 +195,7 @@ export default function ServicesPage() {
         .page-hero__overlay {
           position: absolute;
           inset: 0;
-          background:
-            linear-gradient(
-              108deg,
-              oklch(0.09 0.015 55 / 0.92) 0%,
-              oklch(0.09 0.015 55 / 0.50) 55%,
-              oklch(0.09 0.015 55 / 0.08) 100%
-            );
+          background: linear-gradient(108deg, oklch(0.09 0.015 55 / 0.92) 0%, oklch(0.09 0.015 55 / 0.50) 55%, oklch(0.09 0.015 55 / 0.08) 100%);
         }
         .page-hero__inner {
           position: relative;
@@ -253,7 +242,6 @@ export default function ServicesPage() {
           max-width: 52ch;
           line-height: 1.75;
         }
-
         .svc-hero__meta {
           display: flex;
           align-items: center;
@@ -281,8 +269,6 @@ export default function ServicesPage() {
           background: oklch(1 0 0 / 0.15);
           flex-shrink: 0;
         }
-
-        /* ── TABS ───────────────────────────────────────── */
         .svc-tabs-bar {
           position: sticky;
           top: 0;
@@ -291,11 +277,7 @@ export default function ServicesPage() {
           border-bottom: 1px solid var(--border);
           backdrop-filter: blur(12px);
         }
-        .svc-tabs-inner {
-          display: flex;
-          align-items: center;
-          gap: 0;
-        }
+        .svc-tabs-inner { display: flex; align-items: center; gap: 0; }
         .svc-tab {
           display: inline-flex;
           align-items: center;
@@ -314,10 +296,7 @@ export default function ServicesPage() {
           margin-bottom: -1px;
         }
         .svc-tab:hover { color: var(--text); }
-        .svc-tab--active {
-          color: var(--primary);
-          border-bottom-color: var(--primary);
-        }
+        .svc-tab--active { color: var(--primary); border-bottom-color: var(--primary); }
         .svc-tab__count {
           display: inline-flex;
           align-items: center;
@@ -337,15 +316,12 @@ export default function ServicesPage() {
           border-color: oklch(from var(--primary) l c h / 0.25);
           color: var(--primary);
         }
-
-        /* ── CONTENT ────────────────────────────────────── */
         .svc-content {
           padding-block: clamp(var(--space-6), 4vw, var(--space-10));
           display: flex;
           flex-direction: column;
           gap: var(--space-8);
         }
-
         .svc-intro {
           display: flex;
           align-items: flex-end;
@@ -370,11 +346,7 @@ export default function ServicesPage() {
           line-height: 1.15;
           max-width: 32ch;
         }
-        .svc-intro__cta {
-          white-space: nowrap;
-          flex-shrink: 0;
-        }
-
+        .svc-intro__cta { white-space: nowrap; flex-shrink: 0; }
         .svc-group { display: flex; flex-direction: column; gap: var(--space-4); }
         .svc-group__title {
           font-size: var(--text-xs);
@@ -385,13 +357,11 @@ export default function ServicesPage() {
           padding-bottom: var(--space-3);
           border-bottom: 1px solid var(--border);
         }
-
         .svc-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
           gap: var(--space-3);
         }
-
         .svc-card {
           display: flex;
           flex-direction: column;
@@ -406,53 +376,18 @@ export default function ServicesPage() {
           cursor: pointer;
           opacity: 0;
           transform: translateY(12px);
-          transition:
-            opacity 0.35s ease,
-            transform 0.35s ease,
-            background var(--transition-fast),
-            box-shadow var(--transition-fast);
+          transition: opacity 0.35s ease, transform 0.35s ease, background var(--transition-fast), box-shadow var(--transition-fast);
         }
-        .svc-card--visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .svc-card:hover {
-          background: var(--surface2);
-          box-shadow: var(--shadow-md);
-        }
+        .svc-card--visible { opacity: 1; transform: translateY(0); }
+        .svc-card:hover { background: var(--surface2); box-shadow: var(--shadow-md); }
         .svc-card__body { display: flex; flex-direction: column; gap: var(--space-1); }
-        .svc-card__title {
-          font-size: var(--text-base);
-          font-weight: 600;
-          color: var(--text);
-          line-height: 1.4;
-        }
-        .svc-card__desc {
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          line-height: 1.55;
-        }
-        .svc-card__footer {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-top: var(--space-2);
-        }
-        .svc-card__price {
-          font-size: var(--text-sm);
-          font-weight: 700;
-          color: var(--primary);
-        }
+        .svc-card__title { font-size: var(--text-base); font-weight: 600; color: var(--text); line-height: 1.4; }
+        .svc-card__desc { font-size: var(--text-xs); color: var(--text-faint); line-height: 1.55; }
+        .svc-card__footer { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-2); }
+        .svc-card__price { font-size: var(--text-sm); font-weight: 700; color: var(--primary); }
         .svc-card__arrow { color: var(--text-faint); }
-
-        /* ── ANIMATIONS ─────────────────────────────────── */
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeUp 0.5s ease forwards; }
-
-        /* ── MOBILE ─────────────────────────────────────── */
         @media (max-width: 640px) {
           .page-hero__inner { padding-block: 2.5rem 2.5rem; }
           .svc-hero__meta { gap: var(--space-4); }
