@@ -1,16 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { services, ServiceItem } from "@/lib/services";
 import { ArrowLeft, Package, Clock, Tag, ChevronRight } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
 
 interface Props { params: Promise<{ slug: string }> }
 
-export const dynamic = "force-dynamic";
+export async function generateStaticParams() {
+  return services.map((s) => ({ slug: s.slug }));
+}
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const service = await prisma.service.findUnique({ where: { slug } });
+  const service = services.find((s) => s.slug === slug);
   if (!service) return {};
   return { title: `${service.title} | Тірнью Truck Service`, description: service.short };
 }
@@ -18,14 +20,12 @@ export async function generateMetadata({ params }: Props) {
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
 
-  const service = await prisma.service.findUnique({ where: { slug } });
+  const service: ServiceItem | undefined = services.find((s) => s.slug === slug);
   if (!service) notFound();
 
-  const related = await prisma.service.findMany({
-    where: { category: service.category, slug: { not: service.slug }, active: true },
-    orderBy: { order: "asc" },
-    take: 3,
-  });
+  const related = services
+    .filter((s) => s.category === service.category && s.slug !== service.slug)
+    .slice(0, 3);
 
   return (
     <>
@@ -131,31 +131,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                   <span>Вартість</span>
                 </div>
 
-                {/* Per-vehicle pricing */}
-                {(service.priceCar != null || service.priceTruck != null || service.priceTrailer != null) ? (
-                  <div className="sd-price__vehicle">
-                    {service.priceCar != null && (
-                      <div className="sd-price__row">
-                        <span>Легкове</span>
-                        <strong>{service.priceCar} ₴</strong>
-                      </div>
-                    )}
-                    {service.priceTruck != null && (
-                      <div className="sd-price__row">
-                        <span>Вантажне / Тягач</span>
-                        <strong>{service.priceTruck} ₴</strong>
-                      </div>
-                    )}
-                    {service.priceTrailer != null && (
-                      <div className="sd-price__row">
-                        <span>Причіп</span>
-                        <strong>{service.priceTrailer} ₴</strong>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="sd-price__value">{service.price}</div>
-                )}
+                <div className="sd-price__value">{service.price}</div>
 
                 {service.hours && (
                   <div className="sd-price__hours">
@@ -470,23 +446,6 @@ export default async function ServiceDetailPage({ params }: Props) {
           letter-spacing: -0.025em;
           font-variant-numeric: tabular-nums;
         }
-        .sd-price__vehicle {
-          display: flex;
-          flex-direction: column;
-          gap: 0.4rem;
-          padding: 0.25rem 0;
-        }
-        .sd-price__row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: var(--text-sm);
-          padding: 0.35rem 0;
-          border-bottom: 1px solid var(--border);
-        }
-        .sd-price__row:last-child { border-bottom: none; }
-        .sd-price__row span { color: var(--text-muted); }
-        .sd-price__row strong { color: var(--primary); font-weight: 700; font-variant-numeric: tabular-nums; }
         .sd-price__hours {
           display: flex;
           align-items: center;
