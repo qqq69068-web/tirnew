@@ -1121,6 +1121,9 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
 }
 
+.status { display: inline-flex; align-items: center; gap: 5px; font-size: var(--text-xs); font-weight: 600; padding: 3px 9px; border-radius: var(--radius-pill); border: 1px solid; white-space: nowrap; line-height: 1.5; }
+.status::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
 .status-new      { background: var(--status-new-bg);      color: var(--status-new-text);      border-color: var(--status-new-border); }
 .status-done     { background: var(--status-done-bg);     color: var(--status-done-text);     border-color: var(--status-done-border); }
 .status-progress { background: var(--status-progress-bg); color: var(--status-progress-text); border-color: var(--status-progress-border); }
@@ -1242,19 +1245,15 @@ a { color: inherit; text-decoration: none; }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  /* Горизонтальний скрол — текст не обрізається, а скролиться */
   overflow: hidden;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  /* Підказка що можна скролити горизонтально */
   scroll-snap-type: x proximity;
 }
 
-/* Візуальна підказка для скролу на мобільному */
 @media (max-width: 768px) {
   .table-wrapper,
   .table-wrap {
-    /* Плавний тіньовий градієнт праворуч — підказка про скрол */
     background-image: linear-gradient(to right, var(--surface) 30%, transparent),
                       linear-gradient(to right, transparent, var(--surface) 70%);
     background-position: left center, right center;
@@ -1275,11 +1274,9 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   border-collapse: collapse;
   font-size: var(--text-sm);
-  /* min-width дає таблиці нормальний розмір, а .table-wrap скролить */
   min-width: 540px;
 }
 
-/* На ландшафтних телефонах (>= 568px шириною, <= 430px висотою) — компактніша таблиця */
 @media (max-height: 430px) and (orientation: landscape) {
   .data-table {
     min-width: 480px;
@@ -1305,12 +1302,10 @@ a { color: inherit; text-decoration: none; }
   color: var(--text);
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
-  /* Дозволяємо перенос тексту в комірках — текст більше не обрізається */
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-/* Компактніші відступи на мобільному */
 @media (max-width: 480px) {
   .data-table th { padding: var(--space-2) var(--space-3); }
   .data-table td { padding: var(--space-3) var(--space-3); }
@@ -1358,7 +1353,6 @@ a { color: inherit; text-decoration: none; }
   animation: modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 
-/* На ландшафтних телефонах — менша висота модалки, щоб не перекривала весь екран */
 @media (max-height: 430px) and (orientation: landscape) {
   .modal {
     max-height: 96dvh;
@@ -1821,7 +1815,7 @@ a { color: inherit; text-decoration: none; }
   background: var(--admin-bg);
 }
 
-/* ── Top bar (mobile only) ── */
+/* ── Top bar (mobile only — hidden on desktop) ── */
 .admin-topbar {
   display: none;
   grid-column: 1 / -1;
@@ -2049,4 +2043,134 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
   width: 16px;
   height: 16px;
+}
+
+/* ── ADMIN CONTENT ─────────────────────────────────────────────── */
+.admin-content {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+/* ── ADMIN PAGE LAYOUT ─────────────────────────────────────────── */
+.admin-page {
+  padding: var(--space-6) var(--space-6);
+  max-width: 900px;
+}
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.admin-page-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.admin-page-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ── FADE IN ─────────────────────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.22s ease both;
+}
+
+/* ── SPIN ────────────────────────────────────────────────────────── */
+.spin { animation: spin 0.65s linear infinite; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN SHELL — MOBILE RESPONSIVE  (≤ 768px)
+   Sidebar becomes a full-width slide-in drawer.
+   Content uses the full viewport width.
+═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Shell: single column, topbar on top */
+  .admin-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px 1fr;
+  }
+
+  /* Show topbar */
+  .admin-topbar {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* Show overlay */
+  .admin-overlay {
+    display: block;
+    pointer-events: none;
+  }
+  .admin-overlay.visible {
+    pointer-events: all;
+  }
+
+  /* Sidebar: off-screen drawer */
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: min(280px, 85vw);
+    z-index: 150;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.28s ease;
+    box-shadow: none;
+    /* Keep sticky off — it's now fixed */
+    grid-column: unset;
+    grid-row: unset;
+  }
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Content: full width, below topbar */
+  .admin-content {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /* Page padding reduction on small screens */
+  .admin-page {
+    padding: var(--space-4) var(--space-4);
+  }
+
+  /* Page title smaller on mobile */
+  .admin-page-title {
+    font-size: var(--text-lg);
+  }
+
+  /* Admin sidebar user email — truncate */
+  .admin-sidebar__user-email {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+}
+
+/* Extra small — iPhone SE etc */
+@media (max-width: 375px) {
+  .admin-page {
+    padding: var(--space-3) var(--space-3);
+  }
 }
