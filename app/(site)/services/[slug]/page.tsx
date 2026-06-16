@@ -1,18 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { services, ServiceItem } from "@/lib/services";
-import { ArrowLeft, Package, Clock, Tag, ChevronRight } from "lucide-react";
+import { ArrowLeft, Clock, Tag, ChevronRight } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
+import { prisma } from "@/lib/prisma";
 
 interface Props { params: Promise<{ slug: string }> }
 
-export async function generateStaticParams() {
-  return services.map((s) => ({ slug: s.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = await prisma.service.findUnique({ where: { slug } });
   if (!service) return {};
   return { title: `${service.title} | Тірнью Truck Service`, description: service.short };
 }
@@ -20,12 +18,14 @@ export async function generateMetadata({ params }: Props) {
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
 
-  const service: ServiceItem | undefined = services.find((s) => s.slug === slug);
+  const service = await prisma.service.findUnique({ where: { slug } });
   if (!service) notFound();
 
-  const related = services
-    .filter((s) => s.category === service.category && s.slug !== service.slug)
-    .slice(0, 3);
+  const related = await prisma.service.findMany({
+    where: { category: service.category, slug: { not: service.slug }, active: true },
+    take: 3,
+    orderBy: { order: "asc" },
+  });
 
   return (
     <>
