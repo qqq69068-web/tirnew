@@ -19,12 +19,12 @@ import BookingButton from "@/components/BookingButton";
 import AiChat from "@/components/AiChat";
 
 const footerServices = [
-  { label: "Діагностика двигуна", href: "/services/diahnostyka-dvyhuna" },
-  { label: "Гальмівна система", href: "/services/halimvna-systema" },
-  { label: "Ходова частина", href: "/services/khodova-chastyna" },
-  { label: "Трансмісія", href: "/services/transmisiia" },
-  { label: "Пневмосистема", href: "/services/pnevmosystema" },
-  { label: "Електрика", href: "/services/elektryka" },
+  { label: "Комп'ютерна діагностика", href: "/services/comp-diagnostic-electro" },
+  { label: "Гальмівна система", href: "/services/remont-galmivnyh-mehanizmiv" },
+  { label: "Ходова частина", href: "/services/remont-pidvisky" },
+  { label: "Трансмісія (КПП)", href: "/services/remont-kpp" },
+  { label: "Пневмосистема", href: "/services/remont-pnevmosistem" },
+  { label: "Електрика", href: "/services/comp-diagnostic" },
 ];
 
 const navLinks = [
