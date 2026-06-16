@@ -1,13 +1,8 @@
 import ServicesClient from "./ServicesClient";
-import { prisma } from "@/lib/prisma";
+import { services } from "@/lib/services";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
-export default async function ServicesPage() {
-  const allServices = await prisma.service.findMany({
-    where: { active: true },
-    orderBy: { order: "asc" },
-  });
-
-  return <ServicesClient initialServices={allServices} />;
+export default function ServicesPage() {
+  return <ServicesClient initialServices={services} />;
 }

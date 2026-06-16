@@ -3,28 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronRight, Wrench, Car, ArrowRight } from "lucide-react";
-
-type ServiceItem = {
-  id: string;
-  slug: string;
-  title: string;
-  short: string;
-  price: string;
-  category: string;
-  image: string;
-  vehicleType?: string;
-};
+import type { ServiceItem } from "@/lib/services";
 
 export default function ServicesClient({ initialServices }: { initialServices: ServiceItem[] }) {
-  // Визначаємо тип по категорії: якщо категорія містить «легков» — це car, інакше tir
-  function detectType(s: ServiceItem): "tir" | "car" {
-    const cat = s.category.toLowerCase();
-    if (cat.includes("легков") || cat.includes("car")) return "car";
-    return "tir";
+  function getVehicleType(s: ServiceItem): "truck" | "car" {
+    if (s.vehicleType === "car") return "car";
+    return "truck"; // truck | both | undefined → TIR
   }
 
-  const tirServices = initialServices.filter((s) => detectType(s) === "tir");
-  const carServices = initialServices.filter((s) => detectType(s) === "car");
+  const tirServices = initialServices.filter((s) => getVehicleType(s) === "truck");
+  const carServices = initialServices.filter((s) => getVehicleType(s) === "car");
 
   const [activeTab, setActiveTab] = useState<"tir" | "car">("tir");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
