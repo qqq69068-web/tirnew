@@ -379,11 +379,6 @@ export default function AdminBookingsPage() {
         .bk-card--open { border-color: var(--border-accent); box-shadow: var(--shadow-sm); }
         .bk-card:hover:not(.bk-card--open) { border-color: var(--border-strong); }
 
-        /* ── Summary row ──
-           Desktop: [client] [car/service] [status+chevron]
-           Mobile: [client] [status+chevron] — car/service hidden
-           Meta never wraps under client — chevron always visible
-        */
         .bk-card__summary {
           width: 100%;
           display: flex;
@@ -396,12 +391,10 @@ export default function AdminBookingsPage() {
           text-align: left;
           transition: background var(--transition-fast);
           min-height: 60px;
-          /* Never overflow the card */
           overflow: hidden;
         }
         .bk-card__summary:hover { background: var(--surface2); }
 
-        /* Client block — takes flexible space, but shrinks if needed */
         .bk-card__client {
           flex: 1;
           min-width: 0;
@@ -425,7 +418,6 @@ export default function AdminBookingsPage() {
           text-overflow: ellipsis;
         }
 
-        /* Car/service — shown only on wider screens */
         .bk-card__car {
           display: none;
           flex: 1;
@@ -450,18 +442,15 @@ export default function AdminBookingsPage() {
           text-overflow: ellipsis;
         }
 
-        /* Meta — fixed size, never wraps, always right-aligned */
         .bk-card__meta {
           display: flex;
           align-items: center;
           gap: var(--space-2);
           flex-shrink: 0;
-          /* Max width prevents overflow on xs */
           max-width: 55%;
         }
         @media (min-width: 480px) { .bk-card__meta { max-width: none; } }
 
-        /* Hide scheduled date on small screens */
         .bk-card__scheduled {
           display: none;
           align-items: center;
@@ -472,7 +461,6 @@ export default function AdminBookingsPage() {
         }
         @media (min-width: 600px) { .bk-card__scheduled { display: flex; } }
 
-        /* Price — hidden on very small screens to save space */
         .bk-card__price {
           font-size: var(--text-sm);
           font-weight: 700;
@@ -481,7 +469,6 @@ export default function AdminBookingsPage() {
         }
         @media (max-width: 420px) { .bk-card__price { display: none; } }
 
-        /* Status badge — compact on xs */
         .bk-card__meta .status {
           white-space: nowrap;
           flex-shrink: 1;
@@ -511,7 +498,6 @@ export default function AdminBookingsPage() {
           flex-direction: column;
           gap: var(--space-4);
           animation: fadeIn 0.18s ease both;
-          /* Prevent body content from overflowing the card */
           overflow: hidden;
           width: 100%;
           box-sizing: border-box;
@@ -520,7 +506,7 @@ export default function AdminBookingsPage() {
           .bk-card__body { padding: var(--space-5); gap: var(--space-5); }
         }
 
-        /* ── Custom field input ── */
+        /* ── Field input — light theme compatible ── */
         .bk-field-input {
           display: block;
           width: 100%;
@@ -531,36 +517,40 @@ export default function AdminBookingsPage() {
           font-weight: 400;
           line-height: 1;
           border-radius: var(--radius);
-          border: 1.5px solid rgba(255,255,255,0.14);
-          background: rgba(255,255,255,0.06);
-          color: #edeae6;
+          border: 1.5px solid var(--border-strong);
+          background: var(--surface);
+          color: var(--text);
           outline: none;
-          transition: border-color 150ms ease, box-shadow 150ms ease;
+          transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
           -webkit-appearance: none;
           appearance: none;
-          /* Prevent input from overflowing its container */
           max-width: 100%;
           box-sizing: border-box;
         }
-        .bk-field-input::placeholder { color: rgba(237,234,230,0.35); }
+        .bk-field-input::placeholder { color: var(--text-faint); }
+        .bk-field-input:hover:not(:focus) {
+          border-color: var(--border-strong);
+          background: var(--surface2);
+        }
         .bk-field-input:focus {
-          border-color: rgba(239,68,68,0.6);
-          box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px var(--primary-glow);
+          background: var(--surface2);
         }
         select.bk-field-input {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6254' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 12px center;
+          background-color: var(--surface);
           padding-right: 36px;
           cursor: pointer;
         }
         select.bk-field-input option {
-          background: #1c1b19;
-          color: #edeae6;
+          background: var(--surface);
+          color: var(--text);
         }
         input[type="datetime-local"].bk-field-input::-webkit-calendar-picker-indicator {
-          filter: invert(0.7);
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: pointer;
         }
         input[type="number"].bk-field-input::-webkit-inner-spin-button,
@@ -577,7 +567,7 @@ export default function AdminBookingsPage() {
           margin-bottom: var(--space-2);
         }
 
-        /* Fields grid — 1 col on mobile, 2 on ≥540 */
+        /* Fields grid */
         .bk-fields { display:grid; grid-template-columns:1fr; gap:var(--space-4); }
         @media (min-width:540px) { .bk-fields { grid-template-columns:1fr 1fr; } }
         .bk-fields__full { grid-column:1 / -1; }
@@ -595,7 +585,7 @@ export default function AdminBookingsPage() {
         .bk-worklist__remove { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:var(--radius); color:var(--text-faint); transition:color var(--transition-fast),background var(--transition-fast); flex-shrink:0; }
         .bk-worklist__remove:hover { color:var(--primary); background:var(--primary-subtle); }
 
-        /* Add work — stacks on very small screens */
+        /* Add work */
         .bk-addwork { display:flex; gap:var(--space-2); align-items:stretch; }
         .bk-addwork .bk-field-input { flex:1; min-width:0; }
         @media (max-width:400px) {
@@ -608,7 +598,7 @@ export default function AdminBookingsPage() {
         .bk-total__label { font-size:var(--text-xs); font-weight:600; color:var(--accent); letter-spacing:0.04em; text-transform:uppercase; }
         .bk-total__value { font-size:var(--text-sm); font-weight:700; color:var(--accent); }
 
-        /* Actions — save btn full-width on mobile, date below */
+        /* Actions */
         .bk-actions { display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap; }
         .bk-actions__date { font-size:var(--text-xs); color:var(--text-faint); margin-left:auto; }
         @media (max-width:480px) {
