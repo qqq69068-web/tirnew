@@ -142,7 +142,7 @@ export default function AdminBookingsPage() {
               </svg>
             </div>
             <h3>Замовлень поки немає</h3>
-            <p>Нові записи клієнтів з'являться тут після бронювання.</p>
+            <p>Нові записи клієнтів з&apos;являться тут після бронювання.</p>
           </div>
         </div>
       )}
@@ -169,16 +169,19 @@ export default function AdminBookingsPage() {
                 className="bk-card__summary"
                 aria-expanded={isOpen}
               >
-                <div className="bk-card__info">
-                  <div className="bk-card__client">
-                    <p className="bk-card__name">{b.name}</p>
-                    <p className="bk-card__phone">{b.phone}</p>
-                  </div>
-                  <div className="bk-card__car">
-                    <p className="bk-card__car-model">{b.carBrand} {b.carModel}</p>
-                    <p className="bk-card__service">{getServiceLabel(b.service)}</p>
-                  </div>
+                {/* Left: name + phone */}
+                <div className="bk-card__client">
+                  <p className="bk-card__name">{b.name}</p>
+                  <p className="bk-card__phone">{b.phone}</p>
                 </div>
+
+                {/* Middle: car + service (hidden on xs) */}
+                <div className="bk-card__car">
+                  <p className="bk-card__car-model">{b.carBrand} {b.carModel}</p>
+                  <p className="bk-card__service">{getServiceLabel(b.service)}</p>
+                </div>
+
+                {/* Right: status + chevron */}
                 <div className="bk-card__meta">
                   {b.scheduledAt && (
                     <span className="bk-card__scheduled">
@@ -376,46 +379,129 @@ export default function AdminBookingsPage() {
         .bk-card--open { border-color: var(--border-accent); box-shadow: var(--shadow-sm); }
         .bk-card:hover:not(.bk-card--open) { border-color: var(--border-strong); }
 
-        /* Summary row */
+        /* ── Summary row ──
+           Desktop: [client] [car/service] [status+chevron]
+           Mobile: [client] [status+chevron] — car/service hidden
+           Meta never wraps under client — chevron always visible
+        */
         .bk-card__summary {
-          width:100%; display:flex; align-items:center; justify-content:space-between;
-          gap:var(--space-3); padding:var(--space-4) var(--space-4);
-          background:none; border:none; cursor:pointer; text-align:left;
-          transition:background var(--transition-fast);
-          min-height: 64px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          padding: var(--space-3) var(--space-4);
+          background: none;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+          transition: background var(--transition-fast);
+          min-height: 60px;
+          /* Never overflow the card */
+          overflow: hidden;
         }
-        .bk-card__summary:hover { background:var(--surface2); }
-        .bk-card__info { display:flex; align-items:center; gap:var(--space-4); min-width:0; flex:1; }
-        .bk-card__client { flex-shrink:0; min-width:0; }
-        .bk-card__name { font-size:var(--text-sm); font-weight:600; color:var(--text); line-height:1.3; }
-        .bk-card__phone { font-size:var(--text-xs); color:var(--text-muted); margin-top:2px; }
-        .bk-card__car { display:none; min-width:0; overflow:hidden; }
-        @media (min-width:540px) { .bk-card__car { display:block; } }
-        .bk-card__car-model { font-size:var(--text-sm); color:var(--text-muted); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .bk-card__service { font-size:var(--text-xs); color:var(--text-faint); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px; }
+        .bk-card__summary:hover { background: var(--surface2); }
 
+        /* Client block — takes flexible space, but shrinks if needed */
+        .bk-card__client {
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+        }
+        .bk-card__name {
+          font-size: var(--text-sm);
+          font-weight: 600;
+          color: var(--text);
+          line-height: 1.3;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .bk-card__phone {
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          margin-top: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* Car/service — shown only on wider screens */
+        .bk-card__car {
+          display: none;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+        }
+        @media (min-width: 540px) { .bk-card__car { display: block; } }
+        .bk-card__car-model {
+          font-size: var(--text-sm);
+          color: var(--text-muted);
+          line-height: 1.3;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .bk-card__service {
+          font-size: var(--text-xs);
+          color: var(--text-faint);
+          margin-top: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* Meta — fixed size, never wraps, always right-aligned */
         .bk-card__meta {
-          display:flex;
-          align-items:center;
-          gap:var(--space-2);
-          flex-shrink:0;
-          flex-wrap:wrap;
-          justify-content:flex-end;
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          flex-shrink: 0;
+          /* Max width prevents overflow on xs */
+          max-width: 55%;
         }
-        /* Hide scheduled date on very small screens */
-        .bk-card__scheduled { display:none; align-items:center; gap:4px; font-size:var(--text-xs); color:var(--text-muted); }
-        @media (min-width:480px) { .bk-card__scheduled { display:flex; } }
+        @media (min-width: 480px) { .bk-card__meta { max-width: none; } }
 
-        /* Hide price label on xs */
-        .bk-card__price { font-size:var(--text-sm); font-weight:700; color:var(--accent); }
-        @media (max-width:380px) { .bk-card__price { display:none; } }
+        /* Hide scheduled date on small screens */
+        .bk-card__scheduled {
+          display: none;
+          align-items: center;
+          gap: 4px;
+          font-size: var(--text-xs);
+          color: var(--text-muted);
+          white-space: nowrap;
+        }
+        @media (min-width: 600px) { .bk-card__scheduled { display: flex; } }
 
-        /* Status badge: shorter text on xs */
-        @media (max-width:400px) {
-          .status { font-size: 9px; padding: 2px 6px; letter-spacing:0.06em; }
+        /* Price — hidden on very small screens to save space */
+        .bk-card__price {
+          font-size: var(--text-sm);
+          font-weight: 700;
+          color: var(--accent);
+          white-space: nowrap;
+        }
+        @media (max-width: 420px) { .bk-card__price { display: none; } }
+
+        /* Status badge — compact on xs */
+        .bk-card__meta .status {
+          white-space: nowrap;
+          flex-shrink: 1;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        @media (max-width: 400px) {
+          .bk-card__meta .status {
+            font-size: 9px;
+            padding: 2px 5px;
+            letter-spacing: 0.04em;
+          }
         }
 
-        .bk-card__chevron { color:var(--text-faint); transition:transform var(--transition-fast); flex-shrink:0; }
+        .bk-card__chevron {
+          color: var(--text-faint);
+          transition: transform var(--transition-fast);
+          flex-shrink: 0;
+        }
 
         /* Expanded body */
         .bk-card__body {
@@ -425,6 +511,10 @@ export default function AdminBookingsPage() {
           flex-direction: column;
           gap: var(--space-4);
           animation: fadeIn 0.18s ease both;
+          /* Prevent body content from overflowing the card */
+          overflow: hidden;
+          width: 100%;
+          box-sizing: border-box;
         }
         @media (min-width: 540px) {
           .bk-card__body { padding: var(--space-5); gap: var(--space-5); }
@@ -448,6 +538,9 @@ export default function AdminBookingsPage() {
           transition: border-color 150ms ease, box-shadow 150ms ease;
           -webkit-appearance: none;
           appearance: none;
+          /* Prevent input from overflowing its container */
+          max-width: 100%;
+          box-sizing: border-box;
         }
         .bk-field-input::placeholder { color: rgba(237,234,230,0.35); }
         .bk-field-input:focus {
@@ -491,14 +584,14 @@ export default function AdminBookingsPage() {
 
         /* Client message */
         .bk-message { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); }
-        .bk-message p { font-size:var(--text-sm); color:var(--text-muted); line-height:1.6; max-width:none; }
+        .bk-message p { font-size:var(--text-sm); color:var(--text-muted); line-height:1.6; max-width:none; word-break:break-word; }
 
         /* Work items */
         .bk-worklist { display:flex; flex-direction:column; gap:var(--space-1); margin-bottom:var(--space-2); min-height:24px; }
         .bk-worklist__empty { font-size:var(--text-xs); color:var(--text-faint); font-style:italic; padding:var(--space-2) 0; }
         .bk-worklist__item { display:flex; align-items:center; gap:var(--space-2); background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-2) var(--space-3); animation:fadeIn 0.2s ease both; }
         .bk-worklist__num { font-size:var(--text-xs); font-weight:700; color:var(--accent); flex-shrink:0; width:18px; }
-        .bk-worklist__text { font-size:var(--text-sm); color:var(--text); flex:1; word-break:break-word; }
+        .bk-worklist__text { font-size:var(--text-sm); color:var(--text); flex:1; word-break:break-word; overflow-wrap:break-word; min-width:0; }
         .bk-worklist__remove { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:var(--radius); color:var(--text-faint); transition:color var(--transition-fast),background var(--transition-fast); flex-shrink:0; }
         .bk-worklist__remove:hover { color:var(--primary); background:var(--primary-subtle); }
 
