@@ -33,7 +33,7 @@ export default async function ServiceDetailPage({ params }: Props) {
     <>
       <main className="sd">
 
-        {/* ─── HERO ──────────────────────────────────────────────────── */}
+        {/* ─── HERO ────────────────────────────────────────────── */}
         <div className="sd__hero">
           <img
             src={service.image}
@@ -58,7 +58,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ─── BREADCRUMB ────────────────────────────────────────────── */}
+        {/* ─── BREADCRUMB ────────────────────────────────────────── */}
         <div className="sd__breadcrumb">
           <div className="container">
             <nav className="sd__bread-nav" aria-label="breadcrumb">
@@ -71,7 +71,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ─── BODY ─────────────────────────────────────────────────────── */}
+        {/* ─── BODY ──────────────────────────────────────────────── */}
         <div className="sd__body container">
           <div className="sd__grid">
 
@@ -145,7 +145,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 <hr className="sd-price__hr" />
 
                 <div className="sd-price__actions">
-                  <BookingButton serviceSlug={service.slug} serviceTitle={service.title} />
+                  <BookingButton fullWidth />
                   <Link href="/services" className="btn btn-outline btn-block">
                     ← Усі послуги
                   </Link>
@@ -285,7 +285,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           max-width: 28ch;
         }
 
-        /* ──── BODY LAYOUT ───────────────────────────────────────────── */
+        /* ──── BODY LAYOUT ────────────────────────────────────────────── */
         .sd__body {
           padding-block: clamp(2rem, 5vw, 3.5rem);
         }
@@ -296,7 +296,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           align-items: start;
         }
 
-        /* ──── CONTENT (left) ────────────────────────────────────────── */
+        /* ──── CONTENT (left) ──────────────────────────────────────────── */
         .sd__content {
           display: flex;
           flex-direction: column;
@@ -413,7 +413,7 @@ export default async function ServiceDetailPage({ params }: Props) {
         }
         .sd-rel:hover .sd-rel__arr { color: var(--primary); transform: translateX(3px); }
 
-        /* ──── PRICE SIDEBAR ─────────────────────────────────────────── */
+        /* ──── PRICE SIDEBAR ──────────────────────────────────────────── */
         .sd__sidebar {
           position: sticky;
           top: 78px;
