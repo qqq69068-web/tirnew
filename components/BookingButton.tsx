@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { CAR_BRANDS, getModels } from "@/lib/carData";
 import { getAvailableDates } from "@/lib/scheduling";
-import { CheckCircle, ChevronLeft, Clock, Calendar, Car, Truck, Phone as PhoneIcon } from "lucide-react";
+import { CheckCircle, ChevronLeft, Clock, Calendar, Car, Truck, Phone as PhoneIcon, X } from "lucide-react";
 
 interface Props {
   serviceSlug?: string;
@@ -131,6 +132,148 @@ function SlotSkeleton() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   MODAL OVERLAY (portal)
+   ════════════════════════════════════════════════════════════ */
+function BookingModal({
+  onClose,
+  children,
+}: {
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <>
+      {/* Backdrop */}
+      <div
+        className="bk-overlay"
+        onClick={onClose}
+        aria-hidden
+      />
+      {/* Dialog */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Запис на сервіс"
+        className="bk-dialog"
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="bk-dialog-close"
+          aria-label="Закрити"
+        >
+          <X size={18} strokeWidth={2} />
+        </button>
+
+        <div className="bk-dialog-scroll">
+          {children}
+        </div>
+      </div>
+
+      <style>{`
+        .bk-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 1000;
+          background: oklch(0 0 0 / 0.55);
+          backdrop-filter: blur(2px);
+          animation: bkOverlayIn 0.2s ease both;
+        }
+        @keyframes bkOverlayIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .bk-dialog {
+          position: fixed;
+          z-index: 1001;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(480px, calc(100vw - 32px));
+          max-height: calc(100dvh - 48px);
+          background: var(--bg);
+          border: 1px solid var(--border-strong);
+          border-radius: var(--radius-lg, 12px);
+          box-shadow: 0 24px 64px oklch(0 0 0 / 0.4);
+          display: flex;
+          flex-direction: column;
+          animation: bkDialogIn 0.28s cubic-bezier(0.22,1,0.36,1) both;
+          overflow: hidden;
+        }
+        @keyframes bkDialogIn {
+          from { opacity: 0; transform: translate(-50%, calc(-50% + 16px)); }
+          to   { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        .bk-dialog-close {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          width: 32px;
+          height: 32px;
+          border-radius: var(--radius-md, 6px);
+          background: none;
+          border: none;
+          color: var(--text-faint);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.15s ease, color 0.15s ease;
+          z-index: 1;
+        }
+        .bk-dialog-close:hover {
+          background: oklch(from var(--text) l c h / 0.08);
+          color: var(--text);
+        }
+        .bk-dialog-scroll {
+          overflow-y: auto;
+          padding: 24px 20px 20px;
+          flex: 1;
+        }
+        @media (max-width: 480px) {
+          .bk-dialog {
+            top: auto;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-height: 92dvh;
+            transform: none;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            animation: bkDialogSlideUp 0.28s cubic-bezier(0.22,1,0.36,1) both;
+          }
+          @keyframes bkDialogSlideUp {
+            from { transform: translateY(100%); opacity: 0.5; }
+            to   { transform: translateY(0);    opacity: 1; }
+          }
+          .bk-dialog-scroll { padding: 20px 16px 32px; }
+          .bk-overlay { animation: bkOverlayIn 0.2s ease both; }
+        }
+      `}</style>
+    </>,
+    document.body
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
    MAIN COMPONENT
    ════════════════════════════════════════════════════════════ */
 export default function BookingButton({
@@ -194,6 +337,24 @@ export default function BookingButton({
       })
       .catch(() => setStatus("guest"));
   }, []);
+
+  const handleClose = () => {
+    setOpen(false);
+    // reset state on close
+    setStep("form");
+    setCarBrand("");
+    setCarModel("");
+    setCustomModel("");
+    setCarCategory("");
+    setPhone(profilePhone);
+    setEditPhone(false);
+    setMessage("");
+    setSelectedDate(null);
+    setSelectedSlot(null);
+    setSlots([]);
+    setErrorMsg("");
+    setDone(false);
+  };
 
   const handleBrandChange = (val: string) => {
     setCarBrand(val);
@@ -269,288 +430,278 @@ export default function BookingButton({
     );
   }
 
-  /* ── SUCCESS ─────────────────────────────────────────── */
-  if (done) {
-    return (
-      <div className="bk-success">
-        <div className="bk-success__icon">
-          <CheckCircle size={28} strokeWidth={1.5} />
-        </div>
-        <p className="bk-success__title">Запис підтверджено</p>
-        {selectedSlot && selectedDate && (
-          <p className="bk-success__sub">
-            {formatDate(selectedDate)}, {selectedSlot.timeLabel}
-          </p>
-        )}
-        <p className="bk-success__hint">Ми зв&apos;яжемося з вами найближчим часом</p>
-      </div>
-    );
-  }
-
-  /* ── CLOSED TRIGGER BUTTON ───────────────────────────── */
-  if (!open) {
-    return (
+  /* ── TRIGGER BUTTON + MODAL ──────────────────────────── */
+  return (
+    <>
       <button onClick={() => setOpen(true)} className={btnClass}>
         Записатись
       </button>
-    );
-  }
 
-  /* ════════════════════════════════════════════════════════
-     BOOKING MODAL INLINE FLOW
-     ════════════════════════════════════════════════════════ */
-  const totalWorkers = carCategory === "car" ? 2 : 5;
-  const step1Valid   = !!carBrand && !!(profilePhone || phone);
-
-  return (
-    <div className="bk-wrap">
-      {/* Step progress */}
-      <StepDots current={step} />
-
-      {/* ── STEP 1: Vehicle + contact ── */}
-      {step === "form" && (
-        <StepPanel stepKey="form">
-          {client?.name && (
-            <div className="bk-client-badge">
-              <span className="bk-client-badge__dot" />
-              {client.name}
-            </div>
-          )}
-
-          <Field label="Марка авто *">
-            <div className="bk-select-wrap">
-              <select
-                value={carBrand}
-                onChange={(e) => handleBrandChange(e.target.value)}
-                className="bk-select"
-              >
-                <option value="">— Оберіть марку —</option>
-                <optgroup label="Вантажні / Тягачі / Причепи">
-                  {TRUCK_BRANDS_LIST.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
-                </optgroup>
-                <optgroup label="Легкові">
-                  {CAR_BRANDS_LIST.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
-                </optgroup>
-              </select>
-              <span className="bk-select-arrow" aria-hidden>▾</span>
-            </div>
-          </Field>
-
-          {carBrand && carCategory && (
-            <div className="bk-category-row">
-              <div className="bk-category-label">
-                {carCategory === "car" ? <Car size={13} strokeWidth={2} /> : <Truck size={13} strokeWidth={2} />}
-                <span>{getCategoryLabel(carCategory)}</span>
+      {open && (
+        <BookingModal onClose={handleClose}>
+          {/* SUCCESS */}
+          {done ? (
+            <div className="bk-success">
+              <div className="bk-success__icon">
+                <CheckCircle size={28} strokeWidth={1.5} />
               </div>
-              {hasCategoryPrices && (
-                <span className="bk-price-badge">
-                  {dynamicPrice != null
-                    ? `від ${dynamicPrice.toLocaleString("uk-UA")} грн`
-                    : <span style={{ color: "var(--text-faint)", fontSize: "var(--text-xs)" }}>ціна за запитом</span>}
-                </span>
+              <p className="bk-success__title">Запис підтверджено</p>
+              {selectedSlot && selectedDate && (
+                <p className="bk-success__sub">
+                  {formatDate(selectedDate)}, {selectedSlot.timeLabel}
+                </p>
               )}
+              <p className="bk-success__hint">Ми зв&apos;яжемося з вами найближчим часом</p>
+              <button onClick={handleClose} className="btn btn-primary" style={{ marginTop: 8 }}>Закрити</button>
             </div>
-          )}
+          ) : (
+            <div className="bk-wrap">
+              {/* Step progress */}
+              <StepDots current={step} />
 
-          {carBrand && (
-            <Field label="Модель авто">
-              <div className="bk-select-wrap">
-                <select
-                  value={carModel}
-                  onChange={(e) => setCarModel(e.target.value)}
-                  className="bk-select"
-                >
-                  <option value="">— Оберіть модель —</option>
-                  {models.map((m) => <option key={m} value={m}>{m}</option>)}
-                  <option value="__custom__">Інша модель...</option>
-                </select>
-                <span className="bk-select-arrow" aria-hidden>▾</span>
-              </div>
-              {carModel === "__custom__" && (
-                <input
-                  type="text"
-                  placeholder="Введіть модель вручну"
-                  value={customModel}
-                  onChange={(e) => setCustomModel(e.target.value)}
-                  className="bk-input"
-                  style={{ marginTop: "var(--space-2)" }}
-                />
+              {/* ── STEP 1: Vehicle + contact ── */}
+              {step === "form" && (
+                <StepPanel stepKey="form">
+                  {client?.name && (
+                    <div className="bk-client-badge">
+                      <span className="bk-client-badge__dot" />
+                      {client.name}
+                    </div>
+                  )}
+
+                  <Field label="Марка авто *">
+                    <div className="bk-select-wrap">
+                      <select
+                        value={carBrand}
+                        onChange={(e) => handleBrandChange(e.target.value)}
+                        className="bk-select"
+                      >
+                        <option value="">— Оберіть марку —</option>
+                        <optgroup label="Вантажні / Тягачі / Причепи">
+                          {TRUCK_BRANDS_LIST.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
+                        </optgroup>
+                        <optgroup label="Легкові">
+                          {CAR_BRANDS_LIST.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
+                        </optgroup>
+                      </select>
+                      <span className="bk-select-arrow" aria-hidden>▾</span>
+                    </div>
+                  </Field>
+
+                  {carBrand && carCategory && (
+                    <div className="bk-category-row">
+                      <div className="bk-category-label">
+                        {carCategory === "car" ? <Car size={13} strokeWidth={2} /> : <Truck size={13} strokeWidth={2} />}
+                        <span>{getCategoryLabel(carCategory)}</span>
+                      </div>
+                      {hasCategoryPrices && (
+                        <span className="bk-price-badge">
+                          {dynamicPrice != null
+                            ? `від ${dynamicPrice.toLocaleString("uk-UA")} грн`
+                            : <span style={{ color: "var(--text-faint)", fontSize: "var(--text-xs)" }}>ціна за запитом</span>}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {carBrand && (
+                    <Field label="Модель авто">
+                      <div className="bk-select-wrap">
+                        <select
+                          value={carModel}
+                          onChange={(e) => setCarModel(e.target.value)}
+                          className="bk-select"
+                        >
+                          <option value="">— Оберіть модель —</option>
+                          {models.map((m) => <option key={m} value={m}>{m}</option>)}
+                          <option value="__custom__">Інша модель...</option>
+                        </select>
+                        <span className="bk-select-arrow" aria-hidden>▾</span>
+                      </div>
+                      {carModel === "__custom__" && (
+                        <input
+                          type="text"
+                          placeholder="Введіть модель вручну"
+                          value={customModel}
+                          onChange={(e) => setCustomModel(e.target.value)}
+                          className="bk-input"
+                          style={{ marginTop: "var(--space-2)" }}
+                        />
+                      )}
+                    </Field>
+                  )}
+
+                  <Field label="Телефон *">
+                    {profilePhone && !editPhone ? (
+                      <div className="bk-phone-row">
+                        <div className="bk-phone-display">
+                          <PhoneIcon size={12} strokeWidth={2} style={{ color: "var(--text-faint)" }} />
+                          {profilePhone}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => { setEditPhone(true); setPhone(""); }}
+                          className="bk-link"
+                        >
+                          Змінити
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        type="tel"
+                        placeholder="+380 50 000 00 00"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="bk-input"
+                      />
+                    )}
+                  </Field>
+
+                  <Field label="Коментар">
+                    <textarea
+                      placeholder="необов'язково"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      rows={2}
+                      className="bk-input bk-textarea"
+                    />
+                  </Field>
+
+                  <div className="bk-actions">
+                    <button
+                      onClick={() => { if (step1Valid) setStep("date"); }}
+                      disabled={!step1Valid}
+                      className="btn btn-primary bk-btn-full"
+                    >
+                      Обрати дату та час
+                    </button>
+                  </div>
+                </StepPanel>
               )}
-            </Field>
-          )}
 
-          <Field label="Телефон *">
-            {profilePhone && !editPhone ? (
-              <div className="bk-phone-row">
-                <div className="bk-phone-display">
-                  <PhoneIcon size={12} strokeWidth={2} style={{ color: "var(--text-faint)" }} />
-                  {profilePhone}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { setEditPhone(true); setPhone(""); }}
-                  className="bk-link"
-                >
-                  Змінити
-                </button>
-              </div>
-            ) : (
-              <input
-                type="tel"
-                placeholder="+380 50 000 00 00"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="bk-input"
-              />
-            )}
-          </Field>
-
-          <Field label="Коментар">
-            <textarea
-              placeholder="необов'язково"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={2}
-              className="bk-input bk-textarea"
-            />
-          </Field>
-
-          <div className="bk-actions">
-            <button
-              onClick={() => { if (step1Valid) setStep("date"); }}
-              disabled={!step1Valid}
-              className="btn btn-primary bk-btn-full"
-            >
-              Обрати дату та час
-            </button>
-            <button type="button" onClick={() => setOpen(false)} className="bk-cancel">Скасувати</button>
-          </div>
-        </StepPanel>
-      )}
-
-      {/* ── STEP 2: Date selection ── */}
-      {step === "date" && (
-        <StepPanel stepKey="date">
-          <button onClick={() => setStep("form")} className="bk-back">
-            <ChevronLeft size={14} strokeWidth={2} /> Назад
-          </button>
-
-          <div className="bk-dates-grid">
-            {availableDates.map((d) => (
-              <button
-                key={toDateKey(d)}
-                onClick={() => handleDateSelect(d)}
-                className="bk-date-btn"
-              >
-                <span className="bk-date-weekday">
-                  {d.toLocaleDateString("uk-UA", { weekday: "short" })}
-                </span>
-                <span className="bk-date-day">
-                  {d.toLocaleDateString("uk-UA", { day: "numeric", month: "short" })}
-                </span>
-                <Calendar size={11} strokeWidth={1.5} className="bk-date-icon" />
-              </button>
-            ))}
-          </div>
-
-          <button type="button" onClick={() => setOpen(false)} className="bk-cancel">Скасувати</button>
-        </StepPanel>
-      )}
-
-      {/* ── STEP 3: Time slots ── */}
-      {step === "time" && (
-        <StepPanel stepKey="time">
-          <div className="bk-time-header">
-            <button onClick={() => { setStep("date"); setSelectedSlot(null); }} className="bk-back">
-              <ChevronLeft size={14} strokeWidth={2} /> Назад
-            </button>
-            {selectedDate && (
-              <span className="bk-time-date">
-                <Calendar size={11} strokeWidth={1.5} />
-                {formatDate(selectedDate)}
-              </span>
-            )}
-          </div>
-
-          <p className="bk-slots-hint">
-            <Clock size={11} strokeWidth={1.5} />
-            {carCategory === "car" ? "Майстрів для легкових: 2" : "Майстрів для вантажних: 5"}
-          </p>
-
-          {slotsLoading ? <SlotSkeleton /> : (
-            <div className="bk-slots-grid">
-              {slots.map((slot) => {
-                const busy  = !slot.available;
-                const tight = slot.available && slot.free < totalWorkers;
-                return (
-                  <button
-                    key={slot.time}
-                    disabled={busy}
-                    onClick={() => { setSelectedSlot(slot); setStep("confirm"); }}
-                    className={`bk-slot ${
-                      busy  ? "bk-slot--busy" :
-                      tight ? "bk-slot--tight" :
-                              "bk-slot--free"
-                    }`}
-                  >
-                    <span className="bk-slot-time">{slot.timeLabel}</span>
-                    <span className="bk-slot-avail">
-                      {busy ? "зайнято" : `${slot.free} вільн.`}
-                    </span>
+              {/* ── STEP 2: Date selection ── */}
+              {step === "date" && (
+                <StepPanel stepKey="date">
+                  <button onClick={() => setStep("form")} className="bk-back">
+                    <ChevronLeft size={14} strokeWidth={2} /> Назад
                   </button>
-                );
-              })}
+
+                  <div className="bk-dates-grid">
+                    {availableDates.map((d) => (
+                      <button
+                        key={toDateKey(d)}
+                        onClick={() => handleDateSelect(d)}
+                        className="bk-date-btn"
+                      >
+                        <span className="bk-date-weekday">
+                          {d.toLocaleDateString("uk-UA", { weekday: "short" })}
+                        </span>
+                        <span className="bk-date-day">
+                          {d.toLocaleDateString("uk-UA", { day: "numeric", month: "short" })}
+                        </span>
+                        <Calendar size={11} strokeWidth={1.5} className="bk-date-icon" />
+                      </button>
+                    ))}
+                  </div>
+                </StepPanel>
+              )}
+
+              {/* ── STEP 3: Time slots ── */}
+              {step === "time" && (
+                <StepPanel stepKey="time">
+                  <div className="bk-time-header">
+                    <button onClick={() => { setStep("date"); setSelectedSlot(null); }} className="bk-back">
+                      <ChevronLeft size={14} strokeWidth={2} /> Назад
+                    </button>
+                    {selectedDate && (
+                      <span className="bk-time-date">
+                        <Calendar size={11} strokeWidth={1.5} />
+                        {formatDate(selectedDate)}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="bk-slots-hint">
+                    <Clock size={11} strokeWidth={1.5} />
+                    {carCategory === "car" ? "Майстрів для легкових: 2" : "Майстрів для вантажних: 5"}
+                  </p>
+
+                  {slotsLoading ? <SlotSkeleton /> : (
+                    <div className="bk-slots-grid">
+                      {slots.map((slot) => {
+                        const busy  = !slot.available;
+                        const tight = slot.available && slot.free < totalWorkers;
+                        return (
+                          <button
+                            key={slot.time}
+                            disabled={busy}
+                            onClick={() => { setSelectedSlot(slot); setStep("confirm"); }}
+                            className={`bk-slot ${
+                              busy  ? "bk-slot--busy" :
+                              tight ? "bk-slot--tight" :
+                                      "bk-slot--free"
+                            }`}
+                          >
+                            <span className="bk-slot-time">{slot.timeLabel}</span>
+                            <span className="bk-slot-avail">
+                              {busy ? "зайнято" : `${slot.free} вільн.`}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {errorMsg && <p className="bk-error">{errorMsg}</p>}
+                </StepPanel>
+              )}
+
+              {/* ── STEP 4: Confirm ── */}
+              {step === "confirm" && (
+                <StepPanel stepKey="confirm">
+                  <button onClick={() => setStep("time")} className="bk-back">
+                    <ChevronLeft size={14} strokeWidth={2} /> Назад
+                  </button>
+
+                  <div className="bk-summary">
+                    {([
+                      ["Послуга",  serviceTitle],
+                      ["Авто",     `${carBrand} ${finalModel}`.trim()],
+                      ["Тип",      getCategoryLabel(carCategory)],
+                      ["Дата / Час", selectedDate && selectedSlot ? `${formatDate(selectedDate)}, ${selectedSlot.timeLabel}` : "—"],
+                      dynamicPrice != null ? ["Вартість", `від ${dynamicPrice.toLocaleString("uk-UA")} грн`] : null,
+                      ["Телефон",  finalPhone],
+                    ] as ([string, string] | null)[]).filter(Boolean).map(([label, value]) => (
+                      <div key={label} className="bk-summary-row">
+                        <span className="bk-summary-label">{label}</span>
+                        <span className={`bk-summary-value${ label === "Вартість" ? " bk-summary-value--accent" : "" }${ label === "Дата / Час" ? " bk-summary-value--strong" : "" }`}>
+                          {value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {errorMsg && <p className="bk-error">{errorMsg}</p>}
+
+                  <div className="bk-actions">
+                    <button
+                      onClick={submit}
+                      disabled={sending}
+                      className="btn btn-primary bk-btn-full"
+                    >
+                      {sending ? (
+                        <span className="bk-sending">
+                          <span className="bk-spinner" /> Надсилаємо...
+                        </span>
+                      ) : "Підтвердити запис"}
+                    </button>
+                  </div>
+                </StepPanel>
+              )}
             </div>
           )}
-
-          {errorMsg && <p className="bk-error">{errorMsg}</p>}
-          <button type="button" onClick={() => setOpen(false)} className="bk-cancel">Скасувати</button>
-        </StepPanel>
-      )}
-
-      {/* ── STEP 4: Confirm ── */}
-      {step === "confirm" && (
-        <StepPanel stepKey="confirm">
-          <button onClick={() => setStep("time")} className="bk-back">
-            <ChevronLeft size={14} strokeWidth={2} /> Назад
-          </button>
-
-          <div className="bk-summary">
-            {([
-              ["Послуга",  serviceTitle],
-              ["Авто",     `${carBrand} ${finalModel}`.trim()],
-              ["Тип",      getCategoryLabel(carCategory)],
-              ["Дата / Час", selectedDate && selectedSlot ? `${formatDate(selectedDate)}, ${selectedSlot.timeLabel}` : "—"],
-              dynamicPrice != null ? ["Вартість", `від ${dynamicPrice.toLocaleString("uk-UA")} грн`] : null,
-              ["Телефон",  finalPhone],
-            ] as ([string, string] | null)[]).filter(Boolean).map(([label, value]) => (
-              <div key={label} className="bk-summary-row">
-                <span className="bk-summary-label">{label}</span>
-                <span className={`bk-summary-value${ label === "Вартість" ? " bk-summary-value--accent" : "" }${ label === "Дата / Час" ? " bk-summary-value--strong" : "" }`}>
-                  {value}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {errorMsg && <p className="bk-error">{errorMsg}</p>}
-
-          <div className="bk-actions">
-            <button
-              onClick={submit}
-              disabled={sending}
-              className="btn btn-primary bk-btn-full"
-            >
-              {sending ? (
-                <span className="bk-sending">
-                  <span className="bk-spinner" /> Надсилаємо...
-                </span>
-              ) : "Підтвердити запис"}
-            </button>
-            <button type="button" onClick={() => setOpen(false)} className="bk-cancel">Скасувати</button>
-          </div>
-        </StepPanel>
+        </BookingModal>
       )}
 
       {/* ══ STYLES ══════════════════════════════════════════ */}
@@ -888,7 +1039,7 @@ export default function BookingButton({
         .bk-summary-value--accent { color: var(--primary); font-weight: 700; }
         .bk-summary-value--strong { font-weight: 700; }
 
-        /* ─ actions / buttons ────────────────────────── */
+        /* ─ actions ──────────────────────────────────── */
         .bk-actions {
           display: flex;
           flex-direction: column;
@@ -911,18 +1062,6 @@ export default function BookingButton({
           transition: color 0.16s ease;
         }
         .bk-back:hover { color: var(--text); }
-        .bk-cancel {
-          width: 100%;
-          text-align: center;
-          font-size: var(--text-xs);
-          color: var(--text-faint);
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: var(--space-1) 0;
-          transition: color 0.16s ease;
-        }
-        .bk-cancel:hover { color: var(--text-muted); }
 
         /* ─ error ────────────────────────────────────── */
         .bk-error {
@@ -950,9 +1089,6 @@ export default function BookingButton({
           text-align: center;
           gap: var(--space-2);
           padding: var(--space-6) var(--space-4);
-          background: var(--primary-subtle);
-          border: 1px solid rgba(185,28,28,0.18);
-          border-radius: var(--radius);
           animation: bkSuccessIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
         }
         @keyframes bkSuccessIn {
@@ -1033,6 +1169,13 @@ export default function BookingButton({
           .bk-success__icon { animation: none; }
         }
       `}</style>
-    </div>
+
+      {/* step1Valid ref needed inside JSX */}
+      {/* eslint-disable-next-line @typescript-eslint/no-unused-expressions */}
+      {void (step1Valid = !!carBrand && !!(profilePhone || phone))}
+    </>
   );
+
+  var step1Valid = !!carBrand && !!(profilePhone || phone);
+  var totalWorkers = carCategory === "car" ? 2 : 5;
 }
