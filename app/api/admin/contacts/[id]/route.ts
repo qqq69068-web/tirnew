@@ -20,3 +20,15 @@ export async function PATCH(
 
   return NextResponse.json(updated);
 }
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const payload = await getTokenPayload();
+  if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  await prisma.contactMessage.delete({ where: { id } });
+  return NextResponse.json({ ok: true });
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCheck, Phone, Calendar } from "lucide-react";
+import { CheckCheck, Phone, Calendar, Trash2 } from "lucide-react";
 
 interface ContactMessage {
   id: string;
@@ -27,6 +27,8 @@ export default function AdminContactsPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading]   = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/contacts")
@@ -45,12 +47,20 @@ export default function AdminContactsPage() {
     setUpdating(null);
   };
 
+  const deleteMessage = async (id: string) => {
+    setDeleting(id);
+    await fetch(`/api/admin/contacts/${id}`, { method: "DELETE" });
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+    setDeleting(null);
+    setConfirmId(null);
+  };
+
   if (loading) {
     return (
       <div className="admin-page fade-in">
         <div className="admin-page-header">
           <div>
-            <p className="section-eyebrow">Зв"язок</p>
+            <p className="section-eyebrow">Зв'язок</p>
             <h1 className="admin-page-title">Повідомлення</h1>
           </div>
         </div>
@@ -72,7 +82,7 @@ export default function AdminContactsPage() {
       <div className="admin-page-header">
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
           <div>
-            <p className="section-eyebrow">Зв"язок</p>
+            <p className="section-eyebrow">Зв'язок</p>
             <h1 className="admin-page-title">Повідомлення</h1>
           </div>
           {newCount > 0 && (
@@ -95,7 +105,7 @@ export default function AdminContactsPage() {
               </svg>
             </div>
             <h3>Повідомлень поки немає</h3>
-            <p>Нові звернення з форми контактів з’являться тут.</p>
+            <p>Нові звернення з форми контактів з'являться тут.</p>
           </div>
         </div>
       ) : (
@@ -103,7 +113,7 @@ export default function AdminContactsPage() {
           {messages.map((m) => (
             <div
               key={m.id}
-              className={`cm-card${m.status === "new" ? " cm-card--new" : ""}`}
+              className={`cm-card${m.status === "new" ? " cm-card--new" : ""}${deleting === m.id ? " cm-card--deleting" : ""}`}
             >
               <div className="cm-card__body">
                 <div className="cm-card__left">
@@ -130,7 +140,7 @@ export default function AdminContactsPage() {
                   {m.status === "new" && (
                     <button
                       onClick={() => updateStatus(m.id, "read")}
-                      disabled={updating === m.id}
+                      disabled={updating === m.id || deleting === m.id}
                       className="btn btn-outline btn-sm"
                     >
                       Переглянуто
@@ -139,11 +149,40 @@ export default function AdminContactsPage() {
                   {m.status !== "done" && (
                     <button
                       onClick={() => updateStatus(m.id, "done")}
-                      disabled={updating === m.id}
+                      disabled={updating === m.id || deleting === m.id}
                       className="btn btn-ghost btn-sm cm-done-btn"
                     >
                       <CheckCheck size={13} aria-hidden="true" />
                       Оброблено
+                    </button>
+                  )}
+
+                  {confirmId === m.id ? (
+                    <div className="cm-confirm">
+                      <span className="cm-confirm__label">Видалити?</span>
+                      <button
+                        onClick={() => deleteMessage(m.id)}
+                        disabled={deleting === m.id}
+                        className="btn btn-sm cm-delete-confirm-btn"
+                      >
+                        {deleting === m.id ? "..." : "Так"}
+                      </button>
+                      <button
+                        onClick={() => setConfirmId(null)}
+                        className="btn btn-ghost btn-sm"
+                      >
+                        Ні
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmId(m.id)}
+                      disabled={deleting === m.id}
+                      className="btn btn-ghost btn-sm cm-delete-btn"
+                      aria-label="Видалити повідомлення"
+                    >
+                      <Trash2 size={13} aria-hidden="true" />
+                      Видалити
                     </button>
                   )}
                 </div>
@@ -164,11 +203,15 @@ export default function AdminContactsPage() {
           border: 1px solid var(--border);
           border-radius: var(--radius-lg);
           overflow: hidden;
-          transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+          transition: border-color var(--transition-fast), box-shadow var(--transition-fast), opacity 0.3s ease;
         }
         .cm-card--new {
           border-color: var(--status-new-border, oklch(from var(--color-accent-warm, #b45309) l c h / 0.35));
           box-shadow: var(--shadow-sm);
+        }
+        .cm-card--deleting {
+          opacity: 0.4;
+          pointer-events: none;
         }
         .cm-card__body {
           display: flex;
@@ -231,12 +274,41 @@ export default function AdminContactsPage() {
           flex-direction: column;
           gap: var(--space-2);
           flex-shrink: 0;
+          align-items: stretch;
         }
         .cm-done-btn {
           color: var(--status-done-text) !important;
         }
         .cm-done-btn:hover {
           background: var(--status-done-bg) !important;
+        }
+        .cm-delete-btn {
+          color: var(--color-error, #dc2626) !important;
+          opacity: 0.7;
+        }
+        .cm-delete-btn:hover {
+          opacity: 1;
+          background: oklch(from var(--color-error, #dc2626) l c h / 0.08) !important;
+        }
+        .cm-confirm {
+          display: flex;
+          align-items: center;
+          gap: var(--space-1);
+        }
+        .cm-confirm__label {
+          font-size: var(--text-xs);
+          color: var(--color-error, #dc2626);
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .cm-delete-confirm-btn {
+          background: var(--color-error, #dc2626) !important;
+          color: #fff !important;
+          font-size: var(--text-xs) !important;
+          padding: 3px 10px !important;
+        }
+        .cm-delete-confirm-btn:hover {
+          opacity: 0.85;
         }
       `}</style>
     </div>
