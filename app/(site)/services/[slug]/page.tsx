@@ -2,31 +2,94 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Tag, ChevronRight } from "lucide-react";
 import BookingButton from "@/components/BookingButton";
-import { services } from "@/lib/services";
+import { services as staticServices } from "@/lib/services";
+import { prisma } from "@/lib/prisma";
 
 interface Props { params: Promise<{ slug: string }> }
 
-export const dynamic = "force-static";
-
-export async function generateStaticParams() {
-  return services.map((s) => ({ slug: s.slug }));
-}
+// dynamic — щоб зміни з адмінки одразу відображались
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
-  if (!service) return {};
-  return { title: `${service.title} | Тірнью Truck Service`, description: service.short };
+
+  // Спочатку БД, потім static
+  let title = "";
+  let description = "";
+
+  try {
+    const dbService = await prisma.service.findUnique({ where: { slug } });
+    if (dbService) {
+      title = dbService.title;
+      description = dbService.short ?? "";
+    }
+  } catch {}
+
+  if (!title) {
+    const s = staticServices.find((s) => s.slug === slug);
+    if (s) { title = s.title; description = s.short ?? ""; }
+  }
+
+  if (!title) return {};
+  return { title: `${title} | Тірнью Truck Service`, description };
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
 
-  const service = services.find((s) => s.slug === slug);
+  // ── 1. Спробуємо знайти в БД ──────────────────────────────────────
+  let service: {
+    slug: string;
+    title: string;
+    short: string;
+    description: string;
+    price: string;
+    hours: string;
+    image: string;
+    category: string;
+    details: string[];
+  } | null = null;
+
+  try {
+    const dbRow = await prisma.service.findUnique({ where: { slug } });
+    if (dbRow) {
+      service = {
+        slug:        dbRow.slug,
+        title:       dbRow.title,
+        short:       dbRow.short ?? "",
+        description: dbRow.description ?? "",
+        price:       dbRow.price ?? "",
+        hours:       dbRow.hours ?? "",
+        image:       dbRow.image ?? "",
+        category:    dbRow.category ?? "",
+        details:     Array.isArray(dbRow.details) ? (dbRow.details as string[]) : [],
+      };
+    }
+  } catch {}
+
+  // ── 2. Fallback — static services.ts ─────────────────────────────
+  if (!service) {
+    const s = staticServices.find((s) => s.slug === slug);
+    if (s) {
+      service = {
+        slug:        s.slug,
+        title:       s.title,
+        short:       s.short ?? "",
+        description: s.description ?? "",
+        price:       s.price ?? "",
+        hours:       s.hours ?? "",
+        image:       s.image ?? "",
+        category:    s.category ?? "",
+        details:     s.details ?? [],
+      };
+    }
+  }
+
   if (!service) notFound();
 
-  const related = services
-    .filter((s) => s.category === service.category && s.slug !== service.slug)
+  // Related — з того самого джерела (за категорією зі static)
+  const related = staticServices
+    .filter((s) => s.category === service!.category && s.slug !== service!.slug)
     .slice(0, 3);
 
   return (
