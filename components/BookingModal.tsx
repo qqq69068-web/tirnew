@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, CheckCircle2, Loader2 } from "lucide-react";
 import { services } from "@/lib/services";
+import { CAR_BRANDS } from "@/lib/carData";
 
 interface Props {
   open: boolean;
@@ -13,7 +14,7 @@ interface Props {
 const inputCls =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-colors";
 
-const CATEGORIES = [
+const VEHICLE_TYPES = [
   { value: "truck", label: "🚛 Вантажівка" },
   { value: "trailer", label: "🚜 Причіп" },
   { value: "car", label: "🚗 Легкове" },
@@ -23,9 +24,9 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    carCategory: "truck" as "truck" | "trailer" | "car",
     carMake: "",
     carModel: "",
-    carCategory: "truck",
     service: defaultService,
     date: "",
     description: "",
@@ -36,17 +37,27 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
   const overlayRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
-  // sync defaultService when modal opens for a specific service
+  // Фільтр марок за типом авто (причіп = truck-бренди)
+  const filteredBrands = CAR_BRANDS.filter((b) =>
+    form.carCategory === "car" ? b.category === "car" : b.category === "truck"
+  );
+  const availableModels =
+    filteredBrands.find((b) => b.name === form.carMake)?.models ?? [];
+
   useEffect(() => {
     if (open) {
-      setForm((prev) => ({ ...prev, service: defaultService || prev.service }));
+      setForm((prev) => ({
+        ...prev,
+        service: defaultService || prev.service,
+        carMake: "",
+        carModel: "",
+      }));
       setSubmitted(false);
       setError("");
       setTimeout(() => firstInputRef.current?.focus(), 80);
     }
   }, [open, defaultService]);
 
-  // close on Escape
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -54,10 +65,9 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // lock body scroll
   useEffect(() => {
-    if (open) { document.body.style.overflow = "hidden"; }
-    else { document.body.style.overflow = ""; }
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
@@ -65,6 +75,15 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
     const { name, value } = e.target;
     if (name === "name" && !/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
     if (name === "phone" && !/^[0-9+()\-\s]*$/.test(value)) return;
+    // При зміні типу або марки — скидаємо залежні поля
+    if (name === "carCategory") {
+      setForm((prev) => ({ ...prev, carCategory: value as typeof prev.carCategory, carMake: "", carModel: "" }));
+      return;
+    }
+    if (name === "carMake") {
+      setForm((prev) => ({ ...prev, carMake: value, carModel: "" }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [name]: value }));
     setError("");
   };
@@ -115,7 +134,6 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
       aria-label="Форма запису"
     >
       <div className="bm-panel">
-        {/* Header */}
         <div className="bm-header">
           <div>
             <p className="bm-header__title">Записатись на сервіс</p>
@@ -126,7 +144,6 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           </button>
         </div>
 
-        {/* Body */}
         <div className="bm-body">
           {submitted ? (
             <div className="bm-success">
@@ -138,19 +155,19 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           ) : (
             <form onSubmit={handleSubmit} className="bm-form">
 
-              {/* Тип авто */}
+              {/* Тип транспорту */}
               <div className="bm-section">
                 <p className="bm-label-group">Тип транспорту</p>
                 <div className="bm-type-grid">
-                  {CATEGORIES.map((cat) => (
-                    <label key={cat.value} className={`bm-type-card${
-                      form.carCategory === cat.value ? " bm-type-card--active" : ""
+                  {VEHICLE_TYPES.map((vt) => (
+                    <label key={vt.value} className={`bm-type-card${
+                      form.carCategory === vt.value ? " bm-type-card--active" : ""
                     }`}>
-                      <input type="radio" name="carCategory" value={cat.value}
-                        checked={form.carCategory === cat.value}
+                      <input type="radio" name="carCategory" value={vt.value}
+                        checked={form.carCategory === vt.value}
                         onChange={handleChange} className="sr-only" />
-                      <span className="bm-type-icon">{cat.label.split(" ")[0]}</span>
-                      <span className="bm-type-text">{cat.label.split(" ").slice(1).join(" ")}</span>
+                      <span className="bm-type-icon">{vt.label.split(" ")[0]}</span>
+                      <span className="bm-type-text">{vt.label.split(" ").slice(1).join(" ")}</span>
                     </label>
                   ))}
                 </div>
@@ -176,21 +193,31 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
                 </div>
               </div>
 
-              {/* Авто */}
+              {/* Авто — випадаючі списки */}
               <div className="bm-section">
                 <p className="bm-label-group">Автомобіль</p>
                 <div className="bm-grid-2">
                   <div>
                     <label htmlFor="bm-carMake" className="bm-field-label">Марка *</label>
-                    <input id="bm-carMake" name="carMake" required
-                      value={form.carMake} onChange={handleChange}
-                      placeholder="Volvo" className={inputCls} />
+                    <select id="bm-carMake" name="carMake" required
+                      value={form.carMake} onChange={handleChange} className={inputCls}>
+                      <option value="">Оберіть марку</option>
+                      {filteredBrands.map((b) => (
+                        <option key={b.name} value={b.name}>{b.name}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label htmlFor="bm-carModel" className="bm-field-label">Модель *</label>
-                    <input id="bm-carModel" name="carModel" required
+                    <select id="bm-carModel" name="carModel" required
                       value={form.carModel} onChange={handleChange}
-                      placeholder="FH 500" className={inputCls} />
+                      disabled={availableModels.length === 0}
+                      className={inputCls}>
+                      <option value="">{form.carMake ? "Оберіть модель" : "— спочатку оберіть марку"}</option>
+                      {availableModels.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -221,7 +248,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
                       className={inputCls} />
                   </div>
                 </div>
-                <div className="mt-3">
+                <div style={{ marginTop: 12 }}>
                   <label htmlFor="bm-desc" className="bm-field-label">Коментар</label>
                   <textarea id="bm-desc" name="description" rows={3}
                     value={form.description} onChange={handleChange}
@@ -230,12 +257,12 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
                 </div>
               </div>
 
-              {error && (
-                <p className="bm-error">{error}</p>
-              )}
+              {error && <p className="bm-error">{error}</p>}
 
               <button type="submit" disabled={loading} className="bm-submit">
-                {loading ? <><Loader2 size={16} className="bm-spin" /> Відправляємо...</> : "Записатись на сервіс"}
+                {loading
+                  ? <><Loader2 size={16} className="bm-spin" /> Відправляємо...</>
+                  : "Записатись на сервіс"}
               </button>
             </form>
           )}
@@ -251,113 +278,108 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           padding: 16px;
           animation: bm-fade-in 0.18s ease;
         }
-        @keyframes bm-fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes bm-fade-in { from { opacity:0 } to { opacity:1 } }
 
         .bm-panel {
-          background: #fff;
-          border-radius: 20px;
-          width: 100%;
-          max-width: 560px;
+          background: #fff; border-radius: 20px;
+          width: 100%; max-width: 560px;
           max-height: 90dvh;
-          display: flex;
-          flex-direction: column;
+          display: flex; flex-direction: column;
           box-shadow: 0 24px 64px rgba(0,0,0,0.22);
           animation: bm-slide-up 0.22s cubic-bezier(0.34,1.56,0.64,1);
           overflow: hidden;
         }
         @keyframes bm-slide-up {
-          from { opacity: 0; transform: translateY(20px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
+          from { opacity:0; transform:translateY(20px) scale(0.97) }
+          to   { opacity:1; transform:translateY(0) scale(1) }
         }
 
         .bm-header {
-          display: flex; align-items: flex-start; justify-content: space-between;
+          display:flex; align-items:flex-start; justify-content:space-between;
           padding: 20px 24px 16px;
           border-bottom: 1px solid #f0f0f0;
           flex-shrink: 0;
         }
-        .bm-header__title { font-size: 18px; font-weight: 700; color: #111; }
-        .bm-header__sub { font-size: 13px; color: #888; margin-top: 2px; }
+        .bm-header__title { font-size:18px; font-weight:700; color:#111; }
+        .bm-header__sub { font-size:13px; color:#888; margin-top:2px; }
         .bm-close {
-          width: 34px; height: 34px; border-radius: 10px;
-          background: #f5f5f5; border: none; cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          color: #555; transition: background 0.15s; flex-shrink: 0; margin-left: 12px;
+          width:34px; height:34px; border-radius:10px;
+          background:#f5f5f5; border:none; cursor:pointer;
+          display:flex; align-items:center; justify-content:center;
+          color:#555; transition:background .15s;
+          flex-shrink:0; margin-left:12px;
         }
-        .bm-close:hover { background: #ebebeb; }
+        .bm-close:hover { background:#ebebeb; }
 
-        .bm-body {
-          overflow-y: auto; padding: 20px 24px 24px;
-          flex: 1;
-        }
+        .bm-body { overflow-y:auto; padding:20px 24px 24px; flex:1; }
 
-        .bm-form { display: flex; flex-direction: column; gap: 0; }
-        .bm-section { margin-bottom: 20px; }
+        .bm-form { display:flex; flex-direction:column; gap:0; }
+        .bm-section { margin-bottom:20px; }
         .bm-label-group {
-          font-size: 11px; font-weight: 600; color: #999;
-          text-transform: uppercase; letter-spacing: 0.08em;
-          margin-bottom: 10px;
+          font-size:11px; font-weight:600; color:#999;
+          text-transform:uppercase; letter-spacing:.08em;
+          margin-bottom:10px;
         }
         .bm-field-label {
-          display: block; font-size: 13px; font-weight: 500;
-          color: #444; margin-bottom: 5px;
+          display:block; font-size:13px; font-weight:500;
+          color:#444; margin-bottom:5px;
         }
-        .bm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        @media (max-width: 480px) {
-          .bm-grid-2 { grid-template-columns: 1fr; }
-          .bm-panel { border-radius: 16px; }
-          .bm-header, .bm-body { padding-left: 16px; padding-right: 16px; }
-        }
+        .bm-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-        .bm-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .bm-type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
         .bm-type-card {
-          display: flex; flex-direction: column; align-items: center;
-          gap: 4px; cursor: pointer; border-radius: 12px;
-          border: 2px solid #e5e7eb; padding: 10px 8px;
-          text-align: center; transition: border-color 0.15s, background 0.15s;
-          background: #fff;
+          display:flex; flex-direction:column; align-items:center;
+          gap:4px; cursor:pointer; border-radius:12px;
+          border:2px solid #e5e7eb; padding:10px 8px;
+          text-align:center; transition:border-color .15s,background .15s;
+          background:#fff;
         }
-        .bm-type-card:hover { border-color: #f5c518; }
-        .bm-type-card--active { border-color: #f5c518; background: #fffbeb; }
-        .bm-type-icon { font-size: 22px; line-height: 1; }
-        .bm-type-text { font-size: 11px; font-weight: 600; color: #444; line-height: 1.3; }
+        .bm-type-card:hover { border-color:#f5c518; }
+        .bm-type-card--active { border-color:#f5c518; background:#fffbeb; }
+        .bm-type-icon { font-size:22px; line-height:1; }
+        .bm-type-text { font-size:11px; font-weight:600; color:#444; line-height:1.3; }
 
         .bm-error {
-          font-size: 13px; color: #dc2626;
-          background: #fef2f2; border-radius: 10px;
-          padding: 10px 14px; margin-bottom: 12px;
+          font-size:13px; color:#dc2626;
+          background:#fef2f2; border-radius:10px;
+          padding:10px 14px; margin-bottom:12px;
         }
-
         .bm-submit {
-          width: 100%; padding: 13px;
-          background: #f5c518; color: #111;
-          font-weight: 700; font-size: 15px;
-          border: none; border-radius: 12px; cursor: pointer;
-          transition: background 0.15s, transform 0.12s;
-          display: flex; align-items: center; justify-content: center; gap: 8px;
+          width:100%; padding:13px;
+          background:#f5c518; color:#111;
+          font-weight:700; font-size:15px;
+          border:none; border-radius:12px; cursor:pointer;
+          transition:background .15s,transform .12s;
+          display:flex; align-items:center; justify-content:center; gap:8px;
         }
-        .bm-submit:hover:not(:disabled) { background: #e6b800; }
-        .bm-submit:active:not(:disabled) { transform: scale(0.98); }
-        .bm-submit:disabled { opacity: 0.55; cursor: not-allowed; }
-        .bm-spin { animation: bm-spin 0.7s linear infinite; }
-        @keyframes bm-spin { to { transform: rotate(360deg); } }
+        .bm-submit:hover:not(:disabled) { background:#e6b800; }
+        .bm-submit:active:not(:disabled) { transform:scale(0.98); }
+        .bm-submit:disabled { opacity:.55; cursor:not-allowed; }
+        .bm-spin { animation:bm-spin .7s linear infinite; }
+        @keyframes bm-spin { to { transform:rotate(360deg) } }
 
         .bm-success {
-          display: flex; flex-direction: column; align-items: center;
-          text-align: center; padding: 32px 16px;
+          display:flex; flex-direction:column; align-items:center;
+          text-align:center; padding:32px 16px;
         }
-        .bm-success__icon { color: #16a34a; margin-bottom: 16px; }
-        .bm-success h3 { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 8px; }
-        .bm-success p { font-size: 14px; color: #666; max-width: 280px; margin-bottom: 24px; }
+        .bm-success__icon { color:#16a34a; margin-bottom:16px; }
+        .bm-success h3 { font-size:22px; font-weight:700; color:#111; margin-bottom:8px; }
+        .bm-success p { font-size:14px; color:#666; max-width:280px; margin-bottom:24px; }
         .bm-btn-close-success {
-          padding: 10px 28px; background: #f5c518; color: #111;
-          font-weight: 600; font-size: 14px; border: none;
-          border-radius: 10px; cursor: pointer;
+          padding:10px 28px; background:#f5c518; color:#111;
+          font-weight:600; font-size:14px; border:none;
+          border-radius:10px; cursor:pointer;
         }
-        .bm-btn-close-success:hover { background: #e6b800; }
+        .bm-btn-close-success:hover { background:#e6b800; }
 
-        .mt-3 { margin-top: 12px; }
-        .sr-only { position: absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+        .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+        .resize-none { resize:none; }
+
+        @media (max-width:480px) {
+          .bm-grid-2 { grid-template-columns:1fr; }
+          .bm-panel { border-radius:16px; }
+          .bm-header, .bm-body { padding-left:16px; padding-right:16px; }
+        }
       `}</style>
     </div>
   );
