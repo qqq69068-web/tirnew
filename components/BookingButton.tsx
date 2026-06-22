@@ -11,11 +11,13 @@ interface Props {
   size?: "sm" | "md";
   /** Якщо вказано — відкриває модалку з вже вибраною послугою */
   defaultService?: string;
+  /** Підказка яку вкладку відкрити (вантажні або легкові) */
+  defaultVehicleTab?: "truck" | "car";
   /** Якщо true — завжди веде на /contacts (navbar) */
   toContacts?: boolean;
 }
 
-export default function BookingButton({ fullWidth, size, defaultService, toContacts }: Props) {
+export default function BookingButton({ fullWidth, size, defaultService, defaultVehicleTab, toContacts }: Props) {
   const [open, setOpen] = useState(false);
 
   const btnClass = `btn btn-primary${
@@ -39,6 +41,7 @@ export default function BookingButton({ fullWidth, size, defaultService, toConta
         open={open}
         onClose={() => setOpen(false)}
         defaultService={defaultService}
+        defaultVehicleTab={defaultVehicleTab}
       />
     </>
   );
