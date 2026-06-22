@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { randomBytes } from "crypto";
 
 const PRODUCTION_URL = "https://tirnew-production.up.railway.app";
+
+function generateOtp(): string {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
 
 export async function POST(req: NextRequest) {
   const { email, name, phone } = await req.json();
@@ -14,30 +17,39 @@ export async function POST(req: NextRequest) {
     create: { email, name, phone },
   });
 
-  const token = randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
-  await prisma.magicToken.create({ data: { token, email, expiresAt } });
+  // Invalidate previous unused tokens
+  await prisma.magicToken.updateMany({
+    where: { email, used: false },
+    data: { used: true },
+  });
+
+  const otp = generateOtp();
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 хвилин
+  await prisma.magicToken.create({ data: { token: otp, email, expiresAt } });
 
   const baseUrl = process.env.APP_URL || PRODUCTION_URL;
-  const url = `${baseUrl}/api/client/verify?token=${token}`;
+  void baseUrl;
 
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
-      "accept": "application/json",
+      accept: "application/json",
       "content-type": "application/json",
       "api-key": process.env.BREVO_API_KEY!,
     },
     body: JSON.stringify({
       sender: { name: "TIR Service", email: "qqq69068@gmail.com" },
       to: [{ email }],
-      subject: "Ваше посилання для входу — TIR Service",
+      subject: "Ваш код для входу — TIR Service",
       htmlContent: `
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-          <h2 style="color:#0f1923">Вхід до особистого кабінету</h2>
-          <p style="color:#555">Натисніть кнопку нижче щоб увійти. Посилання діє 30 хвилин.</p>
-          <a href="${url}" style="display:inline-block;margin-top:16px;padding:14px 28px;background:#01696f;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Увійти до кабінету</a>
-          <p style="margin-top:24px;color:#aaa;font-size:12px">Якщо ви не запитували цей лист — просто проігноруйте його.</p>
+        <div style="font-family:sans-serif;max-width:420px;margin:0 auto;padding:32px">
+          <h2 style="color:#0f1923;margin-bottom:8px">Вхід до особистого кабінету</h2>
+          <p style="color:#555;margin-bottom:24px">Введіть цей код на сайті. Він дійсний <strong>10 хвилин</strong>.</p>
+          <div style="background:#f3f0ec;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">
+            <p style="margin:0 0 6px;font-size:12px;color:#7a7974;letter-spacing:0.1em;text-transform:uppercase">Ваш код</p>
+            <p style="margin:0;font-size:42px;font-weight:800;letter-spacing:0.18em;color:#01696f;font-family:monospace">${otp}</p>
+          </div>
+          <p style="color:#aaa;font-size:12px">Якщо ви не запитували цей код — просто проігноруйте листа.</p>
         </div>
       `,
     }),
