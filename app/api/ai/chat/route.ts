@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
 Якщо хоче записатися — обов'язково збери ім'я, телефон і email.
 Email обов'язковий! Поясни природно: "Будь ласка, вкажіть ваш email — це потрібно щоб надіслати підтвердження запису та посилання для входу в особистий кабінет де ви зможете бачити свій запис."
 BEZ email-а не створюй запис!
-Якщо запитують про свої записи або історію — запропонуй відправити посилання для входу (не згадуй посилання на /cabinet в тексті — тільки запропонуй ввести email для отримання посилання).`;
+Якщо запитують про свої записи або історію — запропонуй ввести email для отримання посилання для входу.`;
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
@@ -166,7 +166,7 @@ BEZ email-а не створюй запис!
       return NextResponse.json({ reply });
     }
 
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -183,15 +183,26 @@ BEZ email-а не створюй запис!
       }),
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error("[AI CHAT] OpenAI error:", res.status, err);
+    const data = await openaiRes.json();
+
+    if (!openaiRes.ok) {
+      console.error("[AI CHAT] OpenAI error:", openaiRes.status, JSON.stringify(data));
+      // Повертаємо деталі помилки для діагностики
+      const errorMsg = data?.error?.message || data?.error?.code || JSON.stringify(data);
       const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
-      return NextResponse.json({ reply: getRuleBasedReply(lastMsg, client) });
+      const fallback = getRuleBasedReply(lastMsg, client);
+      console.error("[AI CHAT] OpenAI error detail:", errorMsg);
+      return NextResponse.json({ reply: fallback, _debug_error: errorMsg });
     }
 
-    const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content || "Вибачте, не зміг відповісти. Спробуйте ще раз.";
+    const reply = data.choices?.[0]?.message?.content;
+
+    if (!reply) {
+      console.error("[AI CHAT] Empty choices from OpenAI:", JSON.stringify(data));
+      const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
+      return NextResponse.json({ reply: getRuleBasedReply(lastMsg, client), _debug: "empty_choices" });
+    }
+
     return NextResponse.json({ reply });
   } catch (e) {
     console.error("[AI CHAT ERROR]", e);
@@ -202,7 +213,7 @@ BEZ email-а не створюй запис!
 function getRuleBasedReply(msg: string, client: ClientLite | null): string {
   if (msg.includes("привіт") || msg.includes("здравств") || msg.includes("добрий")) {
     return client
-      ? "Привіт! 👋 Радий бачити вас знову. Чим можу допомогти?"
+      ? `Привіт, ${client.name || ""}! 👋 Радий бачити вас знову. Чим можу допомогти?`
       : "Привіт! 👋 Я AI-помічник Tirnew Truck Service. Чим можу допомогти?";
   }
   if (msg.includes("запис") || msg.includes("записат")) {
