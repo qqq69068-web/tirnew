@@ -44,6 +44,17 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
   const availableModels =
     filteredBrands.find((b) => b.name === form.carMake)?.models ?? [];
 
+  // Фільтр послуг за типом транспорту:
+  // "truck"/"trailer" → показуємо truck + both
+  // "car"             → показуємо car + both
+  const filteredServices = services.filter((s) => {
+    const vt = s.vehicleType ?? "both";
+    if (form.carCategory === "car") return vt === "car" || vt === "both";
+    return vt === "truck" || vt === "both"; // truck і trailer
+  });
+
+  const serviceCategories = Array.from(new Set(filteredServices.map((s) => s.category)));
+
   useEffect(() => {
     if (open) {
       setForm((prev) => ({
@@ -75,9 +86,9 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
     const { name, value } = e.target;
     if (name === "name" && !/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
     if (name === "phone" && !/^[0-9+()\-\s]*$/.test(value)) return;
-    // При зміні типу або марки — скидаємо залежні поля
+    // При зміні типу — скидаємо марку, модель і послугу
     if (name === "carCategory") {
-      setForm((prev) => ({ ...prev, carCategory: value as typeof prev.carCategory, carMake: "", carModel: "" }));
+      setForm((prev) => ({ ...prev, carCategory: value as typeof prev.carCategory, carMake: "", carModel: "", service: "" }));
       return;
     }
     if (name === "carMake") {
@@ -121,8 +132,6 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
   };
 
   if (!open) return null;
-
-  const serviceCategories = Array.from(new Set(services.map((s) => s.category)));
 
   return (
     <div
@@ -233,7 +242,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
                       <option value="">Оберіть послугу</option>
                       {serviceCategories.map((cat) => (
                         <optgroup key={cat} label={cat}>
-                          {services.filter((s) => s.category === cat).map((s) => (
+                          {filteredServices.filter((s) => s.category === cat).map((s) => (
                             <option key={s.slug} value={s.slug}>{s.title}</option>
                           ))}
                         </optgroup>
