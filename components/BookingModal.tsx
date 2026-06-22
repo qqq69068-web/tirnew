@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X, CheckCircle2, Loader2 } from "lucide-react";
+import { X, CheckCircle2, Loader2, Truck, Car } from "lucide-react";
 import { services } from "@/lib/services";
 import { CAR_BRANDS } from "@/lib/carData";
 
@@ -9,64 +9,83 @@ interface Props {
   open: boolean;
   onClose: () => void;
   defaultService?: string;
+  /** Підказка з якої вкладки відкрили (truck | car) */
+  defaultVehicleTab?: "truck" | "car";
 }
 
 const inputCls =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-colors";
 
-const VEHICLE_TYPES = [
-  { value: "truck", label: "🚛 Вантажівка" },
+// Підтип транспорту всередині вкладки "Вантажні"
+const TRUCK_SUBTYPES = [
+  { value: "truck",   label: "🚛 Вантажівка" },
   { value: "trailer", label: "🚜 Причіп" },
-  { value: "car", label: "🚗 Легкове" },
 ];
 
-export default function BookingModal({ open, onClose, defaultService = "" }: Props) {
+export default function BookingModal({ open, onClose, defaultService = "", defaultVehicleTab }: Props) {
+  // Визначаємо початкову вкладку за defaultService або defaultVehicleTab
+  const getInitialTab = (): "truck" | "car" => {
+    if (defaultVehicleTab) return defaultVehicleTab;
+    if (defaultService) {
+      const svc = services.find((s) => s.slug === defaultService);
+      if (svc?.vehicleType === "car") return "car";
+    }
+    return "truck";
+  };
+
+  const [tab, setTab] = useState<"truck" | "car">(getInitialTab);
+  const [truckSubtype, setTruckSubtype] = useState<"truck" | "trailer">("truck");
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    carCategory: "truck" as "truck" | "trailer" | "car",
     carMake: "",
     carModel: "",
     service: defaultService,
     date: "",
     description: "",
   });
+
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const overlayRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
-  // Фільтр марок за типом авто (причіп = truck-бренди)
-  const filteredBrands = CAR_BRANDS.filter((b) =>
-    form.carCategory === "car" ? b.category === "car" : b.category === "truck"
-  );
-  const availableModels =
-    filteredBrands.find((b) => b.name === form.carMake)?.models ?? [];
-
-  // Фільтр послуг за типом транспорту:
-  // "truck"/"trailer" → показуємо truck + both
-  // "car"             → показуємо car + both
+  // Послуги відфільтровані по вкладці
   const filteredServices = services.filter((s) => {
     const vt = s.vehicleType ?? "both";
-    if (form.carCategory === "car") return vt === "car" || vt === "both";
-    return vt === "truck" || vt === "both"; // truck і trailer
+    if (tab === "car") return vt === "car" || vt === "both";
+    return vt === "truck" || vt === "both";
   });
 
   const serviceCategories = Array.from(new Set(filteredServices.map((s) => s.category)));
 
+  // Марки відфільтровані по вкладці
+  const filteredBrands = CAR_BRANDS.filter((b) =>
+    tab === "car" ? b.category === "car" : b.category === "truck"
+  );
+  const availableModels = filteredBrands.find((b) => b.name === form.carMake)?.models ?? [];
+
   useEffect(() => {
     if (open) {
-      setForm((prev) => ({
-        ...prev,
-        service: defaultService || prev.service,
+      const initTab = getInitialTab();
+      setTab(initTab);
+      setTruckSubtype("truck");
+      setForm({
+        name: "",
+        phone: "",
         carMake: "",
         carModel: "",
-      }));
+        service: defaultService,
+        date: "",
+        description: "",
+      });
       setSubmitted(false);
       setError("");
       setTimeout(() => firstInputRef.current?.focus(), 80);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, defaultService]);
 
   useEffect(() => {
@@ -82,15 +101,15 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  const switchTab = (newTab: "truck" | "car") => {
+    setTab(newTab);
+    setForm((prev) => ({ ...prev, carMake: "", carModel: "", service: "" }));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name === "name" && !/^[a-zA-Z\u0400-\u04FF\s\-']*$/.test(value)) return;
     if (name === "phone" && !/^[0-9+()\-\s]*$/.test(value)) return;
-    // При зміні типу — скидаємо марку, модель і послугу
-    if (name === "carCategory") {
-      setForm((prev) => ({ ...prev, carCategory: value as typeof prev.carCategory, carMake: "", carModel: "", service: "" }));
-      return;
-    }
     if (name === "carMake") {
       setForm((prev) => ({ ...prev, carMake: value, carModel: "" }));
       return;
@@ -104,6 +123,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
     setError("");
     setLoading(true);
     try {
+      const carCategory = tab === "car" ? "car" : truckSubtype;
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,7 +132,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           phone: form.phone,
           carBrand: form.carMake,
           carModel: form.carModel,
-          carCategory: form.carCategory,
+          carCategory,
           service: form.service,
           date: form.date ? new Date(form.date).toISOString() : null,
           message: form.description,
@@ -125,7 +145,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
       }
       setSubmitted(true);
     } catch {
-      setError("Помилка з\'єднання. Спробуйте ще раз.");
+      setError("Помилка з'єднання. Спробуйте ще раз.");
     } finally {
       setLoading(false);
     }
@@ -143,6 +163,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
       aria-label="Форма запису"
     >
       <div className="bm-panel">
+        {/* Заголовок */}
         <div className="bm-header">
           <div>
             <p className="bm-header__title">Записатись на сервіс</p>
@@ -150,6 +171,26 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           </div>
           <button className="bm-close" onClick={onClose} aria-label="Закрити">
             <X size={18} />
+          </button>
+        </div>
+
+        {/* Головні вкладки */}
+        <div className="bm-tabs">
+          <button
+            type="button"
+            className={`bm-tab${tab === "truck" ? " bm-tab--active" : ""}`}
+            onClick={() => switchTab("truck")}
+          >
+            <Truck size={18} />
+            <span>Вантажні / TIR</span>
+          </button>
+          <button
+            type="button"
+            className={`bm-tab${tab === "car" ? " bm-tab--active" : ""}`}
+            onClick={() => switchTab("car")}
+          >
+            <Car size={18} />
+            <span>Легкові авто</span>
           </button>
         </div>
 
@@ -164,23 +205,31 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           ) : (
             <form onSubmit={handleSubmit} className="bm-form">
 
-              {/* Тип транспорту */}
-              <div className="bm-section">
-                <p className="bm-label-group">Тип транспорту</p>
-                <div className="bm-type-grid">
-                  {VEHICLE_TYPES.map((vt) => (
-                    <label key={vt.value} className={`bm-type-card${
-                      form.carCategory === vt.value ? " bm-type-card--active" : ""
-                    }`}>
-                      <input type="radio" name="carCategory" value={vt.value}
-                        checked={form.carCategory === vt.value}
-                        onChange={handleChange} className="sr-only" />
-                      <span className="bm-type-icon">{vt.label.split(" ")[0]}</span>
-                      <span className="bm-type-text">{vt.label.split(" ").slice(1).join(" ")}</span>
-                    </label>
-                  ))}
+              {/* Підтип (лише для вантажних) */}
+              {tab === "truck" && (
+                <div className="bm-section">
+                  <p className="bm-label-group">Тип транспорту</p>
+                  <div className="bm-subtype-grid">
+                    {TRUCK_SUBTYPES.map((st) => (
+                      <label
+                        key={st.value}
+                        className={`bm-subtype-card${truckSubtype === st.value ? " bm-subtype-card--active" : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name="truckSubtype"
+                          value={st.value}
+                          checked={truckSubtype === st.value}
+                          onChange={() => setTruckSubtype(st.value as "truck" | "trailer")}
+                          className="sr-only"
+                        />
+                        <span className="bm-subtype-icon">{st.label.split(" ")[0]}</span>
+                        <span className="bm-subtype-text">{st.label.split(" ").slice(1).join(" ")}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Контакти */}
               <div className="bm-section">
@@ -202,9 +251,9 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
                 </div>
               </div>
 
-              {/* Авто — випадаючі списки */}
+              {/* Авто */}
               <div className="bm-section">
-                <p className="bm-label-group">Автомобіль</p>
+                <p className="bm-label-group">{tab === "truck" ? "Транспорт" : "Автомобіль"}</p>
                 <div className="bm-grid-2">
                   <div>
                     <label htmlFor="bm-carMake" className="bm-field-label">Марка *</label>
@@ -320,6 +369,27 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
         }
         .bm-close:hover { background:#ebebeb; }
 
+        /* Головні вкладки */
+        .bm-tabs {
+          display: grid; grid-template-columns: 1fr 1fr;
+          border-bottom: 1px solid #f0f0f0;
+          flex-shrink: 0;
+        }
+        .bm-tab {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          padding: 13px 16px;
+          font-size: 14px; font-weight: 600; color: #888;
+          background: #fafafa; border: none; cursor: pointer;
+          transition: color .15s, background .15s, box-shadow .15s;
+          position: relative;
+        }
+        .bm-tab:first-child { border-right: 1px solid #f0f0f0; }
+        .bm-tab:hover { color: #555; background: #f5f5f5; }
+        .bm-tab--active {
+          color: #111; background: #fff;
+          box-shadow: inset 0 -2px 0 #f5c518;
+        }
+
         .bm-body { overflow-y:auto; padding:20px 24px 24px; flex:1; }
 
         .bm-form { display:flex; flex-direction:column; gap:0; }
@@ -335,18 +405,19 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
         }
         .bm-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-        .bm-type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-        .bm-type-card {
+        /* Підтип вантажних */
+        .bm-subtype-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .bm-subtype-card {
           display:flex; flex-direction:column; align-items:center;
           gap:4px; cursor:pointer; border-radius:12px;
           border:2px solid #e5e7eb; padding:10px 8px;
           text-align:center; transition:border-color .15s,background .15s;
           background:#fff;
         }
-        .bm-type-card:hover { border-color:#f5c518; }
-        .bm-type-card--active { border-color:#f5c518; background:#fffbeb; }
-        .bm-type-icon { font-size:22px; line-height:1; }
-        .bm-type-text { font-size:11px; font-weight:600; color:#444; line-height:1.3; }
+        .bm-subtype-card:hover { border-color:#f5c518; }
+        .bm-subtype-card--active { border-color:#f5c518; background:#fffbeb; }
+        .bm-subtype-icon { font-size:24px; line-height:1; }
+        .bm-subtype-text { font-size:12px; font-weight:600; color:#444; }
 
         .bm-error {
           font-size:13px; color:#dc2626;
@@ -388,6 +459,7 @@ export default function BookingModal({ open, onClose, defaultService = "" }: Pro
           .bm-grid-2 { grid-template-columns:1fr; }
           .bm-panel { border-radius:16px; }
           .bm-header, .bm-body { padding-left:16px; padding-right:16px; }
+          .bm-tabs { font-size:13px; }
         }
       `}</style>
     </div>
