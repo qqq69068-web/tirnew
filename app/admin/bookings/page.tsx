@@ -27,6 +27,7 @@ const PROGRESS_OPTIONS = [
   { value: "diagnostics", label: "Діагностика" },
   { value: "in_progress", label: "В роботі" },
   { value: "done",        label: "Готово до видачі" },
+  { value: "issued",      label: "Видано" },
 ];
 
 const PROGRESS_STATUS_CLASS: Record<string, string> = {
@@ -34,6 +35,7 @@ const PROGRESS_STATUS_CLASS: Record<string, string> = {
   diagnostics: "status status-progress",
   in_progress: "status status-progress",
   done:        "status status-done",
+  issued:      "status status-issued",
 };
 
 function toLocalDatetimeInput(iso: string | null): string {
@@ -533,80 +535,51 @@ export default function AdminBookingsPage() {
           background: var(--surface2);
         }
         .bk-field-input:focus {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px var(--primary-glow);
-          background: var(--surface2);
-        }
-        select.bk-field-input {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6254' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-          background-color: var(--surface);
-          padding-right: 36px;
-          cursor: pointer;
-        }
-        select.bk-field-input option {
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px var(--accent-subtle);
           background: var(--surface);
-          color: var(--text);
-        }
-        input[type="datetime-local"].bk-field-input::-webkit-calendar-picker-indicator {
-          opacity: 0.5;
-          cursor: pointer;
-        }
-        input[type="number"].bk-field-input::-webkit-inner-spin-button,
-        input[type="number"].bk-field-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-
-        /* Labels */
-        .bk-card__body .form-label {
-          display: block;
-          font-size: var(--text-xs);
-          font-weight: 600;
-          color: var(--text-muted);
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          margin-bottom: var(--space-2);
         }
 
         /* Fields grid */
-        .bk-fields { display:grid; grid-template-columns:1fr; gap:var(--space-4); }
-        @media (min-width:540px) { .bk-fields { grid-template-columns:1fr 1fr; } }
-        .bk-fields__full { grid-column:1 / -1; }
-
-        /* Client message */
-        .bk-message { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); }
-        .bk-message p { font-size:var(--text-sm); color:var(--text-muted); line-height:1.6; max-width:none; word-break:break-word; }
-
-        /* Work items */
-        .bk-worklist { display:flex; flex-direction:column; gap:var(--space-1); margin-bottom:var(--space-2); min-height:24px; }
-        .bk-worklist__empty { font-size:var(--text-xs); color:var(--text-faint); font-style:italic; padding:var(--space-2) 0; }
-        .bk-worklist__item { display:flex; align-items:center; gap:var(--space-2); background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-2) var(--space-3); animation:fadeIn 0.2s ease both; }
-        .bk-worklist__num { font-size:var(--text-xs); font-weight:700; color:var(--accent); flex-shrink:0; width:18px; }
-        .bk-worklist__text { font-size:var(--text-sm); color:var(--text); flex:1; word-break:break-word; overflow-wrap:break-word; min-width:0; }
-        .bk-worklist__remove { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:var(--radius); color:var(--text-faint); transition:color var(--transition-fast),background var(--transition-fast); flex-shrink:0; }
-        .bk-worklist__remove:hover { color:var(--primary); background:var(--primary-subtle); }
-
-        /* Add work */
-        .bk-addwork { display:flex; gap:var(--space-2); align-items:stretch; }
-        .bk-addwork .bk-field-input { flex:1; min-width:0; }
-        @media (max-width:400px) {
-          .bk-addwork { flex-direction:column; }
-          .bk-addwork .btn { width:100%; justify-content:center; }
+        .bk-fields {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: var(--space-3);
         }
+        @media (max-width: 480px) { .bk-fields { grid-template-columns: 1fr; } }
+        .bk-fields__full { grid-column: 1 / -1; }
+
+        /* Work list */
+        .bk-worklist { display:flex; flex-direction:column; gap:var(--space-2); margin-bottom:var(--space-2); }
+        .bk-worklist__empty { font-size:var(--text-xs); color:var(--text-faint); font-style:italic; }
+        .bk-worklist__item { display:flex; align-items:center; gap:var(--space-2); background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-2) var(--space-3); }
+        .bk-worklist__num  { font-size:var(--text-xs); color:var(--text-faint); flex-shrink:0; }
+        .bk-worklist__text { font-size:var(--text-sm); color:var(--text); flex:1; min-width:0; }
+        .bk-worklist__remove { display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:var(--radius-sm); color:var(--text-faint); transition:background var(--transition-fast), color var(--transition-fast); flex-shrink:0; }
+        .bk-worklist__remove:hover { background:var(--error-subtle, #fee2e2); color:var(--error, #ef4444); }
+        .bk-addwork { display:flex; gap:var(--space-2); }
+        .bk-addwork .bk-field-input { flex:1; }
 
         /* Total */
-        .bk-total { display:flex; align-items:center; justify-content:space-between; background:var(--accent-subtle); border:1px solid var(--accent-border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); }
-        .bk-total__label { font-size:var(--text-xs); font-weight:600; color:var(--accent); letter-spacing:0.04em; text-transform:uppercase; }
-        .bk-total__value { font-size:var(--text-sm); font-weight:700; color:var(--accent); }
+        .bk-total { display:flex; justify-content:space-between; align-items:center; padding:var(--space-3) var(--space-4); background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); }
+        .bk-total__label { font-size:var(--text-sm); color:var(--text-muted); }
+        .bk-total__value { font-size:var(--text-base); font-weight:700; color:var(--accent); }
 
         /* Actions */
         .bk-actions { display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap; }
-        .bk-actions__date { font-size:var(--text-xs); color:var(--text-faint); margin-left:auto; }
-        @media (max-width:480px) {
-          .bk-actions { flex-direction:column; align-items:stretch; }
-          .bk-actions .btn { width:100%; justify-content:center; }
-          .bk-actions__date { margin-left:0; text-align:center; }
+        .bk-actions__date { margin-left:auto; font-size:var(--text-xs); color:var(--text-faint); }
+        .bk-saved-msg { display:inline-flex; align-items:center; gap:4px; font-size:var(--text-xs); font-weight:600; color:var(--accent); }
+
+        /* Message bubble */
+        .bk-message { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); }
+        .bk-message p { font-size:var(--text-sm); color:var(--text-muted); }
+
+        /* Issued status badge */
+        .status-issued {
+          background: rgba(99, 102, 241, 0.10);
+          color: #6366f1;
+          border: 1px solid rgba(99, 102, 241, 0.30);
         }
-        .bk-saved-msg { display:inline-flex; align-items:center; gap:5px; font-size:var(--text-xs); font-weight:600; color:var(--status-done-text); animation:fadeIn 0.2s ease both; }
       `}</style>
     </div>
   );

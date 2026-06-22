@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Suspense } from "react";
 import {
   LogOut, Clock, CheckCircle2, Wrench, Search, User,
-  ReceiptText, Timer, Mail, Package, ChevronRight, ArrowRight,
+  ReceiptText, Timer, Mail, Package, ChevronRight, ArrowRight, HandCoins,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -17,10 +17,11 @@ interface Client { email: string; name: string | null; phone: string | null; boo
 
 /* ─── Constants ─── */
 const PROGRESS_STEPS = [
-  { key: "received",    label: "Прийнято",    icon: <Clock    size={12} /> },
-  { key: "diagnostics", label: "Діагностика", icon: <Search   size={12} /> },
-  { key: "in_progress", label: "В роботі",    icon: <Wrench   size={12} /> },
+  { key: "received",    label: "Прийнято",    icon: <Clock        size={12} /> },
+  { key: "diagnostics", label: "Діагностика", icon: <Search       size={12} /> },
+  { key: "in_progress", label: "В роботі",    icon: <Wrench       size={12} /> },
   { key: "done",        label: "Готово",      icon: <CheckCircle2 size={12} /> },
+  { key: "issued",      label: "Видано",      icon: <HandCoins    size={12} /> },
 ];
 
 /* ─── Animated counter hook ─── */
@@ -48,7 +49,15 @@ function ProgressTrack({ current }: { current: string }) {
     <div className="cb-progress-track">
       {PROGRESS_STEPS.map((step, i) => (
         <div key={step.key} className="cb-progress-item">
-          <div className={`cb-progress-step ${i < idx ? "cb-progress-step--done" : i === idx ? "cb-progress-step--active" : "cb-progress-step--future"}`}>
+          <div className={`cb-progress-step ${
+            i < idx
+              ? "cb-progress-step--done"
+              : i === idx
+                ? step.key === "issued"
+                  ? "cb-progress-step--issued"
+                  : "cb-progress-step--active"
+                : "cb-progress-step--future"
+          }`}>
             {i < idx ? <CheckCircle2 size={11} /> : step.icon}
             <span>{step.label}</span>
           </div>
@@ -64,7 +73,7 @@ function ProgressTrack({ current }: { current: string }) {
 /* ─── StatsBar ─── */
 function StatsBar({ bookings }: { bookings: Booking[] }) {
   const total    = bookings.length;
-  const done     = bookings.filter((b) => b.progress === "done").length;
+  const done     = bookings.filter((b) => b.progress === "done" || b.progress === "issued").length;
   const totalPrc = bookings.reduce((s, b) => s + (b.price || 0) + (b.partsCost || 0), 0);
   const cTotal   = useCountUp(total);
   const cDone    = useCountUp(done);
@@ -185,7 +194,7 @@ function CabinetSkeleton() {
             <div className="skeleton" style={{ height: 20, width: 70, borderRadius: 6 }} />
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-            {[1, 2, 3, 4].map((k) => <div key={k} className="skeleton" style={{ height: 24, flex: 1, borderRadius: 99 }} />)}
+            {[1, 2, 3, 4, 5].map((k) => <div key={k} className="skeleton" style={{ height: 24, flex: 1, borderRadius: 99 }} />)}
           </div>
         </div>
       ))}
@@ -197,7 +206,6 @@ function CabinetSkeleton() {
 function OtpInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Build exactly 6 slots from the current value string
   const slots: string[] = Array.from({ length: 6 }, (_, i) => value[i] ?? "");
 
   const handleChange = (i: number, raw: string) => {
@@ -211,7 +219,6 @@ function OtpInput({ value, onChange }: { value: string; onChange: (v: string) =>
   const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace") {
       if (slots[i]) {
-        // clear current
         const next = [...slots];
         next[i] = "";
         onChange(next.join(""));
@@ -305,7 +312,6 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
     setLoading(false);
   };
 
-  /* ── Step 2: Enter code ── */
   if (sent) return (
     <div className="cb-auth-wrap">
       <div className="cb-auth-icon-wrap">
@@ -350,7 +356,6 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
     </div>
   );
 
-  /* ── Step 1: Enter email ── */
   return (
     <div className="cb-auth-wrap">
       <div className="cb-auth-icon-wrap">
@@ -510,6 +515,7 @@ export default function CabinetPage() {
         .cb-progress-step--future { background: var(--surface2); color: var(--text-faint); border-color: var(--border); }
         .cb-progress-step--active { background: rgba(74,158,107,0.10); color: #4a9e6b; border-color: rgba(74,158,107,0.30); }
         .cb-progress-step--done   { background: #4a9e6b; color: #fff; border-color: #4a9e6b; }
+        .cb-progress-step--issued { background: #6366f1; color: #fff; border-color: #6366f1; }
         .cb-progress-arrow { color: var(--text-faint); flex-shrink: 0; }
         .cb-progress-arrow--done { color: #4a9e6b; }
 
