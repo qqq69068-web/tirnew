@@ -50,6 +50,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Якщо новий клієнт з email — спочатку створюємо акаунт ──
+    // (має бути ДО booking.create через FK constraint Booking_clientEmail_fkey)
+    let isNewClient = false;
+    if (!clientEmail && finalEmail) {
+      await prisma.client.upsert({
+        where: { email: finalEmail },
+        update: {
+          name: finalName || undefined,
+          phone: finalPhone || undefined,
+        },
+        create: {
+          email: finalEmail,
+          name: finalName,
+          phone: finalPhone,
+        },
+      });
+      isNewClient = true;
+    }
+    // ────────────────────────────────────────────────────────────
+
     // ── Перевірка зайнятості слота ──────────────────────────────
     let scheduledStart: Date | null = null;
     let scheduledEnd: Date | null = null;
@@ -107,27 +127,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Якщо клієнт не авторизований, але надав email — створюємо/оновлюємо акаунт і відправляємо magic link
-    if (!clientEmail && finalEmail) {
+    // ── Відправка email ──────────────────────────────────────────
+    if (isNewClient && finalEmail) {
       try {
-        await prisma.client.upsert({
-          where: { email: finalEmail },
-          update: {
-            name: finalName || undefined,
-            phone: finalPhone || undefined,
-          },
-          create: {
-            email: finalEmail,
-            name: finalName,
-            phone: finalPhone,
-          },
-        });
-
-        await prisma.booking.update({
-          where: { id: booking.id },
-          data: { clientEmail: finalEmail },
-        });
-
         const magicToken = randomBytes(32).toString("hex");
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 3);
         await prisma.magicToken.create({
@@ -179,7 +181,7 @@ export async function POST(req: NextRequest) {
                 </table>
                 <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:20px;margin-bottom:24px">
                   <p style="margin:0 0 12px;color:#374151;font-weight:600">🔑 Увійдіть в особистий кабінет</p>
-                  <p style="margin:0 0 16px;color:#6b7280;font-size:14px">Для перегляду історії записів та статусу ремонту — натисніть кнопку нижче. Посилання діє 3 дні.</p>
+                  <p style="margin:0 0 16px;color:#6b7280;font-size:14px">Для перегляду записів та статусу ремонту — натисніть кнопку нижче. Посилання діє 3 дні.</p>
                   <a href="${loginUrl}" style="display:inline-block;padding:12px 24px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px">Увійти в кабінет</a>
                 </div>
                 <p style="color:#9ca3af;font-size:12px">Якщо ви не робили цього запису — зателефонуйте нам: +38 (066) 418-88-26</p>
