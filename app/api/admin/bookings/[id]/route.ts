@@ -9,6 +9,7 @@ const PROGRESS_LABELS: Record<string, string> = {
   diagnostics: "Діагностика",
   in_progress: "В роботі",
   done: "Готово до видачі",
+  issued: "Видано",
 };
 
 async function verifyAdmin(req: NextRequest) {
@@ -68,22 +69,33 @@ export async function PATCH(
 
   const emailTo = clientEmail || booking.clientEmail;
 
-  // Визначаємо базову URL — з env або з заголовка запиту
   const origin = process.env.NEXT_PUBLIC_APP_URL ||
     `${req.headers.get("x-forwarded-proto") || "https"}://${req.headers.get("host")}`;
 
   if (progress && progress !== booking.progress && emailTo) {
     const label = PROGRESS_LABELS[progress] || progress;
     const isDone = progress === "done";
+    const isIssued = progress === "issued";
     try {
       await sendEmail(
         emailTo,
-        isDone ? "✅ Ваш автомобіль готовий до видачі" : `Оновлення статусу: ${label}`,
+        isIssued
+          ? "✅ Автомобіль видано"
+          : isDone
+          ? "✅ Ваш автомобіль готовий до видачі"
+          : `Оновлення статусу: ${label}`,
         `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-          <h2 style="color:#0f1923">${isDone ? "🎉 Ваш автомобіль готовий!" : "Оновлення по вашому замовленню"}</h2>
+          <h2 style="color:#0f1923">${
+            isIssued
+              ? "🏁 Автомобіль видано"
+              : isDone
+              ? "🎉 Ваш автомобіль готовий!"
+              : "Оновлення по вашому замовленню"
+          }</h2>
           <p style="color:#555">Статус вашого замовлення змінено на: <strong>${label}</strong></p>
           ${booking.carBrand ? `<p style="color:#555">Авто: <strong>${booking.carBrand} ${booking.carModel || ""}</strong></p>` : ""}
           ${isDone ? "<p style='color:#01696f;font-weight:600'>Запрошуємо забрати авто!</p>" : ""}
+          ${isIssued ? "<p style='color:#01696f;font-weight:600'>Дякуємо, що обрали нас! Гарної дороги 🚗</p>" : ""}
           <a href="${origin}/cabinet" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#01696f;color:#fff;border-radius:8px;text-decoration:none">Переглянути кабінет</a>
         </div>`
       );
