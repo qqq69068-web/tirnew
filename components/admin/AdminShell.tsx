@@ -63,12 +63,15 @@ export default function AdminShell({ email, children }: Props) {
           <span /><span /><span />
         </button>
         <div className="admin-topbar__brand">
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" stroke="var(--primary)" strokeWidth="1.5" fill="none" />
-            <text x="16" y="21" textAnchor="middle" fontSize="13" fontWeight="700"
-              fontFamily="var(--font-display)" fill="var(--primary)">T</text>
+          {/* Truck icon */}
+          <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <rect x="4" y="18" width="20" height="14" rx="2" fill="none" stroke="var(--primary)" strokeWidth="1.5" />
+            <rect x="22" y="14" width="14" height="18" rx="2" fill="none" stroke="var(--primary)" strokeWidth="1.5" />
+            <circle cx="10" cy="33" r="3" fill="var(--primary)" />
+            <circle cx="28" cy="33" r="3" fill="var(--primary)" />
+            <circle cx="34" cy="33" r="3" fill="var(--primary)" />
           </svg>
-          <span className="admin-topbar__name">TIR NEW</span>
+          <span className="admin-topbar__name">DVTrucks</span>
         </div>
       </header>
 
@@ -78,13 +81,15 @@ export default function AdminShell({ email, children }: Props) {
       {/* ── Sidebar ── */}
       <aside id="admin-sidebar" className="admin-sidebar" role="navigation" aria-label="Адмін навігація">
         <div className="admin-sidebar__brand">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-label="TIR NEW logo">
-            <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" stroke="var(--primary)" strokeWidth="1.5" fill="none" />
-            <text x="16" y="21" textAnchor="middle" fontSize="13" fontWeight="700"
-              fontFamily="var(--font-display)" fill="var(--primary)">T</text>
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-label="DVTrucks logo">
+            <rect x="4" y="18" width="20" height="14" rx="2" fill="none" stroke="var(--primary)" strokeWidth="1.5" />
+            <rect x="22" y="14" width="14" height="18" rx="2" fill="none" stroke="var(--primary)" strokeWidth="1.5" />
+            <circle cx="10" cy="33" r="3" fill="var(--primary)" />
+            <circle cx="28" cy="33" r="3" fill="var(--primary)" />
+            <circle cx="34" cy="33" r="3" fill="var(--primary)" />
           </svg>
           <div className="admin-sidebar__brand-text">
-            <span className="admin-sidebar__brand-name">TIR NEW</span>
+            <span className="admin-sidebar__brand-name">DVTrucks</span>
             <span className="admin-sidebar__brand-sub">Адмін-панель</span>
           </div>
         </div>

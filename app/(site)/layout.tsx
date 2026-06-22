@@ -66,10 +66,10 @@ export default function SiteLayout({
       <header className={`site-nav${scrolled ? " site-nav--scrolled" : ""}`}>
         <div className="container site-nav__inner">
           {/* Logo */}
-          <Link href="/" className="site-nav__logo" aria-label="Tirnew — Truck Service">
+          <Link href="/" className="site-nav__logo" aria-label="DVTrucks — Truck Service">
             <TirnewLogo />
             <span className="site-nav__logo-text">
-              <span className="site-nav__logo-name">Tirnew</span>
+              <span className="site-nav__logo-name">DVTrucks</span>
               <span className="site-nav__logo-sub">Truck Service</span>
             </span>
           </Link>
@@ -180,10 +180,10 @@ export default function SiteLayout({
 
           {/* Brand column */}
           <div className="site-footer__brand">
-            <Link href="/" className="site-footer__logo" aria-label="Tirnew">
+            <Link href="/" className="site-footer__logo" aria-label="DVTrucks">
               <TirnewLogo size={28} />
               <div>
-                <p className="site-footer__logo-name">Tirnew</p>
+                <p className="site-footer__logo-name">DVTrucks</p>
                 <p className="site-footer__logo-sub">Truck Service</p>
               </div>
             </Link>
@@ -261,7 +261,7 @@ export default function SiteLayout({
         {/* Bottom bar */}
         <div className="site-footer__bottom">
           <div className="container site-footer__bottom-inner">
-            <span>&copy; {new Date().getFullYear()} Tirnew Truck Service. Всі права захищені.</span>
+            <span>&copy; {new Date().getFullYear()} DVTrucks. Всі права захищені.</span>
             <span>Дипломний проєкт</span>
           </div>
         </div>
@@ -271,9 +271,6 @@ export default function SiteLayout({
       <AiChat />
 
       <style>{`
-        /* ═══════════════════════════════════════════════════════
-           NAVBAR
-        ═══════════════════════════════════════════════════════ */
         .site-nav {
           position: sticky;
           top: 0;
@@ -388,9 +385,6 @@ export default function SiteLayout({
           background: oklch(from var(--text) l c h / 0.06);
         }
 
-        /* ═══════════════════════════════════════════════════════
-           MOBILE MENU
-        ═══════════════════════════════════════════════════════ */
         .mobile-menu {
           position: fixed;
           inset: 58px 0 0 0;
@@ -441,7 +435,7 @@ export default function SiteLayout({
         .mobile-menu__contact {
           padding-top: var(--space-3);
         }
-        .mobile-menu__phone {
+          .mobile-menu__phone {
           display: inline-flex;
           align-items: center;
           gap: var(--space-2);
@@ -457,17 +451,11 @@ export default function SiteLayout({
           background: oklch(0 0 0 / 0.3);
         }
 
-        /* ═══════════════════════════════════════════════════════
-           MAIN
-        ═══════════════════════════════════════════════════════ */
         .site-main {
           flex: 1;
           min-height: 0;
         }
 
-        /* ═══════════════════════════════════════════════════════
-           FOOTER
-        ═══════════════════════════════════════════════════════ */
         .site-footer {
           background: var(--surface);
           border-top: 1px solid var(--border);
@@ -607,7 +595,6 @@ export default function SiteLayout({
           user-select: none;
         }
 
-        /* Bottom bar */
         .site-footer__bottom {
           border-top: 1px solid var(--border);
           padding-block: var(--space-4);
@@ -621,9 +608,6 @@ export default function SiteLayout({
           color: var(--text-faint);
         }
 
-        /* ═══════════════════════════════════════════════════════
-           RESPONSIVE
-        ═══════════════════════════════════════════════════════ */
         @media (max-width: 1024px) {
           .site-footer__grid {
             grid-template-columns: 1fr 1fr;

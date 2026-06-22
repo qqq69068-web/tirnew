@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Tirnew — Сервіс вантажних і легкових автомобілів", template: "%s | Tirnew" },
+  title: { default: "DVTrucks — Сервіс вантажних і легкових автомобілів", template: "%s | DVTrucks" },
   description: "Діагностика, ремонт та обслуговування вантажних і легкових автомобілів, причепів і напівпричепів. Власний склад запчастин.",
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `
 (function(){
   try{
-    var t=localStorage.getItem('tirnew-theme');
+    var t=localStorage.getItem('dvtrucks-theme');
     if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
     document.documentElement.setAttribute('data-theme',t);
   }catch(e){}
@@ -46,12 +46,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {children}
 
-        {/* ── SCROLL REVEAL OBSERVER ──────────────────────────────────────────────
-            Activates .reveal / .reveal-left / .reveal-scale / .reveal-clip
-            by adding .visible class when element enters the viewport.
-            Runs once per element (unobserves after trigger).
-            Respects prefers-reduced-motion — skips animation, shows instantly.
-        ───────────────────────────────────────────────────────────── */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -59,7 +53,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   var SELECTORS = '.reveal,.reveal-left,.reveal-scale,.reveal-clip';
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // If user prefers reduced motion — show all immediately, no animation
   if (reduced) {
     document.querySelectorAll(SELECTORS).forEach(function(el){
       el.classList.add('visible');
@@ -85,10 +78,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     });
   }
 
-  // Observe immediately for elements already in DOM
   observe();
 
-  // Re-observe after Next.js client-side navigation (new elements in DOM)
   var mutObs = new MutationObserver(function(mutations) {
     var hasNew = mutations.some(function(m) {
       return m.addedNodes.length > 0;

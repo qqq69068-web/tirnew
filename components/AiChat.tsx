@@ -49,7 +49,7 @@ export default function AiChat() {
     if (open && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Добридень! Я ваш AI-помічник Tirnew Truck Service. Можу допомогти з записом, відповісти на питання про послуги чи ціни. Оберіть варіант або напишіть своє питання!",
+        content: "Добридень! Я ваш AI-помічник DVTrucks. Можу допомогти з записом, відповісти на питання про послуги чи ціни. Оберіть варіант або напишіть своє питання!",
       }]);
     }
   }, [open]);
@@ -159,7 +159,6 @@ export default function AiChat() {
     }
   };
 
-  // Show suggestions only when there is exactly 1 message (the welcome) and not loading
   const showSuggestions = messages.length === 1 && !loading;
 
   return (
@@ -184,7 +183,7 @@ export default function AiChat() {
               </div>
               <div>
                 <p className="ai-chat-title">AI-помічник</p>
-                <p className="ai-chat-subtitle">Tirnew Truck Service</p>
+                <p className="ai-chat-subtitle">DVTrucks</p>
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="ai-chat-close" aria-label="Закрити">
@@ -220,7 +219,6 @@ export default function AiChat() {
               </div>
             ))}
 
-            {/* Quick suggestion chips — show only on welcome screen */}
             {showSuggestions && (
               <div className="ai-suggestions">
                 {QUICK_SUGGESTIONS.map((s) => (
@@ -244,7 +242,6 @@ export default function AiChat() {
               </div>
             )}
 
-            {/* Confirm / Cancel buttons */}
             {bookingPending && !loading && (
               <div className="ai-confirm-row">
                 <button onClick={confirmBooking} className="ai-confirm-btn ai-confirm-btn--ok">
@@ -419,7 +416,6 @@ export default function AiChat() {
           border-radius: 99px; padding: 2px 8px;
         }
 
-        /* Quick suggestion chips */
         .ai-suggestions {
           display: flex;
           flex-direction: column;
