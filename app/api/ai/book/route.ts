@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { jwtVerify } from "jose";
 import { randomBytes } from "crypto";
+import { parseServiceHours, slotsOverlap, getWorkerIds } from "@/lib/scheduling";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 const PRODUCTION_URL = "https://tirnew-production.up.railway.app";
@@ -49,6 +50,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Перевірка зайнятості слота ──────────────────────────────
+    let scheduledStart: Date | null = null;
+    let scheduledEnd: Date | null = null;
+    let assignedWorker: number | null = null;
+
+    if (date) {
+      scheduledStart = new Date(date);
+      const serviceRecord = service
+        ? await prisma.service.findFirst({ where: { title: { contains: service } } })
+        : null;
+      const slotHours = serviceRecord?.hours ? parseServiceHours(serviceRecord.hours) : 1;
+      scheduledEnd = new Date(scheduledStart.getTime() + slotHours * 3600000);
+
+      const workerIds = getWorkerIds(carCategory || "truck");
+      const conflicts = await prisma.booking.findMany({
+        where: {
+          workerId: { in: workerIds },
+          scheduledAt: { gte: new Date(scheduledStart.getTime() - slotHours * 3600000), lte: scheduledEnd },
+          status: { not: "cancelled" },
+        },
+        select: { workerId: true, scheduledAt: true, scheduledEnd: true },
+      });
+
+      const busy = new Set<number>();
+      for (const b of conflicts) {
+        if (b.scheduledAt && b.scheduledEnd && b.workerId && slotsOverlap(scheduledStart, scheduledEnd, b.scheduledAt, b.scheduledEnd)) {
+          busy.add(b.workerId);
+        }
+      }
+
+      const freeWorker = workerIds.find((id) => !busy.has(id));
+      if (!freeWorker) {
+        return NextResponse.json({ ok: false, error: "no_slots" }, { status: 409 });
+      }
+      assignedWorker = freeWorker;
+    }
+    // ────────────────────────────────────────────────────────────
+
     const booking = await prisma.booking.create({
       data: {
         name: finalName,
@@ -57,8 +96,10 @@ export async function POST(req: NextRequest) {
         carBrand: carBrand ?? null,
         carModel: carModel ?? null,
         carCategory: carCategory ?? null,
-        date: date ? new Date(date) : null,
-        scheduledAt: date ? new Date(date) : null,
+        date: scheduledStart ?? (date ? new Date(date) : null),
+        scheduledAt: scheduledStart ?? (date ? new Date(date) : null),
+        scheduledEnd: scheduledEnd ?? null,
+        workerId: assignedWorker ?? null,
         message: message ?? null,
         status: "new",
         progress: "received",
@@ -69,7 +110,6 @@ export async function POST(req: NextRequest) {
     // Якщо клієнт не авторизований, але надав email — створюємо/оновлюємо акаунт і відправляємо magic link
     if (!clientEmail && finalEmail) {
       try {
-        // Створюємо акаунт (або оновлюємо існуючий)
         await prisma.client.upsert({
           where: { email: finalEmail },
           update: {
@@ -83,15 +123,13 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Прив'язуємо запис до клієнта
         await prisma.booking.update({
           where: { id: booking.id },
           data: { clientEmail: finalEmail },
         });
 
-        // Створюємо magic link для входу
         const magicToken = randomBytes(32).toString("hex");
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 3); // 3 дні
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 3);
         await prisma.magicToken.create({
           data: { token: magicToken, email: finalEmail, expiresAt },
         });
@@ -102,7 +140,6 @@ export async function POST(req: NextRequest) {
           ? new Date(date).toLocaleString("uk-UA", { dateStyle: "long", timeStyle: "short" })
           : "буде узгоджено";
 
-        // Відправляємо підтвердження + ссилку для входу клієнту
         await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: {
@@ -151,7 +188,6 @@ export async function POST(req: NextRequest) {
           }),
         });
 
-        // Сповіщення адміну
         await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: {
@@ -181,7 +217,6 @@ export async function POST(req: NextRequest) {
         console.error("[MAGIC LINK / EMAIL ERROR]", magicErr);
       }
     } else if (clientEmail) {
-      // Авторизований клієнт — просте сповіщення адміну
       try {
         await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
@@ -208,14 +243,14 @@ export async function POST(req: NextRequest) {
             `,
           }),
         });
-      } catch (mailErr) {
-        console.error("[BREVO AI BOOK ERROR]", mailErr);
+      } catch (emailErr) {
+        console.error("[ADMIN EMAIL ERROR]", emailErr);
       }
     }
 
-    return NextResponse.json({ ok: true, bookingId: booking.id }, { status: 201 });
-  } catch (err) {
-    console.error("[AI BOOK ERROR]", err);
-    return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
+    return NextResponse.json({ ok: true, bookingId: booking.id });
+  } catch (e) {
+    console.error("[AI BOOK ERROR]", e);
+    return NextResponse.json({ ok: false, error: "Помилка сервера" }, { status: 500 });
   }
 }
