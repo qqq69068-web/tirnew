@@ -19,22 +19,17 @@ export async function POST() {
 
     await prisma.service.create({
       data: {
-        slug:         s.slug,
-        title:        s.title,
-        short:        s.short        ?? "",
-        description:  s.description  ?? "",
-        price:        s.price        ?? "",
-        priceMin:     s.priceMin     ?? 0,
-        priceMax:     s.priceMax     ?? 0,
-        priceCar:     s.priceCar     ?? null,
-        priceTruck:   s.priceTruck   ?? null,
-        priceTrailer: s.priceTrailer ?? null,
-        hours:        s.hours        ?? "",
-        image:        s.image        ?? "",
-        category:     s.category     ?? "",
-        details:      s.details      ?? [],
-        order:        s.order        ?? 0,
-        active:       s.active       ?? true,
+        slug:        s.slug,
+        title:       s.title,
+        short:       s.short       ?? "",
+        description: s.description ?? "",
+        price:       s.price       ?? "",
+        priceMin:    s.priceMin    ?? 0,
+        priceMax:    s.priceMax    ?? 0,
+        hours:       s.hours       ?? "",
+        image:       s.image       ?? "",
+        category:    s.category    ?? "",
+        details:     s.details     ?? [],
       },
     });
     created++;
