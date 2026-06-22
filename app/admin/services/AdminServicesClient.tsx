@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, ToggleLeft, ToggleRight, X, Check, ExternalLink } from "lucide-react";
+import { Pencil, Trash2, ToggleLeft, ToggleRight, X, Check, ExternalLink, RefreshCw } from "lucide-react";
 
 type Service = {
   id: string;
@@ -28,12 +28,32 @@ export default function AdminServicesClient({ initialServices }: { initialServic
   const [editing, setEditing]   = useState<Service | null>(null);
   const [saving, setSaving]     = useState(false);
   const [search, setSearch]     = useState("");
+  const [syncing, setSyncing]   = useState(false);
+  const [syncMsg, setSyncMsg]   = useState<string | null>(null);
 
   const filtered = services.filter(
     (s) =>
       s.title.toLowerCase().includes(search.toLowerCase()) ||
       s.category.toLowerCase().includes(search.toLowerCase())
   );
+
+  async function handleSync() {
+    if (!confirm("Імпортувати всі послуги зі статичного списку в базу даних?\nПослуги, які вже є в БД, будуть пропущені.")) return;
+    setSyncing(true);
+    setSyncMsg(null);
+    try {
+      const res = await fetch("/api/admin/services/sync", { method: "POST" });
+      const data = await res.json();
+      setSyncMsg(`✅ Додано: ${data.created}, пропущено (вже є): ${data.skipped}`);
+      // Оновити список
+      const listRes = await fetch("/api/admin/services");
+      if (listRes.ok) setServices(await listRes.json());
+    } catch {
+      setSyncMsg("❌ Помилка синхронізації");
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   async function toggleActive(s: Service) {
     const res = await fetch(`/api/admin/services/${s.id}`, {
@@ -83,17 +103,38 @@ export default function AdminServicesClient({ initialServices }: { initialServic
           <h1 className="admin-page-title">Послуги</h1>
           <p className="admin-page-subtitle">{services.length} позицій</p>
         </div>
-        <div className="sv-search-wrap">
-          <input
-            type="search"
-            placeholder="Пошук..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input input-sm"
-            aria-label="Пошук послуги"
-          />
+        <div className="sv-header-actions">
+          <div className="sv-search-wrap">
+            <input
+              type="search"
+              placeholder="Пошук..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input input-sm"
+              aria-label="Пошук послуги"
+            />
+          </div>
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="btn btn-outline btn-sm sv-sync-btn"
+            title="Імпортувати послуги зі статичного списку в БД"
+          >
+            <RefreshCw size={14} className={syncing ? "sv-spin" : ""} aria-hidden="true" />
+            {syncing ? "Синхронізація..." : "Синхронізувати"}
+          </button>
         </div>
       </div>
+
+      {/* ── Sync message ── */}
+      {syncMsg && (
+        <div className="sv-sync-msg">
+          {syncMsg}
+          <button onClick={() => setSyncMsg(null)} className="sv-sync-msg__close" aria-label="Закрити">
+            <X size={13} />
+          </button>
+        </div>
+      )}
 
       {/* ── Desktop table (≥ 640px) ── */}
       <div className="table-wrap sv-table-desktop">
@@ -156,8 +197,6 @@ export default function AdminServicesClient({ initialServices }: { initialServic
       <div className="sv-card-list sv-card-mobile">
         {filtered.map((s) => (
           <div key={s.id} className={`sv-card${s.active ? "" : " sv-card--inactive"}`}>
-
-            {/* Top row: order + title + toggle */}
             <div className="sv-card__top">
               <span className="sv-card__order">{s.order}</span>
               <div className="sv-card__info">
@@ -174,8 +213,6 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                   : <ToggleLeft  size={26} className="sv-toggle--off" aria-hidden="true" />}
               </button>
             </div>
-
-            {/* Price row */}
             <div className="sv-card__price">
               {s.priceCar    != null && <span>Лег.: {s.priceCar} ₴</span>}
               {s.priceTruck  != null && <span>Тягач: {s.priceTruck} ₴</span>}
@@ -184,8 +221,6 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                 <span>від {s.priceMin} ₴</span>
               )}
             </div>
-
-            {/* Actions */}
             <div className="sv-card__actions">
               <a
                 href={`/services/${s.slug}`}
@@ -196,22 +231,15 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                 <ExternalLink size={14} aria-hidden="true" />
                 Переглянути
               </a>
-              <button
-                onClick={() => setEditing(s)}
-                className="btn btn-outline btn-sm sv-card__btn"
-              >
+              <button onClick={() => setEditing(s)} className="btn btn-outline btn-sm sv-card__btn">
                 <Pencil size={14} aria-hidden="true" />
                 Редагувати
               </button>
-              <button
-                onClick={() => deleteService(s)}
-                className="btn btn-sm sv-card__btn sv-card__btn--danger"
-              >
+              <button onClick={() => deleteService(s)} className="btn btn-sm sv-card__btn sv-card__btn--danger">
                 <Trash2 size={14} aria-hidden="true" />
                 Видалити
               </button>
             </div>
-
           </div>
         ))}
       </div>
@@ -226,14 +254,12 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                 <X size={18} aria-hidden="true" />
               </button>
             </div>
-
             <div className="sv-modal-body">
               <Field label="Назва"        value={editing.title}       onChange={(v) => setField("title", v)} />
               <Field label="Slug"          value={editing.slug}        onChange={(v) => setField("slug", v)} />
               <Field label="Категорія"    value={editing.category}    onChange={(v) => setField("category", v)} />
               <Field label="Короткий опис" value={editing.short}       onChange={(v) => setField("short", v)}  textarea />
               <Field label="Повний опис"  value={editing.description} onChange={(v) => setField("description", v)} textarea />
-
               <div className="sv-2col">
                 <Field label="Ціна (текст)"  value={editing.price}        onChange={(v) => setField("price", v)} />
                 <Field label="Час роботи"  value={editing.hours}        onChange={(v) => setField("hours", v)} />
@@ -242,7 +268,6 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                 <Field label="Ціна від (₴)" value={String(editing.priceMin)}  onChange={(v) => setField("priceMin", Number(v))} type="number" />
                 <Field label="Ціна до (₴)" value={String(editing.priceMax)}  onChange={(v) => setField("priceMax", Number(v))} type="number" />
               </div>
-
               <div className="sv-vehicle-prices">
                 <p className="sv-vehicle-prices__title">Ціни по типу транспорту</p>
                 <p className="sv-vehicle-prices__hint">Залиш порожнім, якщо ціна не залежить від типу авто</p>
@@ -252,23 +277,19 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                   <Field label="Причіп (₴)"       value={editing.priceTrailer!= null ? String(editing.priceTrailer): ""} onChange={(v) => setField("priceTrailer", v === "" ? null : Number(v))} type="number" />
                 </div>
               </div>
-
               <Field label="URL фото" value={editing.image} onChange={(v) => setField("image", v)} />
               {editing.image && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={editing.image} alt="preview" width={640} height={160} loading="lazy" className="sv-img-preview" />
               )}
-
               <div className="form-group">
                 <label className="form-label">Деталі (по одному на рядкок)</label>
                 <textarea rows={4} value={editing.details.join("\n")} onChange={(e) => setField("details", e.target.value.split("\n"))} className="input" />
               </div>
-
               <div className="sv-2col">
                 <Field label="Порядок" value={String(editing.order)} onChange={(v) => setField("order", Number(v))} type="number" />
               </div>
             </div>
-
             <div className="modal-footer">
               <button onClick={() => setEditing(null)} className="btn btn-ghost btn-sm">Скасувати</button>
               <button onClick={saveEditing} disabled={saving} className="btn btn-primary btn-sm">
@@ -282,9 +303,43 @@ export default function AdminServicesClient({ initialServices }: { initialServic
 
       {/* ── Scoped styles ── */}
       <style>{`
-        /* Search */
+        /* Header actions */
+        .sv-header-actions {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          flex-wrap: wrap;
+        }
         .sv-search-wrap { display:flex; align-items:center; }
         .input-sm { padding:var(--space-2) var(--space-3) !important; font-size:var(--text-sm) !important; min-width:180px; }
+
+        /* Sync button */
+        .sv-sync-btn { display:flex; align-items:center; gap:var(--space-2); white-space:nowrap; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .sv-spin { animation: spin 1s linear infinite; }
+
+        /* Sync message */
+        .sv-sync-msg {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: var(--space-3);
+          padding: var(--space-3) var(--space-4);
+          border-radius: var(--radius-lg);
+          background: var(--accent-subtle, color-mix(in oklab, var(--accent) 10%, transparent));
+          border: 1px solid var(--accent-border, color-mix(in oklab, var(--accent) 20%, transparent));
+          font-size: var(--text-sm);
+          color: var(--text);
+          margin-bottom: var(--space-2);
+        }
+        .sv-sync-msg__close {
+          display:flex; align-items:center; justify-content:center;
+          background:none; border:none; cursor:pointer;
+          color:var(--text-faint); padding:2px;
+          border-radius:var(--radius);
+          transition:color var(--transition-fast);
+        }
+        .sv-sync-msg__close:hover { color:var(--text); }
 
         /* ── Desktop table: shown only on ≥640px ── */
         .sv-table-desktop { display: none; }
@@ -294,141 +349,58 @@ export default function AdminServicesClient({ initialServices }: { initialServic
         .sv-card-mobile { display: flex; }
         @media (min-width: 640px) { .sv-card-mobile { display: none; } }
 
-        /* Card list */
-        .sv-card-list {
-          flex-direction: column;
-          gap: var(--space-3);
-        }
-
+        .sv-card-list { flex-direction: column; gap: var(--space-3); }
         .sv-card {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: var(--space-4);
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-3);
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: var(--radius-lg); padding: var(--space-4);
+          display: flex; flex-direction: column; gap: var(--space-3);
           transition: border-color var(--transition-fast);
         }
         .sv-card--inactive { opacity: 0.5; }
         .sv-card--inactive .sv-card__title { text-decoration: line-through; }
-
-        /* Card top row */
-        .sv-card__top {
-          display: flex;
-          align-items: flex-start;
-          gap: var(--space-3);
-        }
-        .sv-card__order {
-          font-size: var(--text-xs);
-          font-weight: 700;
-          color: var(--text-faint);
-          min-width: 20px;
-          padding-top: 3px;
-        }
-        .sv-card__info {
-          flex: 1;
-          min-width: 0;
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-1);
-        }
-        .sv-card__title {
-          font-size: var(--text-sm);
-          font-weight: 600;
-          color: var(--text);
-          line-height: 1.35;
-          word-break: break-word;
-        }
+        .sv-card__top { display: flex; align-items: flex-start; gap: var(--space-3); }
+        .sv-card__order { font-size: var(--text-xs); font-weight: 700; color: var(--text-faint); min-width: 20px; padding-top: 3px; }
+        .sv-card__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+        .sv-card__title { font-size: var(--text-sm); font-weight: 600; color: var(--text); line-height: 1.35; word-break: break-word; }
         .sv-toggle--card {
-          flex-shrink: 0;
-          padding: 4px;
-          min-width: 44px;
-          min-height: 44px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: var(--radius);
-          background: none;
-          border: none;
-          cursor: pointer;
+          flex-shrink: 0; padding: 4px; min-width: 44px; min-height: 44px;
+          display: flex; align-items: center; justify-content: center;
+          border-radius: var(--radius); background: none; border: none; cursor: pointer;
           transition: background var(--transition-fast);
         }
         .sv-toggle--card:hover { background: var(--surface2); }
-
-        /* Price row */
-        .sv-card__price {
-          display: flex;
-          flex-wrap: wrap;
-          gap: var(--space-2);
-          font-size: var(--text-xs);
-          color: var(--text-muted);
-          font-variant-numeric: tabular-nums;
-        }
-        .sv-card__price span {
-          background: var(--surface2);
-          border: 1px solid var(--border);
-          border-radius: var(--radius);
-          padding: 2px var(--space-2);
-        }
-
-        /* Actions row */
-        .sv-card__actions {
-          display: flex;
-          gap: var(--space-2);
-          flex-wrap: wrap;
-        }
-        .sv-card__btn {
-          flex: 1;
-          justify-content: center;
-          min-height: 40px;
-        }
+        .sv-card__price { display: flex; flex-wrap: wrap; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+        .sv-card__price span { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 2px var(--space-2); }
+        .sv-card__actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+        .sv-card__btn { flex: 1; justify-content: center; min-height: 40px; }
         .sv-card__btn--danger {
           background: var(--primary-subtle, rgba(239,68,68,0.08)) !important;
           color: var(--primary) !important;
           border: 1px solid var(--primary-subtle, rgba(239,68,68,0.2)) !important;
         }
-        .sv-card__btn--danger:hover {
-          background: var(--primary-subtle, rgba(239,68,68,0.15)) !important;
-        }
+        .sv-card__btn--danger:hover { background: var(--primary-subtle, rgba(239,68,68,0.15)) !important; }
 
-        /* Toggle (shared) */
-        .sv-toggle {
-          display: flex;
-          align-items: center;
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 2px;
-          border-radius: var(--radius);
-          transition: opacity var(--transition-fast);
-        }
+        .sv-toggle { display: flex; align-items: center; background: none; border: none; cursor: pointer; padding: 2px; border-radius: var(--radius); transition: opacity var(--transition-fast); }
         .sv-toggle:hover { opacity: 0.75; }
         .sv-toggle--on  { color: var(--accent); }
         .sv-toggle--off { color: var(--text-faint); }
 
-        /* Desktop row actions */
         .sv-row-actions { display:flex; align-items:center; gap:var(--space-1); }
         .sv-action-btn {
           display:flex; align-items:center; justify-content:center;
-          width:30px; height:30px;
-          border-radius:var(--radius); background:none; border:none;
+          width:30px; height:30px; border-radius:var(--radius); background:none; border:none;
           color:var(--text-faint); cursor:pointer;
           transition:color var(--transition-fast),background var(--transition-fast);
         }
         .sv-action-btn:hover { color:var(--text); background:var(--surface2); }
         .sv-action-btn--danger:hover { color:var(--primary); background:var(--primary-subtle); }
 
-        /* Modal */
         .modal-overlay {
           position:fixed; inset:0; z-index:50;
           display:flex; align-items:center; justify-content:center;
-          background:oklch(0 0 0 / 0.55);
-          backdrop-filter:blur(4px);
-          animation:fadeIn 0.2s ease both;
-          padding: var(--space-4);
+          background:oklch(0 0 0 / 0.55); backdrop-filter:blur(4px);
+          animation:fadeIn 0.2s ease both; padding: var(--space-4);
         }
-        /* On mobile: full-screen modal */
         @media (max-width: 640px) {
           .modal-overlay { padding: 0; align-items: flex-end; }
           .modal-panel { border-bottom-left-radius: 0; border-bottom-right-radius: 0; max-height: 92dvh; }
@@ -437,84 +409,48 @@ export default function AdminServicesClient({ initialServices }: { initialServic
           background:var(--surface); border:1px solid var(--border);
           border-radius:var(--radius-xl);
           box-shadow:var(--shadow-xl, 0 24px 64px oklch(0 0 0 / 0.4));
-          width:100%; max-height:90vh;
-          overflow-y:auto;
+          width:100%; max-height:90vh; overflow-y:auto;
           display:flex; flex-direction:column;
           animation:slideUp 0.25s cubic-bezier(0.22,1,0.36,1) both;
         }
         .modal-panel--lg { max-width:680px; }
-        @keyframes slideUp {
-          from { opacity:0; transform:translateY(16px); }
-          to   { opacity:1; transform:translateY(0); }
-        }
+        @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
         .modal-header {
           display:flex; align-items:center; justify-content:space-between;
-          padding:var(--space-5) var(--space-6);
-          border-bottom:1px solid var(--border);
+          padding:var(--space-5) var(--space-6); border-bottom:1px solid var(--border);
           position:sticky; top:0; background:var(--surface); z-index:1;
         }
-        @media (max-width: 480px) {
-          .modal-header { padding: var(--space-4) var(--space-4); }
-        }
-        .modal-title {
-          font-family:var(--font-display); font-size:var(--text-lg);
-          font-weight:700; color:var(--text);
-        }
+        @media (max-width: 480px) { .modal-header { padding: var(--space-4) var(--space-4); } }
+        .modal-title { font-family:var(--font-display); font-size:var(--text-lg); font-weight:700; color:var(--text); }
         .modal-close {
           display:flex; align-items:center; justify-content:center;
-          width:36px; height:36px;
-          border-radius:var(--radius); background:none; border:none;
+          width:36px; height:36px; border-radius:var(--radius); background:none; border:none;
           color:var(--text-faint); cursor:pointer;
           transition:background var(--transition-fast),color var(--transition-fast);
         }
         .modal-close:hover { background:var(--surface2); color:var(--text); }
-        .sv-modal-body {
-          padding:var(--space-5) var(--space-6);
-          display:flex; flex-direction:column; gap:var(--space-4);
-        }
-        @media (max-width: 480px) {
-          .sv-modal-body { padding: var(--space-4) var(--space-4); }
-        }
+        .sv-modal-body { padding:var(--space-5) var(--space-6); display:flex; flex-direction:column; gap:var(--space-4); }
+        @media (max-width: 480px) { .sv-modal-body { padding: var(--space-4) var(--space-4); } }
         .modal-footer {
           display:flex; align-items:center; justify-content:flex-end;
-          gap:var(--space-3);
-          padding:var(--space-4) var(--space-6);
-          border-top:1px solid var(--border);
-          position:sticky; bottom:0; background:var(--surface);
+          gap:var(--space-3); padding:var(--space-4) var(--space-6);
+          border-top:1px solid var(--border); position:sticky; bottom:0; background:var(--surface);
         }
-        @media (max-width: 480px) {
-          .modal-footer { padding: var(--space-3) var(--space-4); flex-direction: column; }
-          .modal-footer .btn { width: 100%; justify-content: center; }
-        }
+        @media (max-width: 480px) { .modal-footer { padding: var(--space-3) var(--space-4); flex-direction: column; } .modal-footer .btn { width: 100%; justify-content: center; } }
 
-        /* Grid helpers */
         .sv-2col { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-4); }
         .sv-3col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--space-3); }
-        @media (max-width: 480px) {
-          .sv-2col { grid-template-columns:1fr; }
-          .sv-3col { grid-template-columns:1fr; }
-        }
+        @media (max-width: 480px) { .sv-2col { grid-template-columns:1fr; } .sv-3col { grid-template-columns:1fr; } }
 
-        /* Vehicle prices */
         .sv-vehicle-prices {
           background:var(--accent-subtle); border:1px solid var(--accent-border);
           border-radius:var(--radius-lg); padding:var(--space-4);
           display:flex; flex-direction:column; gap:var(--space-3);
         }
-        .sv-vehicle-prices__title {
-          font-size:var(--text-xs); font-weight:700; color:var(--accent);
-          letter-spacing:0.06em; text-transform:uppercase; max-width:none;
-        }
-        .sv-vehicle-prices__hint {
-          font-size:var(--text-xs); color:var(--text-faint);
-          margin-top:-8px; max-width:none;
-        }
+        .sv-vehicle-prices__title { font-size:var(--text-xs); font-weight:700; color:var(--accent); letter-spacing:0.06em; text-transform:uppercase; max-width:none; }
+        .sv-vehicle-prices__hint { font-size:var(--text-xs); color:var(--text-faint); margin-top:-8px; max-width:none; }
 
-        /* Image preview */
-        .sv-img-preview {
-          border-radius:var(--radius-lg); width:100%; height:160px;
-          object-fit:cover; border:1px solid var(--border);
-        }
+        .sv-img-preview { border-radius:var(--radius-lg); width:100%; height:160px; object-fit:cover; border:1px solid var(--border); }
       `}</style>
     </div>
   );
