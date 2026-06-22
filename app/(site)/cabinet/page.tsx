@@ -196,35 +196,57 @@ function CabinetSkeleton() {
 /* ─── OTP inputs (6 boxes) ─── */
 function OtpInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
-  const digits = value.padEnd(6, "").split("").slice(0, 6);
 
-  const handleChange = (i: number, v: string) => {
-    const clean = v.replace(/\D/g, "").slice(-1);
-    const next = [...digits];
-    next[i] = clean;
-    onChange(next.join("").trimEnd());
-    if (clean && i < 5) inputs.current[i + 1]?.focus();
+  // Build exactly 6 slots from the current value string
+  const slots: string[] = Array.from({ length: 6 }, (_, i) => value[i] ?? "");
+
+  const handleChange = (i: number, raw: string) => {
+    const digit = raw.replace(/\D/g, "").slice(-1);
+    const next = [...slots];
+    next[i] = digit;
+    onChange(next.join(""));
+    if (digit && i < 5) inputs.current[i + 1]?.focus();
   };
 
-  const handleKeyDown = (i: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !digits[i] && i > 0) {
+  const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      if (slots[i]) {
+        // clear current
+        const next = [...slots];
+        next[i] = "";
+        onChange(next.join(""));
+      } else if (i > 0) {
+        inputs.current[i - 1]?.focus();
+      }
+    } else if (e.key === "ArrowLeft" && i > 0) {
       inputs.current[i - 1]?.focus();
+    } else if (e.key === "ArrowRight" && i < 5) {
+      inputs.current[i + 1]?.focus();
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (pasted) { onChange(pasted); e.preventDefault(); inputs.current[Math.min(pasted.length, 5)]?.focus(); }
+    if (!pasted) return;
+    const next = Array.from({ length: 6 }, (_, i) => pasted[i] ?? "");
+    onChange(next.join(""));
+    const focusIdx = Math.min(pasted.length, 5);
+    setTimeout(() => inputs.current[focusIdx]?.focus(), 0);
   };
 
   return (
     <div className="cb-otp-row">
-      {digits.map((d, i) => (
+      {slots.map((d, i) => (
         <input
           key={i}
           ref={(el) => { inputs.current[i] = el; }}
-          type="text" inputMode="numeric" maxLength={1}
-          value={d} className="cb-otp-box"
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={d}
+          className="cb-otp-box"
+          autoComplete="one-time-code"
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={handlePaste}
@@ -245,9 +267,8 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
   const [resendCd, setResendCd] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Countdown after sending
   useEffect(() => {
-    if (resendCd <= 0) return;
+    if (resendCd <= 0) { if (timerRef.current) clearInterval(timerRef.current); return; }
     timerRef.current = setInterval(() => setResendCd((v) => v - 1), 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [resendCd]);
@@ -266,18 +287,19 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
 
   const submitCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code.length < 6) { setError("Введіть всі 6 цифр"); return; }
+    const filled = code.replace(/\s/g, "");
+    if (filled.length < 6) { setError("Введіть всі 6 цифр"); return; }
     setLoading(true); setError("");
     const res = await fetch("/api/client/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code }),
+      body: JSON.stringify({ email, code: filled }),
     });
     if (res.ok) {
       const me = await fetch("/api/client/me", { credentials: "include" });
       if (me.ok) onLogin(await me.json());
     } else {
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       setError(data.error || "Невірний код");
     }
     setLoading(false);
@@ -287,7 +309,7 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
   if (sent) return (
     <div className="cb-auth-wrap">
       <div className="cb-auth-icon-wrap">
-        <Mail size={22} style={{ color: "var(--cb-green)" }} />
+        <Mail size={22} style={{ color: "#4a9e6b" }} />
       </div>
       <h2 className="cb-auth-title">Перевірте пошту</h2>
       <p className="cb-auth-sub">
@@ -304,8 +326,11 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
 
         {error && <p className="cb-auth-error">{error}</p>}
 
-        <button type="submit" disabled={loading || code.length < 6}
-          className={`cb-submit-btn ${loading ? "cb-submit-btn--loading" : ""}`}>
+        <button
+          type="submit"
+          disabled={loading || code.replace(/\s/g, "").length < 6}
+          className={`cb-submit-btn ${loading ? "cb-submit-btn--loading" : ""}`}
+        >
           {loading ? <span className="cb-spinner" /> : <><span>Підтвердити</span><ArrowRight size={15} /></>}
         </button>
       </form>
@@ -329,7 +354,7 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
   return (
     <div className="cb-auth-wrap">
       <div className="cb-auth-icon-wrap">
-        <User size={22} style={{ color: "var(--cb-green)" }} />
+        <User size={22} style={{ color: "#4a9e6b" }} />
       </div>
       <h2 className="cb-auth-title">Увійти / зареєструватись</h2>
       <p className="cb-auth-sub">Введіть email — надішлемо 6-значний код. Без пароля.</p>
@@ -337,15 +362,13 @@ function AuthForm({ onLogin }: { onLogin: (client: Client) => void }) {
       <form onSubmit={(e) => { e.preventDefault(); sendCode(); }} className="cb-auth-form">
         <div className="cb-field">
           <label className="cb-label">
-            Email <span style={{ color: "var(--cb-green)" }}>*</span>
+            Email <span style={{ color: "#4a9e6b" }}>*</span>
           </label>
           <div className="cb-input-wrap">
             <Mail size={14} className="cb-input-icon" />
             <input
               type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com" required className="cb-input"
-              onFocus={(e) => (e.currentTarget.style.borderColor = "var(--cb-green)")}
-              onBlur={(e)  => (e.currentTarget.style.borderColor = "var(--border)")}
             />
           </div>
         </div>
@@ -423,12 +446,9 @@ export default function CabinetPage() {
   return (
     <>
       <style>{`
-        .cb-root, .cb-root * {
-          --cb-green:        #4a9e6b;
-          --cb-green-hover:  #3a8459;
-          --cb-green-subtle: rgba(74,158,107,0.10);
-          --cb-green-border: rgba(74,158,107,0.30);
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
         .cb-page-hero {
           background: var(--surface);
           border-bottom: 1px solid var(--border);
@@ -502,19 +522,33 @@ export default function CabinetPage() {
         .cb-empty-link:hover { border-color: #4a9e6b; }
 
         /* ── OTP boxes ── */
-        .cb-otp-row { display: flex; gap: 8px; justify-content: center; margin: 4px 0; }
+        .cb-otp-row {
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          margin: 8px 0 4px;
+        }
         .cb-otp-box {
-          width: 44px; height: 52px;
-          text-align: center; font-size: 22px; font-weight: 700;
-          font-family: monospace; color: var(--text);
-          background: var(--surface2); border: 1.5px solid var(--border);
-          border-radius: 10px; outline: none;
+          width: 46px;
+          height: 54px;
+          text-align: center;
+          font-size: 24px;
+          font-weight: 700;
+          font-family: monospace;
+          color: var(--text, #1a1a1a);
+          background: var(--surface2, #f5f5f5);
+          border: 2px solid var(--border, #d4d1ca);
+          border-radius: 10px;
+          outline: none;
           transition: border-color 0.15s, box-shadow 0.15s;
           caret-color: transparent;
+          -webkit-appearance: none;
+          appearance: none;
         }
         .cb-otp-box:focus {
           border-color: #4a9e6b;
-          box-shadow: 0 0 0 3px rgba(74,158,107,0.15);
+          box-shadow: 0 0 0 3px rgba(74,158,107,0.18);
+          background: var(--surface, #fff);
         }
 
         /* ── Auth ── */
@@ -533,23 +567,21 @@ export default function CabinetPage() {
         .cb-input-wrap { position: relative; }
         .cb-input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-faint); }
         .cb-input { width: 100%; border-radius: 10px; padding: 10px 12px 10px 36px; font-size: 13px; color: var(--text); background: var(--surface2); border: 1px solid var(--border); outline: none; transition: border-color 0.18s; }
+        .cb-input:focus { border-color: #4a9e6b; }
 
         .cb-submit-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: #4a9e6b; color: #fff; font-weight: 700; font-size: 13px; padding: 12px; border-radius: 10px; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s; }
         .cb-submit-btn:hover:not(:disabled) { background: #3a8459; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(74,158,107,0.30); }
         .cb-submit-btn:active:not(:disabled) { transform: translateY(0); }
         .cb-submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-        .cb-submit-btn--loading { opacity: 0.65; cursor: not-allowed; }
 
         .cb-spinner { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; animation: spin 0.65s linear infinite; }
 
         @media (max-width: 480px) {
-          .cb-stats { grid-template-columns: repeat(3,1fr); gap: 6px; }
+          .cb-stats { gap: 6px; }
           .cb-stat-value { font-size: 18px; }
-          .cb-card { padding: 14px 14px; }
-          .cb-progress-track { gap: 2px; }
-          .cb-progress-step  { font-size: 10px; padding: 3px 7px; }
+          .cb-card { padding: 14px; }
           .cb-progress-arrow { display: none; }
-          .cb-otp-box { width: 38px; height: 46px; font-size: 19px; }
+          .cb-otp-box { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
         }
       `}</style>
 
