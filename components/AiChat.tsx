@@ -120,30 +120,49 @@ export default function AiChat() {
     }
 
     try {
-      const history = messages.slice(-10).map((m) => ({ role: m.role, content: m.content }));
+      // Формуємо масив повідомлень у форматі який очікує API
+      const apiMessages = [...messages.slice(-13), userMsg].map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history, isAuth }),
+        body: JSON.stringify({ messages: apiMessages }),
       });
       const data = await res.json();
 
-      if (data.booking) {
-        if (!isAuth && !data.booking.email) {
-          setEmailPending(data.booking);
-          setMessages((prev) => [...prev, {
-            role: "assistant",
-            content: `Чудово, майже все готово! \n\nОстаннє питання: вкажіть ваш email, щоб ви могли стежити статус ремонту в особистому кабінеті. Або напишіть 'пропустити'.`,
-          }]);
-        } else {
-          setBookingPending(data.booking);
-          const b = data.booking;
-          const dateStr = b.date ? new Date(b.date).toLocaleString("uk-UA", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "не вказано";
-          const confirmMsg = `Підтверджуємо запис:\n\n🔧 Послуга: ${b.service || "—"}\n🚗 Авто: ${[b.carBrand, b.carModel].filter(Boolean).join(" ") || "—"}\n📅 Час: ${dateStr}\n👤 Ім'я: ${b.name || "—"}\n📱 Телефон: ${b.phone || "—"}\n\nНатисніть "Підтвердити" або "Скасувати" для виправлення даних.`;
-          setMessages((prev) => [...prev, { role: "assistant", content: confirmMsg }]);
+      if (!res.ok) {
+        setMessages((prev) => [...prev, { role: "assistant", content: "❌ Помилка сервера. Спробуйте ще раз." }]);
+        return;
+      }
+
+      const reply: string = data.reply || "";
+
+      // Перевіряємо чи є дія запису в відповіді
+      const bookMatch = reply.match(/<BOOK_ACTION>\s*([\s\S]*?)\s*<\/BOOK_ACTION>/);
+      if (bookMatch) {
+        try {
+          const booking: BookingData = JSON.parse(bookMatch[1]);
+          if (!isAuth && !booking.email) {
+            setEmailPending(booking);
+            setMessages((prev) => [...prev, {
+              role: "assistant",
+              content: `Чудово, майже все готово! \n\nОстаннє питання: вкажіть ваш email, щоб ви могли стежити статус ремонту в особистому кабінеті. Або напишіть 'пропустити'.`,
+            }]);
+          } else {
+            setBookingPending(booking);
+            const b = booking;
+            const dateStr = b.date ? new Date(b.date).toLocaleString("uk-UA", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "не вказано";
+            const confirmMsg = `Підтверджуємо запис:\n\n🔧 Послуга: ${b.service || "—"}\n🚗 Авто: ${[b.carBrand, b.carModel].filter(Boolean).join(" ") || "—"}\n📅 Час: ${dateStr}\n👤 Ім'я: ${b.name || "—"}\n📱 Телефон: ${b.phone || "—"}\n\nНатисніть "Підтвердити" або "Скасувати" для виправлення даних.`;
+            setMessages((prev) => [...prev, { role: "assistant", content: confirmMsg }]);
+          }
+        } catch {
+          setMessages((prev) => [...prev, { role: "assistant", content: reply.replace(/<BOOK_ACTION>[\s\S]*?<\/BOOK_ACTION>/, "").trim() || "Щось пішло не так. Спробуйте ще раз." }]);
         }
       } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.reply || "Вибачте пробачте ще раз." }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: reply || "Не вдалось отримати відповідь. Спробуйте ще раз." }]);
       }
     } catch {
       setMessages((prev) => [...prev, { role: "assistant", content: "❌ Помилка зв'язку. Спробуйте ще раз." }]);
