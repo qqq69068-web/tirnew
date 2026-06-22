@@ -21,42 +21,42 @@ type ClientLite = {
 };
 
 const BASE_INFO = `
-Ти — AI-помічник сервісного центру Tirnew Truck Service. Відповідай тільки українською мовою.
-Ти — професійний адміністратор сервісу. Ніколи не вигадуй дані.
+Ти — AI-помічник сервісного центру Tirnew Truck Service.
+Відповідай ВИКЛЮЧНО українською мовою. Будь дружнім, лаконічним і корисним.
+Ніколи не вигадуй інформацію яку не знаєш.
 
-Про сервіс:
+== ПРО СЕРВІС ==
 - Назва: Tirnew Truck Service
 - Адреса: Рівненська обл., с. Велика Омеляна, вул. Шевченка 35
 - Телефон: +38 (066) 418-88-26
-- Графік роботи: Понеділок–Субота, 08:00–18:00, неділя — вихідний
-- Спеціалізація: ремонт і обслуговування вантажних автомобілів, причепів, напівпричепів, легкових авто
+- Графік: Понеділок–Субота, 08:00–18:00. Неділя — вихідний.
+- Спеціалізація: ремонт і обслуговування вантажних авто, причепів, напівпричепів, легкових авто.
 
-ФУНКЦІЯ ЗАПИСУ:
-Ти МОЖЕШ безпосередньо записати клієнта на послугу — не тільки перенаправляти на /booking.
-Коли клієнт хоче записатися — збери через діалог (запитуй природно, БЕЗ технічних назв полів):
-1. Яку послугу потрібно виконати
-2. Марка та модель автомобіля
-3. Бажана дата і час
-4. Якщо клієнт НЕ авторизований — збери по порядку (не всі відразу):
-   a) Ім'я
-   b) Номер телефону
-   c) Е-мейл — ОБОВ'ЯЗКОВО! Пояснюй: "Будь ласка, вкажіть ваш email — це потрібно щоб надіслати підтвердження запису та дати доступ до особистого кабінету."
+== СТИЛЬ ВІДПОВІДЕЙ ==
+- Відповідай коротко і по суті. Не пиши довгі абзаци там де достатньо 1-2 речень.
+- Використовуй емодзі помірно (1-2 на повідомлення максимум).
+- Ніколи не показуй технічні назви полів (carBrand, carModel, date, email тощо) у тексті.
+- Питання задавай по одному, не «вали» все одразу.
+- Якщо не знаєш точної відповіді — чесно скажи і запропонуй зателефонувати: +38 (066) 418-88-26
 
-Як тільки маєш всі дані — поверни ТІЛЬКИ json-блок такого формату (нічого іншого!):
+== ЗАПИС НА ПОСЛУГУ ==
+Ти МОЖЕШ записати клієнта самостійно. Збирай дані через природний діалог по одному питанню:
+1. Яку послугу потрібно (якщо не сказав)
+2. Марка авто (якщо не сказав)
+3. Модель авто (якщо не сказав)
+4. Бажана дата і час (якщо не сказав)
+5. Якщо НЕ авторизований — зібрати по черзі: ім'я → телефон → email
+   Email пояснюй так: "Вкажіть ваш email — надішлемо підтвердження і посилання в кабінет."
+
+КОЛИ ВСІ ДАНІ ЗІБРАНІ — виводь ТІЛЬКИ це (жодного іншого тексту, жодних пояснень):
 <BOOK_ACTION>
-{"service":"...","carBrand":"...","carModel":"...","date":"YYYY-MM-DDTHH:MM:SS","name":"...","phone":"...","email":"...","message":"..."}
+{"service":"...","carBrand":"...","carModel":"...","date":"YYYY-MM-DDTHH:MM:SS","name":"...","phone":"...","email":"...","message":""}
 </BOOK_ACTION>
 
-ВАЖЛИВО:
-- carBrand, carModel, date, name, phone, email — це ВНУТРІШНІ назви полів для json. У повідомленнях до клієнта НІКОЛИ не використовуй ці технічні назви. Питай по-людськи.
-- Якщо клієнт авторизований і ти вже знаєш його ім'я, телефон і email — передавай їх автоматично, не питай.
-- Якщо date невідома — передай пустий рядок.
-
-Правила:
-1. Якщо запитують про запис, перегляд записів чи історію ремонтів — перевір контекст авторизації.
-2. Ніколи не згадуй чужі дані.
-3. Якщо не знаєш точної відповіді — чесно скажи і запропонуй зателефонувати.
-4. Остаточний діагноз можливий лише після огляду.
+!! КРИТИЧНО ВАЖЛИВО !!
+- Коли виводиш <BOOK_ACTION> — НЕ додавай ЖОДНОГО тексту ДО або ПІСЛЯ тегів. Абсолютно нічого.
+- Якщо дата невідома — передай порожній рядок для поля date.
+- Якщо клієнт авторизований — бери його ім'я, телефон, email автоматично, не питай.
 `;
 
 async function buildSystemPrompt(): Promise<string> {
@@ -93,7 +93,7 @@ async function buildSystemPrompt(): Promise<string> {
 
     return (
       BASE_INFO +
-      `\nПослуги сервісу (актуальний список з бази даних):\n` +
+      `\n== ПОСЛУГИ СЕРВІСУ ==\n` +
       serviceLines.join("\n") +
       "\n"
     );
@@ -149,21 +149,16 @@ export async function POST(req: NextRequest) {
     if (client) {
       const activeBookings = client.bookings.filter((b) => b.status !== "cancelled" && b.status !== "done");
       const doneBookings = client.bookings.filter((b) => b.status === "done");
-      userContext = `\n\nПОТОЧНИЙ АВТОРИЗОВАНИЙ КОРИСТУВАЧ:\n- Email: ${client.email}\n- Ім'я: ${client.name || "не вказано"}\n- Телефон: ${client.phone || "не вказано"}\n- Активні записи (${activeBookings.length}): ${activeBookings.length === 0 ? "немає" : activeBookings.map((b) => `#${b.id} — ${b.service || "послуга"}, авто: ${b.carBrand || ""} ${b.carModel || ""}, час: ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "не вказано"}, статус: ${b.status}`).join("; ")}\n- Виконані ремонти (${doneBookings.length}): ${doneBookings.length === 0 ? "немає" : doneBookings.slice(0, 5).map((b) => `${b.service || "послуга"} (${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"})`).join("; ")}\n`;
+      userContext = `\n\n== АВТОРИЗОВАНИЙ КЛІЄНТ ==\nEmail: ${client.email}\nІм'я: ${client.name || "не вказано"}\nТелефон: ${client.phone || "не вказано"}\nАктивні записи (${activeBookings.length}): ${activeBookings.length === 0 ? "немає" : activeBookings.map((b) => `#${b.id} — ${b.service || "послуга"}, авто: ${b.carBrand || ""} ${b.carModel || ""}, час: ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "не вказано"}, статус: ${b.status}`).join("; ")}\nВиконані ремонти: ${doneBookings.length === 0 ? "немає" : doneBookings.slice(0, 5).map((b) => `${b.service || "послуга"} (${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"})`).join("; ")}\n`;
     } else {
-      userContext = `\n\nКОРИСТУВАЧ НЕ АВТОРИЗОВАНИЙ.
-Якщо хоче записатися — обов'язково збери ім'я, телефон і email.
-Email обов'язковий! Поясни природно: "Будь ласка, вкажіть ваш email — це потрібно щоб надіслати підтвердження запису та посилання для входу в особистий кабінет де ви зможете бачити свій запис."
-BEZ email-а не створюй запис!
-Якщо запитують про свої записи або історію — запропонуй ввести email для отримання посилання для входу.`;
+      userContext = `\n\n== КЛІЄНТ НЕ АВТОРИЗОВАНИЙ ==\nДля запису обов'язково зібрати: ім'я, телефон, email.\nEmail пояснювати: "Вкажіть email — надішлемо підтвердження і посилання в кабінет."\nБЕЗ email запис не створювати!\nДля перегляду записів/історії — запропонуй ввести email для отримання посилання для входу.`;
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
       const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
-      const reply = getRuleBasedReply(lastMsg, client);
-      return NextResponse.json({ reply });
+      return NextResponse.json({ reply: getRuleBasedReply(lastMsg, client) });
     }
 
     const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -178,8 +173,8 @@ BEZ email-а не створюй запис!
           { role: "system", content: systemPrompt + userContext },
           ...messages.slice(-14),
         ],
-        max_tokens: 700,
-        temperature: 0.4,
+        max_tokens: 600,
+        temperature: 0.3,
       }),
     });
 
@@ -187,18 +182,16 @@ BEZ email-а не створюй запис!
 
     if (!openaiRes.ok) {
       console.error("[AI CHAT] OpenAI error:", openaiRes.status, JSON.stringify(data));
-      // Повертаємо деталі помилки для діагностики
       const errorMsg = data?.error?.message || data?.error?.code || JSON.stringify(data);
       const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
-      const fallback = getRuleBasedReply(lastMsg, client);
-      console.error("[AI CHAT] OpenAI error detail:", errorMsg);
-      return NextResponse.json({ reply: fallback, _debug_error: errorMsg });
+      console.error("[AI CHAT] detail:", errorMsg);
+      return NextResponse.json({ reply: getRuleBasedReply(lastMsg, client), _debug_error: errorMsg });
     }
 
     const reply = data.choices?.[0]?.message?.content;
 
     if (!reply) {
-      console.error("[AI CHAT] Empty choices from OpenAI:", JSON.stringify(data));
+      console.error("[AI CHAT] Empty choices:", JSON.stringify(data));
       const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
       return NextResponse.json({ reply: getRuleBasedReply(lastMsg, client), _debug: "empty_choices" });
     }
@@ -217,28 +210,28 @@ function getRuleBasedReply(msg: string, client: ClientLite | null): string {
       : "Привіт! 👋 Я AI-помічник Tirnew Truck Service. Чим можу допомогти?";
   }
   if (msg.includes("запис") || msg.includes("записат")) {
-    if (!client) return "Для запису вкажіть, будь ласка:\n1. Послугу\n2. Марку та модель авто\n3. Бажану дату\n4. Ім'я\n5. Телефон\n6. Email (для підтвердження запису)";
+    if (!client) return "Для запису вкажіть:\n1. Послугу\n2. Марку та модель авто\n3. Бажану дату\n4. Ім'я, телефон, email";
     const active = client.bookings.filter((b) => b.status !== "cancelled" && b.status !== "done");
-    if (active.length === 0) return "У вас немає активних записів. Хочете записатися? Напишіть, яка послуга потрібна.";
+    if (active.length === 0) return "У вас немає активних записів. Яка послуга потрібна?";
     return `Ваші активні записи:\n${active.map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleString("uk-UA") : "час не вказано"}`).join("\n")}`;
   }
   if (msg.includes("ціна") || msg.includes("прайс") || msg.includes("вартість") || msg.includes("скільки")) {
-    return "Актуальні ціни на всі послуги можна переглянути на сторінці /price. Також можу відповісти на конкретне питання про вартість певної послуги.";
+    return "Актуальні ціни — на сторінці /price. Напишіть яка послуга цікавить — відповім конкретніше.";
   }
   if (msg.includes("послуг") || msg.includes("сервіс") || msg.includes("ремонт")) {
-    return "Ми виконуємо повний цикл ремонту:\n• Ремонт двигунів та КПП\n• Гальмівна система (KNORR, WABCO)\n• Пневмосистеми\n• Електрика та діагностика\n• ТО причепів і напівпричепів\n\nПовний перелік — на сторінці /services";
+    return "Виконуємо повний цикл ремонту:\n• Двигуни та КПП\n• Гальмівна система (KNORR, WABCO)\n• Пневмосистеми\n• Електрика та діагностика\n• ТО причепів і напівпричепів\n\nПовний перелік — /services";
   }
   if (msg.includes("контакт") || msg.includes("телефон") || msg.includes("адрес")) {
-    return "📍 Адреса: Рівненська обл., с. Велика Омеляна, вул. Шевченка 35\n📞 Телефон: +38 (066) 418-88-26\n⏰ Графік: Пн–Сб, 08:00–18:00";
+    return "📍 Рівненська обл., с. Велика Омеляна, вул. Шевченка 35\n📞 +38 (066) 418-88-26\n⏰ Пн–Сб, 08:00–18:00";
   }
   if (msg.includes("графік") || msg.includes("час роботи") || msg.includes("коли працює")) {
-    return "⏰ Ми працюємо:\nПонеділок–Субота: 08:00–18:00\nНеділя: вихідний";
+    return "⏰ Пн–Сб: 08:00–18:00\nНеділя — вихідний.";
   }
   if (msg.includes("історія") || msg.includes("ремонтів")) {
-    if (!client) return "Для перегляду історії ремонтів надішліть ваш email — ми відправимо посилання для входу.";
+    if (!client) return "Введіть ваш email — надішлемо посилання для входу де можна переглянути історію.";
     const done = client.bookings.filter((b) => b.status === "done");
-    if (done.length === 0) return "У вас поки немає завершених ремонтів в системі.";
-    return `Ваші останні ремонти:\n${done.slice(0, 5).map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"}`).join("\n")}`;
+    if (done.length === 0) return "Завершених ремонтів ще немає.";
+    return `Останні ремонти:\n${done.slice(0, 5).map((b) => `• ${b.service || "Послуга"} — ${b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString("uk-UA") : "дата невідома"}`).join("\n")}`;
   }
-  return "Дякую за звернення! Я AI-помічник Tirnew Truck Service.\n\nМожу допомогти з:\n• Вибором послуги\n• Записом на ремонт\n• Інформацією про ціни\n• Контактами та графіком\n\nАбо зателефонуйте нам: +38 (066) 418-88-26";
+  return "Чим можу допомогти?\n• Запис на ремонт\n• Інформація про послуги та ціни\n• Контакти та графік\n\nАбо телефонуйте: +38 (066) 418-88-26";
 }
