@@ -11,26 +11,42 @@ export async function POST() {
   let updated = 0;
 
   for (const s of staticServices) {
-    const data = {
-      title:       s.title,
-      short:       s.short       ?? "",
-      description: s.description ?? "",
-      price:       s.price       ?? "",
-      priceMin:    s.priceMin    ?? 0,
-      priceMax:    s.priceMax    ?? 0,
-      hours:       s.hours       ?? "",
-      image:       s.image       ?? "",
-      category:    s.category    ?? "",
-      details:     s.details     ?? [],
-    };
-
     const existing = await prisma.service.findUnique({ where: { slug: s.slug } });
 
     if (existing) {
-      await prisma.service.update({ where: { slug: s.slug }, data });
+      // Оновлюємо все КРІМ image — щоб не затерти фото змінене в адмінці
+      await prisma.service.update({
+        where: { slug: s.slug },
+        data: {
+          title:       s.title,
+          short:       s.short       ?? "",
+          description: s.description ?? "",
+          price:       s.price       ?? "",
+          priceMin:    s.priceMin    ?? 0,
+          priceMax:    s.priceMax    ?? 0,
+          hours:       s.hours       ?? "",
+          category:    s.category    ?? "",
+          details:     s.details     ?? [],
+        },
+      });
       updated++;
     } else {
-      await prisma.service.create({ data: { slug: s.slug, ...data } });
+      // Новий запис — вставляємо з image зі services.ts
+      await prisma.service.create({
+        data: {
+          slug:        s.slug,
+          title:       s.title,
+          short:       s.short       ?? "",
+          description: s.description ?? "",
+          price:       s.price       ?? "",
+          priceMin:    s.priceMin    ?? 0,
+          priceMax:    s.priceMax    ?? 0,
+          hours:       s.hours       ?? "",
+          image:       s.image       ?? "",
+          category:    s.category    ?? "",
+          details:     s.details     ?? [],
+        },
+      });
       created++;
     }
   }
