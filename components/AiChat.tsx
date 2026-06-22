@@ -21,6 +21,13 @@ interface BookingData {
   message?: string;
 }
 
+const QUICK_SUGGESTIONS = [
+  { label: "📅 Записатись на ремонт", text: "Хочу записатись на ремонт" },
+  { label: "🔧 Які послуги є?", text: "Які послуги ви надаєте?" },
+  { label: "💰 Скільки коштує ТО?", text: "Скільки коштує технічне обслуговування?" },
+  { label: "🕐 Час роботи", text: "Який у вас графік роботи?" },
+];
+
 export default function AiChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -42,7 +49,7 @@ export default function AiChat() {
     if (open && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Добридень! Я ваш AI-помічник Tirnew Truck Service. Можу допомогти з записом, відповісти на питання про послуги чи ціни. Опишіть, що вас цікавить!",
+        content: "Добридень! Я ваш AI-помічник Tirnew Truck Service. Можу допомогти з записом, відповісти на питання про послуги чи ціни. Оберіть варіант або напишіть своє питання!",
       }]);
     }
   }, [open]);
@@ -97,7 +104,6 @@ export default function AiChat() {
     setInput("");
     setLoading(true);
 
-    // Handle email input for pending booking
     if (emailPending) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (emailRegex.test(text.trim())) {
@@ -152,6 +158,9 @@ export default function AiChat() {
       sendMessage(input);
     }
   };
+
+  // Show suggestions only when there is exactly 1 message (the welcome) and not loading
+  const showSuggestions = messages.length === 1 && !loading;
 
   return (
     <>
@@ -210,6 +219,21 @@ export default function AiChat() {
                 )}
               </div>
             ))}
+
+            {/* Quick suggestion chips — show only on welcome screen */}
+            {showSuggestions && (
+              <div className="ai-suggestions">
+                {QUICK_SUGGESTIONS.map((s) => (
+                  <button
+                    key={s.text}
+                    className="ai-suggestion-chip"
+                    onClick={() => sendMessage(s.text)}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {loading && (
               <div className="ai-msg ai-msg--assistant">
@@ -394,6 +418,34 @@ export default function AiChat() {
           color: #4a9e6b; background: rgba(74,158,107,0.12);
           border-radius: 99px; padding: 2px 8px;
         }
+
+        /* Quick suggestion chips */
+        .ai-suggestions {
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+          padding: 2px 0 4px 32px;
+        }
+        .ai-suggestion-chip {
+          align-self: flex-start;
+          padding: 7px 13px;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 500;
+          background: var(--surface, #fff);
+          color: #4a9e6b;
+          border: 1.5px solid rgba(74,158,107,0.35);
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s, transform 0.12s;
+          text-align: left;
+          white-space: nowrap;
+        }
+        .ai-suggestion-chip:hover {
+          background: rgba(74,158,107,0.08);
+          border-color: #4a9e6b;
+          transform: translateY(-1px);
+        }
+        .ai-suggestion-chip:active { transform: scale(0.97); }
 
         .ai-confirm-row {
           display: flex; gap: 8px; padding: 0 4px;
