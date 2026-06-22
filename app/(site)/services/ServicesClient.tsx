@@ -7,7 +7,7 @@ import type { ServiceItem } from "@/lib/services";
 
 export default function ServicesClient({ initialServices }: { initialServices: ServiceItem[] }) {
   const tirServices = initialServices.filter(
-    (s) => s.vehicleType === "truck" || s.vehicleType === "both" || !s.vehicleType
+    (s) => s.vehicleType === "truck" || s.vehicleType === "both"
   );
   const carServices = initialServices.filter(
     (s) => s.vehicleType === "car" || s.vehicleType === "both"
