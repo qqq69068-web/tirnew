@@ -7,10 +7,10 @@ import type { ServiceItem } from "@/lib/services";
 
 export default function ServicesClient({ initialServices }: { initialServices: ServiceItem[] }) {
   const tirServices = initialServices.filter(
-    (s) => s.vehicleType === "truck" || s.vehicleType === "both"
+    (s) => s.vehicleType === "truck"
   );
   const carServices = initialServices.filter(
-    (s) => s.vehicleType === "car" || s.vehicleType === "both"
+    (s) => s.vehicleType === "car"
   );
 
   const [activeTab, setActiveTab] = useState<"tir" | "car">("tir");
