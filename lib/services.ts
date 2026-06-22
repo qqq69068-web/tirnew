@@ -350,7 +350,7 @@ export const services: ServiceItem[] = [
     vehicleType: "truck",
     details: ["Гальмівні вали S-подібного типу", "Кронштейни ресорної підвіски", "Відновлення посадкових місць", "Дешевша альтернатива заміні"],
   },
-  // ── ЗАПЧАСТИНИ (both: показується у вантажних і легкових) ────────────────────
+  // ── ЗАПЧАСТИНИ (тільки вантажні) ─────────────────────────────────────────────
   {
     slug: "truck-zapchastyny",
     title: "Замовлення запчастин через нашу фірму",
@@ -363,7 +363,7 @@ export const services: ServiceItem[] = [
     hours: "1–3 дні",
     image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&auto=format&fit=crop",
     category: "Запчастини",
-    vehicleType: "both",
+    vehicleType: "truck",
     details: [
       "Підбір за VIN або артикулом",
       "Оригінали та перевірені аналоги",
