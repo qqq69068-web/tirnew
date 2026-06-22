@@ -105,7 +105,8 @@ export default function SiteLayout({
               </svg>
               Кабінет
             </Link>
-            <BookingButton />
+            {/* Ця кнопка веде на /contacts */}
+            <BookingButton toContacts />
 
             {/* Burger */}
             <button
